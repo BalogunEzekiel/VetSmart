@@ -70,7 +70,7 @@ menu = st.sidebar.radio("🐐 Navigate", ["📊 Livestock Dashboard", "🦠 Dise
 if menu == "📊 Livestock Dashboard":
     st.subheader("📋 Add and Monitor Your Livestock")
     with st.form("livestock_form"):
-        name = st.text_input("Animal Name")
+        name = st.text_input("Animal Tag")
         animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
         age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
         weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
