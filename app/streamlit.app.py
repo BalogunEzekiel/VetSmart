@@ -1,5 +1,3 @@
-# VetSmart - Livestock Monitoring, Disease Prevention and Predictive Diagnosis
-
 import streamlit as st
 import pandas as pd
 import datetime
@@ -7,16 +5,38 @@ import random
 from fpdf import FPDF
 import base64
 import os
-import joblib
 
-# Load or simulate ML model (placeholder logic)
+# Load livestock background
+st.markdown(
+    """
+    <style>
+        .stApp {
+            background-image: url('https://images.unsplash.com/photo-1601749111324-82e873f9f9d4'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2E8B57;
+            text-shadow: 1px 1px #ffffff;
+        }
+        .sidebar .sidebar-content {
+            background-color: rgba(255,255,255,0.85);
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Prediction placeholder
 def predict_disease(symptoms):
-    # Simulated prediction
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
     prediction = random.choice(diseases[:-1]) if symptoms else 'None'
     return prediction, f"Recommended treatment and care tips for {prediction}"
 
-# PDF generation function
+# PDF generation
 def generate_pdf(data):
     pdf = FPDF()
     pdf.add_page()
@@ -29,44 +49,44 @@ def generate_pdf(data):
     with open(file_name, "rb") as f:
         b64 = base64.b64encode(f.read()).decode('utf-8')
     os.remove(file_name)
-    return f'<a href="data:application/octet-stream;base64,{b64}" download="{file_name}">Download Report</a>'
+    return f'<a href="data:application/octet-stream;base64,{b64}" download="{file_name}">📄 Download Diagnosis Report</a>'
 
-# Chatbot placeholder
+# Chatbot
 def chatbot_response(user_input):
-    # Simple hardcoded logic
     if 'fever' in user_input.lower():
         return "Fever may indicate infection. Ensure proper hydration and consult a vet."
-    return "Sorry, I'm still learning. Please consult a veterinarian for critical concerns."
+    return "🤖 I'm still learning. Please consult a veterinarian for urgent concerns."
 
-# Main App
-st.set_page_config(page_title="VetSmart - Livestock Monitoring", layout="wide")
-st.title("VetSmart - Livestock Monitoring and Diagnosis App")
+# Page setup
+st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+
+# Title
+st.markdown("<div class='title'>🐮 VetSmart - Livestock Monitoring & Diagnosis</div>", unsafe_allow_html=True)
 
 # Sidebar Navigation
-menu = st.sidebar.selectbox("Navigate", ["Livestock Dashboard", "Disease Diagnosis", "Health Tips", "Feedback", "VetBot AI"])
+menu = st.sidebar.radio("🐐 Navigate", ["📊 Livestock Dashboard", "🦠 Disease Diagnosis", "💡 Health Tips", "📝 Feedback", "🤖 VetBot AI"])
 
 # Livestock Dashboard
-if menu == "Livestock Dashboard":
-    st.subheader("Add and Monitor Livestock")
+if menu == "📊 Livestock Dashboard":
+    st.subheader("📋 Add and Monitor Your Livestock")
     with st.form("livestock_form"):
         name = st.text_input("Animal Name")
         animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
         age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
         weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
         vaccination = st.text_area("Vaccination History")
-        submit = st.form_submit_button("Save")
+        submit = st.form_submit_button("💾 Save")
     if submit:
         st.success(f"{animal_type} '{name}' saved successfully!")
 
 # Disease Diagnosis
-elif menu == "Disease Diagnosis":
-    st.subheader("Symptom-based Disease Diagnosis")
-    st.write("Select symptoms observed in the animal:")
-    symptoms = st.multiselect("Symptoms", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
-    if st.button("Predict Disease"):
+elif menu == "🦠 Disease Diagnosis":
+    st.subheader("🩺 Symptom-based Disease Diagnosis")
+    symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
+    if st.button("🧠 Predict Disease"):
         disease, recommendation = predict_disease(symptoms)
-        st.write(f"*Predicted Disease*: {disease}")
-        st.write(f"*Recommendation*: {recommendation}")
+        st.write(f"**Predicted Disease:** 🐾 {disease}")
+        st.write(f"**Recommendation:** 💊 {recommendation}")
         pdf_data = {
             "Symptoms": ", ".join(symptoms),
             "Predicted Disease": disease,
@@ -76,36 +96,36 @@ elif menu == "Disease Diagnosis":
         st.markdown(generate_pdf(pdf_data), unsafe_allow_html=True)
 
 # Health Tips
-elif menu == "Health Tips":
-    st.subheader("General Health Tips for Livestock")
+elif menu == "💡 Health Tips":
+    st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
     tips = {
-        "Cattle": ["Provide clean water", "Regular deworming", "Maintain hygiene in sheds"],
-        "Goat": ["Avoid overcrowding", "Feed balanced diet", "Trim hooves regularly"],
-        "Sheep": ["Shear fleece annually", "Prevent foot rot", "Use mineral supplements"]
+        "Cattle": ["✅ Provide clean water", "💉 Regular deworming", "🧼 Maintain hygiene in sheds"],
+        "Goat": ["🚫 Avoid overcrowding", "🥗 Feed balanced diet", "✂️ Trim hooves regularly"],
+        "Sheep": ["✂️ Shear fleece annually", "🧼 Prevent foot rot", "🧪 Use mineral supplements"]
     }
-    st.write("Here are some tips:")
+    st.write("🐾 Here are some expert tips:")
     for tip in tips[animal]:
-        st.write(f"- {tip}")
+        st.markdown(f"- {tip}")
 
-# Feedback
-elif menu == "Feedback":
-    st.subheader("Farmer Feedback & Suggestions")
+# Feedback with 5-star rating
+elif menu == "📝 Feedback":
+    st.subheader("🗣️ Farmer Feedback & Suggestions")
     with st.form("feedback_form"):
-        name = st.text_input("Your Name")
-        comments = st.text_area("Suggestions or Comments")
-        rating = st.slider("Rate the App", 1, 5)
-        submitted = st.form_submit_button("Submit")
+        name = st.text_input("👤 Your Name")
+        comments = st.text_area("💬 Suggestions or Comments")
+        rating = st.radio("⭐ Rate the App", [1, 2, 3, 4, 5], horizontal=True)
+        submitted = st.form_submit_button("🚀 Submit Feedback")
     if submitted:
-        st.success("Thank you for your feedback! Love to see you again soon.")
-        st.write(f"Name: {name}")
-        st.write(f"Rating: {rating}/5")
-        st.write(f"Comments: {comments}")
+        st.success("🎉 Thank you for your feedback!")
+        st.write(f"👤 Name: {name}")
+        st.write(f"⭐ Rating: {rating}/5")
+        st.write(f"💬 Comments: {comments}")
 
-# VetBot Chat
-elif menu == "Vetbot":
-    st.subheader("Chat with Vetbot")
-    user_input = st.text_input("Ask VetBot your livestock-related questions")
+# VetBot AI
+elif menu == "🤖 VetBot AI":
+    st.subheader("💬 Ask VetBot - Your Virtual Vet Assistant")
+    user_input = st.text_input("❓ Ask a question about livestock health")
     if user_input:
         response = chatbot_response(user_input)
-        st.write(response)
+        st.markdown(f"💡 **VetBot**: {response}")
