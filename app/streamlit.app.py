@@ -6,6 +6,9 @@ from fpdf import FPDF
 import base64
 import os
 
+# Page setup
+st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+
 # Load livestock background
 st.markdown(
     """
@@ -56,9 +59,6 @@ def chatbot_response(user_input):
     if 'fever' in user_input.lower():
         return "Fever may indicate infection. Ensure proper hydration and consult a vet."
     return "🤖 I'm still learning. Please consult a veterinarian for urgent concerns."
-
-# Page setup
-st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 # Title
 st.markdown("<div class='title'>🐮 VetSmart - Livestock Monitoring & Diagnosis</div>", unsafe_allow_html=True)
