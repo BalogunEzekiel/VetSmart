@@ -1,4 +1,5 @@
-# VetSmart - Livestock Monitoring, Disease Prevention and Predictive Diagnosis App
+# VetSmart
+Livestock monitoring, disease prevention and predictive diagnosis
 
 import streamlit as st
 import pandas as pd
@@ -97,14 +98,14 @@ elif menu == "Feedback":
         rating = st.slider("Rate the App", 1, 5)
         submitted = st.form_submit_button("Submit")
     if submitted:
-        st.success("Thank you for your feedback!")
+        st.success("Thank you for your feedback! Love to see you again soon.")
         st.write(f"Name: {name}")
         st.write(f"Rating: {rating}/5")
         st.write(f"Comments: {comments}")
 
 # VetBot Chat
-elif menu == "VetBot AI":
-    st.subheader("Chat with VetBot")
+elif menu == "Vetbot":
+    st.subheader("Chat with Vetbot")
     user_input = st.text_input("Ask VetBot your livestock-related questions")
     if user_input:
         response = chatbot_response(user_input)
