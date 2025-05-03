@@ -1,5 +1,4 @@
-# VetSmart
-Livestock monitoring, disease prevention and predictive diagnosis
+# VetSmart - Livestock Monitoring, Disease Prevention and Predictive Diagnosis
 
 import streamlit as st
 import pandas as pd
