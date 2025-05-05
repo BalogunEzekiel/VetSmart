@@ -9,7 +9,7 @@ import os
 # Page setup
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
-# Load livestock background
+# Custom CSS
 st.markdown(
     """
     <style>
@@ -25,20 +25,43 @@ st.markdown(
             color: #2E8B57;
             text-shadow: 1px 1px #ffffff;
         }
-        .sidebar .sidebar-content {
-            background-color: rgba(255,255,255,0.85);
+        .menu-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .menu-bar button {
+            background-color: #2E8B57;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .menu-bar button:hover {
+            background-color: #246B46;
+        }
+        .vetbot-box {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            background-color: rgba(255,255,255,0.9);
+            border: 2px solid #2E8B57;
+            padding: 15px;
+            border-radius: 12px;
+            width: 300px;
+            box-shadow: 0px 0px 10px #2E8B57;
         }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Prediction placeholder with specific treatment recommendations
+# Disease prediction logic
 def predict_disease(symptoms):
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
     prediction = random.choice(diseases[:-1]) if symptoms else 'None'
-    
-    # Treatment recommendations for different diseases
     treatments = {
         "Foot-and-Mouth": "Vaccinate the animal, isolate affected livestock, and disinfect the environment.",
         "Anthrax": "Immediate antibiotic treatment (consult a vet for appropriate dosage), quarantine infected animals.",
@@ -46,11 +69,10 @@ def predict_disease(symptoms):
         "Mastitis": "Treat with antibiotics prescribed by a vet, maintain hygiene, and check for any underlying health issues.",
         "None": "No disease detected, continue regular monitoring."
     }
-    
     treatment = treatments.get(prediction, "No treatment information available.")
     return prediction, treatment
 
-# PDF generation
+# Generate downloadable PDF
 def generate_pdf(data):
     pdf = FPDF()
     pdf.add_page()
@@ -65,21 +87,49 @@ def generate_pdf(data):
     os.remove(file_name)
     return f'<a href="data:application/octet-stream;base64,{b64}" download="{file_name}">📄 Download Diagnosis Report</a>'
 
-# Chatbot
+# Chatbot logic
 def chatbot_response(user_input):
     if 'fever' in user_input.lower():
         return "Fever may indicate infection. Ensure proper hydration and consult a vet."
     return "🤖 I'm still learning. Please consult a veterinarian for urgent concerns."
 
-# Title
+# Title and header
 st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
-st.subheader("📋 Livestock Monitoring, Disease Prevention and Diagnosis")
+st.subheader("Livestock Monitoring, Disease Prevention and Diagnosis")
 
-# Sidebar Navigation
-menu = st.sidebar.radio("🐐 Navigate", ["📊 Livestock Dashboard", "🦠 Disease Diagnosis", "💡 Health Tips", "📝 Feedback", "🤖 VetBot AI"])
+# Menu Bar Buttons
+pages = {
+    "📊 Livestock Dashboard": "dashboard",
+    "🦠 Disease Diagnosis": "diagnosis",
+    "💡 Health Tips": "tips",
+    "📝 Feedback": "feedback"
+}
 
-# Disease Diagnosis
-if menu == "🦠 Disease Diagnosis":
+selected_page = None
+cols = st.columns(len(pages))
+for i, (label, key) in enumerate(pages.items()):
+    if cols[i].button(label):
+        selected_page = key
+
+# Default to dashboard if nothing selected
+if selected_page is None:
+    selected_page = "dashboard"
+
+# Page: Dashboard
+if selected_page == "dashboard":
+    st.subheader("📋 Add and Monitor Your Livestock")
+    with st.form("livestock_form"):
+        name = st.text_input("Animal Tag")
+        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
+        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
+        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
+        vaccination = st.text_area("Vaccination History")
+        submit = st.form_submit_button("💾 Save")
+    if submit:
+        st.success(f"{animal_type} '{name}' saved successfully!")
+
+# Page: Disease Diagnosis
+elif selected_page == "diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
     if st.button("🧠 Predict Disease"):
@@ -94,21 +144,8 @@ if menu == "🦠 Disease Diagnosis":
         }
         st.markdown(generate_pdf(pdf_data), unsafe_allow_html=True)
 
-# Livestock Dashboard
-elif menu == "📊 Livestock Dashboard":
-    st.subheader("📋 Add and Monitor Your Livestock")
-    with st.form("livestock_form"):
-        name = st.text_input("Animal Tag")
-        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
-        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
-        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
-        vaccination = st.text_area("Vaccination History")
-        submit = st.form_submit_button("💾 Save")
-    if submit:
-        st.success(f"{animal_type} '{name}' saved successfully!")
-
-# Health Tips
-elif menu == "💡 Health Tips":
+# Page: Health Tips
+elif selected_page == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
     tips = {
@@ -120,8 +157,8 @@ elif menu == "💡 Health Tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
-# Feedback with 5-star rating
-elif menu == "📝 Feedback":
+# Page: Feedback
+elif selected_page == "feedback":
     st.subheader("🗣️ Farmer Feedback & Suggestions")
     with st.form("feedback_form"):
         name = st.text_input("👤 Your Name")
@@ -134,10 +171,10 @@ elif menu == "📝 Feedback":
         st.write(f"⭐ Rating: {rating}/5")
         st.write(f"💬 Comments: {comments}")
 
-# VetBot AI
-elif menu == "🤖 VetBot AI":
-    st.subheader("💬 Ask VetBot - Your Virtual Vet Assistant")
-    user_input = st.text_input("❓ Ask a question about livestock health")
-    if user_input:
-        response = chatbot_response(user_input)
-        st.markdown(f"💡 **VetBot**: {response}")
+# Floating VetBot Assistant (Visible on all pages)
+with st.container():
+    with st.expander("🤖 Ask VetBot", expanded=False):
+        user_input = st.text_input("💬 Ask a question")
+        if user_input:
+            response = chatbot_response(user_input)
+            st.markdown(f"💡 **VetBot**: {response}")
