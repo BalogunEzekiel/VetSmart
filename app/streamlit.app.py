@@ -18,7 +18,7 @@ from googleapiclient.http import MediaFileUpload
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 CSV_FILE = "livestock_data.csv"
 
-# Load data
+# Load and Save Data
 def load_data():
     if os.path.exists(CSV_FILE):
         return pd.read_csv(CSV_FILE)
@@ -47,7 +47,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Authenticate Google Drive
+# Google Drive Authentication
 def authenticate_drive():
     creds = None
     if os.path.exists("token.pkl"):
@@ -73,7 +73,6 @@ def authenticate_drive():
                     pickle.dump(creds, token)
     return creds
 
-# Upload to Google Drive
 def upload_file_to_drive(filepath, filename):
     creds = authenticate_drive()
     if creds:
@@ -84,7 +83,7 @@ def upload_file_to_drive(filepath, filename):
         return file.get("id")
     return None
 
-# Disease prediction
+# Disease Prediction Logic
 def predict_disease(symptoms):
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
     prediction = random.choice(diseases[:-1]) if symptoms else 'None'
@@ -97,7 +96,7 @@ def predict_disease(symptoms):
     }
     return prediction, treatments[prediction]
 
-# Generate PDF
+# PDF Report Generator
 def generate_pdf(data):
     pdf = FPDF()
     pdf.add_page()
@@ -110,13 +109,13 @@ def generate_pdf(data):
     pdf.output(file_name)
     return file_name
 
-# Chatbot
+# Simple Chatbot
 def chatbot_response(user_input):
     if 'fever' in user_input.lower():
         return "Fever may indicate infection. Ensure proper hydration and consult a vet."
     return "🤖 I'm still learning. Please consult a veterinarian for urgent concerns."
 
-# Sidebar
+# Sidebar Navigation
 st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
 st.sidebar.markdown("## VetSmart Navigation")
 pages = {
@@ -128,8 +127,11 @@ pages = {
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
 selected_page_key = pages[selected_page]
 
+# Title
 st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
 st.subheader("Livestock Monitoring, Disease Prevention and Diagnosis")
+
+# ========== PAGES ==========
 
 # Dashboard
 if selected_page_key == "dashboard":
@@ -154,7 +156,9 @@ if selected_page_key == "dashboard":
                 "Vaccination": vaccination,
                 "Added On": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }])
-            st.session_state["livestock_data"] = pd.concat([st.session_state["livestock_data"], new_entry], ignore_index=True)
+            st.session_state["livestock_data"] = pd.concat(
+                [st.session_state["livestock_data"], new_entry], ignore_index=True
+            )
             save_data(st.session_state["livestock_data"])
             st.success(f"{animal_type} '{name}' saved successfully!")
 
@@ -164,11 +168,13 @@ if selected_page_key == "dashboard":
         st.download_button("📥 Download CSV", csv, "livestock_data.csv", "text/csv")
 
         if st.button("🧹 Clear All Livestock Records"):
-            st.session_state["livestock_data"] = pd.DataFrame(columns=["Name", "Type", "Age", "Weight", "Vaccination", "Added On"])
+            st.session_state["livestock_data"] = pd.DataFrame(
+                columns=["Name", "Type", "Age", "Weight", "Vaccination", "Added On"]
+            )
             save_data(st.session_state["livestock_data"])
             st.success("All records cleared.")
 
-# Diagnosis Page
+# Diagnosis
 elif selected_page_key == "diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     if st.session_state["livestock_data"].empty:
@@ -182,7 +188,6 @@ elif selected_page_key == "diagnosis":
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
-            # PDF generation
             pdf_data = {
                 "Animal Name": animal_name,
                 "Symptoms": ", ".join(symptoms),
@@ -195,13 +200,12 @@ elif selected_page_key == "diagnosis":
                 b64 = base64.b64encode(f.read()).decode('utf-8')
             st.markdown(f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">📄 Download Diagnosis Report</a>', unsafe_allow_html=True)
 
-            # Upload to Google Drive
             drive_file_id = upload_file_to_drive(file_path, file_path)
             if drive_file_id:
                 st.success(f"📁 Uploaded to Google Drive! [Open File](https://drive.google.com/file/d/{drive_file_id})")
             os.remove(file_path)
 
-# Tips Page
+# Tips
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
@@ -214,7 +218,7 @@ elif selected_page_key == "tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
-# Feedback Page
+# Feedback
 elif selected_page_key == "feedback":
     st.subheader("🗣️ Farmer Feedback & Suggestions")
     with st.form("feedback_form"):
