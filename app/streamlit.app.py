@@ -75,14 +75,13 @@ def chatbot_response(user_input):
 st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
 st.subheader("📋 Livestock Monitoring, Disease Prevention and Diagnosis")
 
-
 # Sidebar Navigation
-]menu = st.sidebar.radio("🐐 Navigate", ["📊 Livestock Dashboard", "🦠 Disease Diagnosis", "💡 Health Tips", "📝 Feedback", "🤖 VetBot AI"])
+menu = st.sidebar.radio("🐐 Navigate", ["📊 Livestock Dashboard", "🦠 Disease Diagnosis", "💡 Health Tips", "📝 Feedback", "🤖 VetBot AI"])
 
 # Disease Diagnosis
 if menu == "🦠 Disease Diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
-    symptoms = st.multiselect("Select obser]ved symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
+    symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
     if st.button("🧠 Predict Disease"):
         disease, recommendation = predict_disease(symptoms)
         st.write(f"**Predicted Disease:** 🐾 {disease}")
@@ -96,7 +95,7 @@ if menu == "🦠 Disease Diagnosis":
         st.markdown(generate_pdf(pdf_data), unsafe_allow_html=True)
 
 # Livestock Dashboard
-if menu == "📊 Livestock Dashboard":
+elif menu == "📊 Livestock Dashboard":
     st.subheader("📋 Add and Monitor Your Livestock")
     with st.form("livestock_form"):
         name = st.text_input("Animal Tag")
