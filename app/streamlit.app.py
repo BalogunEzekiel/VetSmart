@@ -73,7 +73,7 @@ def chatbot_response(user_input):
 
 # Title
 st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
-    st.subheader("📋 Livestock Monitoring, Disease Prevention and Diagnosis")
+st.subheader("📋 Livestock Monitoring, Disease Prevention and Diagnosis")
 
 
 # Sidebar Navigation
