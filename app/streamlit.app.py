@@ -33,11 +33,22 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Prediction placeholder
+# Prediction placeholder with specific treatment recommendations
 def predict_disease(symptoms):
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
     prediction = random.choice(diseases[:-1]) if symptoms else 'None'
-    return prediction, f"Recommended treatment and care tips for {prediction}"
+    
+    # Treatment recommendations for different diseases
+    treatments = {
+        "Foot-and-Mouth": "Vaccinate the animal, isolate affected livestock, and disinfect the environment.",
+        "Anthrax": "Immediate antibiotic treatment (consult a vet for appropriate dosage), quarantine infected animals.",
+        "PPR": "Administer supportive care and vaccines, isolate the infected animal.",
+        "Mastitis": "Treat with antibiotics prescribed by a vet, maintain hygiene, and check for any underlying health issues.",
+        "None": "No disease detected, continue regular monitoring."
+    }
+    
+    treatment = treatments.get(prediction, "No treatment information available.")
+    return prediction, treatment
 
 # PDF generation
 def generate_pdf(data):
@@ -66,21 +77,8 @@ st.markdown("<div class='title'>🐮 VetSmart - Livestock Monitoring & Diagnosis
 # Sidebar Navigation
 menu = st.sidebar.radio("🐐 Navigate", ["📊 Livestock Dashboard", "🦠 Disease Diagnosis", "💡 Health Tips", "📝 Feedback", "🤖 VetBot AI"])
 
-# Livestock Dashboard
-if menu == "📊 Livestock Dashboard":
-    st.subheader("📋 Add and Monitor Your Livestock")
-    with st.form("livestock_form"):
-        name = st.text_input("Animal Tag")
-        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
-        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
-        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
-        vaccination = st.text_area("Vaccination History")
-        submit = st.form_submit_button("💾 Save")
-    if submit:
-        st.success(f"{animal_type} '{name}' saved successfully!")
-
 # Disease Diagnosis
-elif menu == "🦠 Disease Diagnosis":
+if menu == "🦠 Disease Diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
     if st.button("🧠 Predict Disease"):
@@ -94,6 +92,19 @@ elif menu == "🦠 Disease Diagnosis":
             "Date": str(datetime.date.today())
         }
         st.markdown(generate_pdf(pdf_data), unsafe_allow_html=True)
+
+# Livestock Dashboard
+if menu == "📊 Livestock Dashboard":
+    st.subheader("📋 Add and Monitor Your Livestock")
+    with st.form("livestock_form"):
+        name = st.text_input("Animal Tag")
+        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
+        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
+        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
+        vaccination = st.text_area("Vaccination History")
+        submit = st.form_submit_button("💾 Save")
+    if submit:
+        st.success(f"{animal_type} '{name}' saved successfully!")
 
 # Health Tips
 elif menu == "💡 Health Tips":
