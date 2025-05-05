@@ -25,34 +25,6 @@ st.markdown(
             color: #2E8B57;
             text-shadow: 1px 1px #ffffff;
         }
-        .menu-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .menu-bar button {
-            background-color: #2E8B57;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .menu-bar button:hover {
-            background-color: #246B46;
-        }
-        .vetbot-box {
-            position: fixed;
-            bottom: 20px;
-            right: 30px;
-            background-color: rgba(255,255,255,0.9);
-            border: 2px solid #2E8B57;
-            padding: 15px;
-            border-radius: 12px;
-            width: 300px;
-            box-shadow: 0px 0px 10px #2E8B57;
-        }
     </style>
     """,
     unsafe_allow_html=True
@@ -93,30 +65,24 @@ def chatbot_response(user_input):
         return "Fever may indicate infection. Ensure proper hydration and consult a vet."
     return "🤖 I'm still learning. Please consult a veterinarian for urgent concerns."
 
-# Title and header
-st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
-st.subheader("Livestock Monitoring, Disease Prevention and Diagnosis")
-
-# Menu Bar Buttons
+# Sidebar Menu
+st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
+st.sidebar.markdown("## VetSmart Navigation")
 pages = {
     "📊 Livestock Dashboard": "dashboard",
     "🦠 Disease Diagnosis": "diagnosis",
     "💡 Health Tips": "tips",
     "📝 Feedback": "feedback"
 }
+selected_page = st.sidebar.radio("Go to", list(pages.keys()))
+selected_page_key = pages[selected_page]
 
-selected_page = None
-cols = st.columns(len(pages))
-for i, (label, key) in enumerate(pages.items()):
-    if cols[i].button(label):
-        selected_page = key
-
-# Default to dashboard if nothing selected
-if selected_page is None:
-    selected_page = "dashboard"
+# Title and Header
+st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
+st.subheader("Livestock Monitoring, Disease Prevention and Diagnosis")
 
 # Page: Dashboard
-if selected_page == "dashboard":
+if selected_page_key == "dashboard":
     st.subheader("📋 Add and Monitor Your Livestock")
     with st.form("livestock_form"):
         name = st.text_input("Animal Tag")
@@ -129,7 +95,7 @@ if selected_page == "dashboard":
         st.success(f"{animal_type} '{name}' saved successfully!")
 
 # Page: Disease Diagnosis
-elif selected_page == "diagnosis":
+elif selected_page_key == "diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
     if st.button("🧠 Predict Disease"):
@@ -145,7 +111,7 @@ elif selected_page == "diagnosis":
         st.markdown(generate_pdf(pdf_data), unsafe_allow_html=True)
 
 # Page: Health Tips
-elif selected_page == "tips":
+elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
     tips = {
@@ -158,7 +124,7 @@ elif selected_page == "tips":
         st.markdown(f"- {tip}")
 
 # Page: Feedback
-elif selected_page == "feedback":
+elif selected_page_key == "feedback":
     st.subheader("🗣️ Farmer Feedback & Suggestions")
     with st.form("feedback_form"):
         name = st.text_input("👤 Your Name")
