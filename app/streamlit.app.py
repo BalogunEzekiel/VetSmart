@@ -9,6 +9,23 @@ import os
 # Page setup
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
+# Constants
+CSV_FILE = "livestock_data.csv"
+
+# Utility: Load data from CSV
+def load_data():
+    if os.path.exists(CSV_FILE):
+        return pd.read_csv(CSV_FILE)
+    return pd.DataFrame(columns=["Name", "Type", "Age", "Weight", "Vaccination", "Added On"])
+
+# Utility: Save data to CSV
+def save_data(df):
+    df.to_csv(CSV_FILE, index=False)
+
+# Load into session state if not present
+if "livestock_data" not in st.session_state:
+    st.session_state["livestock_data"] = load_data()
+
 # Custom CSS
 st.markdown(
     """
@@ -50,8 +67,9 @@ def generate_pdf(data):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
     pdf.cell(200, 10, txt="VetSmart Diagnosis Report", ln=1, align="C")
+    pdf.ln(5)
     for key, value in data.items():
-        pdf.cell(200, 10, txt=f"{key}: {value}", ln=1)
+        pdf.multi_cell(0, 10, txt=f"{key}: {value}")
     file_name = "diagnosis_report.pdf"
     pdf.output(file_name)
     with open(file_name, "rb") as f:
@@ -91,8 +109,33 @@ if selected_page_key == "dashboard":
         weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
         vaccination = st.text_area("Vaccination History")
         submit = st.form_submit_button("💾 Save")
+
     if submit:
-        st.success(f"{animal_type} '{name}' saved successfully!")
+        if name.strip() == "":
+            st.warning("Animal Tag cannot be empty.")
+        else:
+            new_entry = pd.DataFrame([{
+                "Name": name,
+                "Type": animal_type,
+                "Age": age,
+                "Weight": weight,
+                "Vaccination": vaccination,
+                "Added On": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }])
+            st.session_state["livestock_data"] = pd.concat([st.session_state["livestock_data"], new_entry], ignore_index=True)
+            save_data(st.session_state["livestock_data"])
+            st.success(f"{animal_type} '{name}' saved successfully!")
+
+    if not st.session_state["livestock_data"].empty:
+        st.dataframe(st.session_state["livestock_data"])
+
+        csv = st.session_state["livestock_data"].to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Download CSV", csv, "livestock_data.csv", "text/csv")
+
+        if st.button("🧹 Clear All Livestock Records"):
+            st.session_state["livestock_data"] = pd.DataFrame(columns=["Name", "Type", "Age", "Weight", "Vaccination", "Added On"])
+            save_data(st.session_state["livestock_data"])
+            st.success("All records cleared.")
 
 # Page: Disease Diagnosis
 elif selected_page_key == "diagnosis":
