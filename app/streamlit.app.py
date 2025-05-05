@@ -125,7 +125,6 @@ if selected_page_key == "dashboard":
             st.session_state["livestock_data"] = pd.concat([st.session_state["livestock_data"], new_entry], ignore_index=True)
             save_data(st.session_state["livestock_data"])
             st.success(f"{animal_type} '{name}' saved successfully!")
-            st.experimental_rerun()  # Automatically clear the form after saving
 
     if not st.session_state["livestock_data"].empty:
         st.dataframe(st.session_state["livestock_data"])
