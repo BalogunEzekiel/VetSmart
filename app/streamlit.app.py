@@ -125,6 +125,7 @@ if selected_page_key == "dashboard":
             st.session_state["livestock_data"] = pd.concat([st.session_state["livestock_data"], new_entry], ignore_index=True)
             save_data(st.session_state["livestock_data"])
             st.success(f"{animal_type} '{name}' saved successfully!")
+            st.experimental_rerun()  # Automatically clear the form after saving
 
     if not st.session_state["livestock_data"].empty:
         st.dataframe(st.session_state["livestock_data"])
@@ -140,18 +141,24 @@ if selected_page_key == "dashboard":
 # Page: Disease Diagnosis
 elif selected_page_key == "diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
-    symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
-    if st.button("🧠 Predict Disease"):
-        disease, recommendation = predict_disease(symptoms)
-        st.write(f"**Predicted Disease:** 🐾 {disease}")
-        st.write(f"**Recommendation:** 💊 {recommendation}")
-        pdf_data = {
-            "Symptoms": ", ".join(symptoms),
-            "Predicted Disease": disease,
-            "Recommendation": recommendation,
-            "Date": str(datetime.date.today())
-        }
-        st.markdown(generate_pdf(pdf_data), unsafe_allow_html=True)
+    if st.session_state["livestock_data"].empty:
+        st.warning("No livestock registered yet. Please add animals to the dashboard first.")
+    else:
+        animal_name = st.selectbox("Select Registered Animal", st.session_state["livestock_data"]["Name"])
+        symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
+
+        if st.button("🧠 Predict Disease"):
+            disease, recommendation = predict_disease(symptoms)
+            st.write(f"**Predicted Disease:** 🐾 {disease}")
+            st.write(f"**Recommendation:** 💊 {recommendation}")
+            pdf_data = {
+                "Animal Name": animal_name,
+                "Symptoms": ", ".join(symptoms),
+                "Predicted Disease": disease,
+                "Recommendation": recommendation,
+                "Date": str(datetime.date.today())
+            }
+            st.markdown(generate_pdf(pdf_data), unsafe_allow_html=True)
 
 # Page: Health Tips
 elif selected_page_key == "tips":
