@@ -61,32 +61,32 @@ def authenticate_drive():
             try:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     'client_secret.json',
-                    scopes=["https://www.googleapis.com/auth/drive.file"],
-                    redirect_uri="urn:ietf:wg:oauth:2.0:oob"
+                    scopes=["https://www.googleapis.com/auth/drive.file"]
                 )
-                auth_url, _ = flow.authorization_url(prompt="consent")
-                st.markdown(f"🔗 [Click here to authorize Google Drive access]({auth_url})")
-                code = st.text_input("Paste the authorization code here:")
-                if code:
-                    flow.fetch_token(code=code)
-                    creds = flow.credentials
-                    with open("token.pkl", "wb") as token:
-                        pickle.dump(creds, token)
-                    st.success("✅ Authorization successful!")
+                creds = flow.run_local_server(port=0)
             except Exception as e:
-                st.error(f"❌ Authentication failed: {str(e)}")
-                st.stop()
+                st.error(f"Google Drive Authentication failed: {e}")
+                return None
+
+        # Save credentials for future use
+        with open("token.pkl", "wb") as token:
+            pickle.dump(creds, token)
+
     return creds
 
-def upload_file_to_drive(filepath, filename):
+def upload_file_to_drive(file_path, file_name):
     creds = authenticate_drive()
-    if creds:
-        service = build("drive", "v3", credentials=creds)
-        file_metadata = {"name": filename}
-        media = MediaFileUpload(filepath, mimetype='application/pdf', resumable=True)
-        file = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-        return file.get("id")
-    return None
+    if not creds:
+        return None
+    try:
+        service = build('drive', 'v3', credentials=creds)
+        file_metadata = {'name': file_name}
+        media = MediaFileUpload(file_path, resumable=True)
+        file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        return file.get('id')
+    except Exception as e:
+        st.error(f"Failed to upload file to Google Drive: {e}")
+        return None
 
 # ========== Disease Prediction ==========
 def predict_disease(symptoms):
