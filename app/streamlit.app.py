@@ -9,7 +9,7 @@ import pickle
 
 # Google Drive API
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import Flow
+from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -59,7 +59,7 @@ def authenticate_drive():
             creds.refresh(Request())
         else:
             try:
-                flow = Flow.from_client_secrets_file(
+                flow = InstalledAppFlow.from_client_secrets_file(
                     'client_secret.json',
                     scopes=["https://www.googleapis.com/auth/drive.file"],
                     redirect_uri="urn:ietf:wg:oauth:2.0:oob"
