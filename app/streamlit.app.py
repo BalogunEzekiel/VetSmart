@@ -59,7 +59,7 @@ def authenticate_drive():
             creds.refresh(Request())
         else:
             flow = Flow.from_client_secrets_file(
-                "https://github.com/BalogunEzekiel/VetSmart/blob/main/client_secret_6268737097-8mbjnnf2s9mer43g1rvajekkml12gse2.apps.googleusercontent.com.json",
+                ""C:\Users\win\Downloads\client_secret_6268737097-8mbjnnf2s9mer43g1rvajekkml12gse2.apps.googleusercontent.com.json"",
                 scopes=["https://www.googleapis.com/auth/drive.file"],
                 redirect_uri="urn:ietf:wg:oauth:2.0:oob"
             )
