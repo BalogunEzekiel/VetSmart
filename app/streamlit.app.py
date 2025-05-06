@@ -14,11 +14,11 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-# Page setup
+# ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 CSV_FILE = "livestock_data.csv"
 
-# Load and Save Data
+# ========== Load & Save Data ==========
 def load_data():
     if os.path.exists(CSV_FILE):
         return pd.read_csv(CSV_FILE)
@@ -30,7 +30,7 @@ def save_data(df):
 if "livestock_data" not in st.session_state:
     st.session_state["livestock_data"] = load_data()
 
-# Custom CSS
+# ========== Custom CSS ==========
 st.markdown("""
 <style>
 .stApp {
@@ -47,7 +47,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Google Drive Authentication
+# ========== Google Drive Authentication ==========
 def authenticate_drive():
     creds = None
     if os.path.exists("token.pkl"):
@@ -58,19 +58,23 @@ def authenticate_drive():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = Flow.from_client_secrets_file(
-                'client_secret_6268737097-8mbjnnf2s9mer43g1rvajekkml12gse2.apps.googleusercontent.com.json',
-                scopes=["https://www.googleapis.com/auth/drive.file"],
-                redirect_uri="urn:ietf:wg:oauth:2.0:oob"
-            )
-            auth_url, _ = flow.authorization_url(prompt="consent")
-            st.markdown(f"🔗 [Click here to authorize Google Drive access]({auth_url})")
-            code = st.text_input("Paste the authorization code here:")
-            if code:
-                flow.fetch_token(code=code)
-                creds = flow.credentials
-                with open("token.pkl", "wb") as token:
-                    pickle.dump(creds, token)
+            try:
+                flow = Flow.from_client_secrets_file(
+                    'client_secret.json',
+                    scopes=["https://www.googleapis.com/auth/drive.file"],
+                    redirect_uri="urn:ietf:wg:oauth:2.0:oob"
+                )
+                auth_url, _ = flow.authorization_url(prompt="consent")
+                st.markdown(f"🔗 [Click here to authorize Google Drive access]({auth_url})")
+                code = st.text_input("Paste the authorization code here:")
+                if code:
+                    flow.fetch_token(code=code)
+                    creds = flow.credentials
+                    with open("token.pkl", "wb") as token:
+                        pickle.dump(creds, token)
+            except Exception as e:
+                st.error("Google Drive authentication failed. Make sure your credentials are correct.")
+                st.stop()
     return creds
 
 def upload_file_to_drive(filepath, filename):
@@ -83,7 +87,7 @@ def upload_file_to_drive(filepath, filename):
         return file.get("id")
     return None
 
-# Disease Prediction Logic
+# ========== Disease Prediction ==========
 def predict_disease(symptoms):
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
     prediction = random.choice(diseases[:-1]) if symptoms else 'None'
@@ -96,7 +100,7 @@ def predict_disease(symptoms):
     }
     return prediction, treatments[prediction]
 
-# PDF Report Generator
+# ========== PDF Generator ==========
 def generate_pdf(data):
     pdf = FPDF()
     pdf.add_page()
@@ -109,13 +113,13 @@ def generate_pdf(data):
     pdf.output(file_name)
     return file_name
 
-# Simple Chatbot
+# ========== Simple Chatbot ==========
 def chatbot_response(user_input):
     if 'fever' in user_input.lower():
         return "Fever may indicate infection. Ensure proper hydration and consult a vet."
     return "🤖 I'm still learning. Please consult a veterinarian for urgent concerns."
 
-# Sidebar Navigation
+# ========== Sidebar ==========
 st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
 st.sidebar.markdown("## VetSmart Navigation")
 pages = {
@@ -127,13 +131,11 @@ pages = {
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
 selected_page_key = pages[selected_page]
 
-# Title
+# ========== Title ==========
 st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
 st.subheader("Livestock Monitoring, Disease Prevention and Diagnosis")
 
-# ========== PAGES ==========
-
-# Dashboard
+# ========== Pages ==========
 if selected_page_key == "dashboard":
     st.subheader("📋 Add and Monitor Your Livestock")
     with st.form("livestock_form"):
@@ -172,9 +174,8 @@ if selected_page_key == "dashboard":
                 columns=["Name", "Type", "Age", "Weight", "Vaccination", "Added On"]
             )
             save_data(st.session_state["livestock_data"])
-            st.success("All records cleared.")
+            st.experimental_rerun()
 
-# Diagnosis
 elif selected_page_key == "diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     if st.session_state["livestock_data"].empty:
@@ -203,9 +204,9 @@ elif selected_page_key == "diagnosis":
             drive_file_id = upload_file_to_drive(file_path, file_path)
             if drive_file_id:
                 st.success(f"📁 Uploaded to Google Drive! [Open File](https://drive.google.com/file/d/{drive_file_id})")
-            os.remove(file_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
-# Tips
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
@@ -218,7 +219,6 @@ elif selected_page_key == "tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
-# Feedback
 elif selected_page_key == "feedback":
     st.subheader("🗣️ Farmer Feedback & Suggestions")
     with st.form("feedback_form"):
@@ -232,7 +232,7 @@ elif selected_page_key == "feedback":
         st.write(f"⭐ Rating: {rating}/5")
         st.write(f"💬 Comments: {comments}")
 
-# VetBot
+# ========== VetBot ==========
 with st.container():
     with st.expander("🤖 Ask VetBot", expanded=False):
         user_input = st.text_input("💬 Ask a question")
