@@ -72,8 +72,9 @@ def authenticate_drive():
                     creds = flow.credentials
                     with open("token.pkl", "wb") as token:
                         pickle.dump(creds, token)
+                    st.success("✅ Authorization successful!")
             except Exception as e:
-                st.error("Google Drive authentication failed. Make sure your credentials are correct.")
+                st.error(f"❌ Authentication failed: {str(e)}")
                 st.stop()
     return creds
 
@@ -82,7 +83,7 @@ def upload_file_to_drive(filepath, filename):
     if creds:
         service = build("drive", "v3", credentials=creds)
         file_metadata = {"name": filename}
-        media = MediaFileUpload(filepath, resumable=True)
+        media = MediaFileUpload(filepath, mimetype='application/pdf', resumable=True)
         file = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
         return file.get("id")
     return None
@@ -219,23 +220,4 @@ elif selected_page_key == "tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
-elif selected_page_key == "feedback":
-    st.subheader("🗣️ Farmer Feedback & Suggestions")
-    with st.form("feedback_form"):
-        name = st.text_input("👤 Your Name")
-        comments = st.text_area("💬 Suggestions or Comments")
-        rating = st.radio("⭐ Rate the App", [1, 2, 3, 4, 5], horizontal=True)
-        submitted = st.form_submit_button("🚀 Submit Feedback")
-    if submitted:
-        st.success("🎉 Thank you for your feedback!")
-        st.write(f"👤 Name: {name}")
-        st.write(f"⭐ Rating: {rating}/5")
-        st.write(f"💬 Comments: {comments}")
-
-# ========== VetBot ==========
-with st.container():
-    with st.expander("🤖 Ask VetBot", expanded=False):
-        user_input = st.text_input("💬 Ask a question")
-        if user_input:
-            response = chatbot_response(user_input)
-            st.markdown(f"💡 **VetBot**: {response}")
+# Add more pages as needed...
