@@ -1,3 +1,4 @@
+integrate the above codes with the below codes and provide full complete functioning code:
 import streamlit as st
 import pandas as pd
 import datetime
