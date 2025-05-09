@@ -65,10 +65,15 @@ def run_vetchat():
     </style>
     """, unsafe_allow_html=True)
 
-    # Toggle button
-    toggle_label = "🧠 Chat with VetChat" if not st.session_state.show_chatbot else "❌ Close VetChat"
-    if st.button(toggle_label, key="vetchat_toggle_btn"):
-        st.session_state.show_chatbot = not st.session_state.show_chatbot
+    # Define toggle_label for the button
+toggle_label = "🧠 Chat with VetChat" if not st.session_state.show else "❌ Close Chat"
+
+# Create a unique key based on session state or other factors
+unique_key = f"vetchat_toggle_btn_{st.session_state.show}"  # Use session state to ensure uniqueness
+
+# Render the button with a dynamic key
+if st.button(toggle_label, key=unique_key):
+    st.session_state.show_chatbot = not st.session_state.show_chatbot
 
     # Chatbot popup window
     if st.session_state.show_chatbot:
