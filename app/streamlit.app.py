@@ -5,6 +5,7 @@ import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+import uuid
 
 # Set the page configuration as the very first command
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
@@ -13,15 +14,13 @@ st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wi
 from vetchat import run_vetchat  # 👈 Add this line
 run_vetchat()
 
-# Your code for running the app
-run_vetchat()  # If this is how you're using your chatbot function
-
 # Continue with the rest of the app code
 if 'show' not in st.session_state:
     st.session_state.show = False
 
+# Ensure that each key is unique by including a dynamic element like a unique ID
 toggle_label = "🧠 Chat with VetChat" if not st.session_state.show else "❌ Close Chat"
-unique_key = f"vetchat_toggle_btn_{st.session_state.show}"
+unique_key = f"vetchat_toggle_btn_{st.session_state.show}_{uuid.uuid4()}"
 
 # Render the button with a unique key
 if st.button(toggle_label, key=unique_key):
