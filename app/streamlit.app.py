@@ -115,10 +115,10 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
 
     # Animal Information Table
     data = [
-        ['Animal Tag', livestock_data['Name']],
-        ['Type', livestock_data['Type']],
-        ['Age (years)', livestock_data['Age']],
-        ['Weight (kg)', livestock_data['Weight']],
+        ['Animal Tag', animal_data['Name']],
+        ['Type', animal_data['Type']],
+        ['Age (years)', animal_data['Age']],
+        ['Weight (kg)', animal_data['Weight']],
     ]
     table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     table.setStyle(TableStyle([
@@ -205,37 +205,14 @@ def display_diagnosis():
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
-pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
+            pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
 
-st.download_button(
-label="Download Diagnosis Report",
-data=pdf_buffer,
-file_name=f"{animal_name}_diagnosis_report.pdf",
-mime="application/pdf"
-)
-
-# VetSmart Authentication Barcode
-barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
-barcode.drawOn(c, letter[0] - 3 * inch, inch)
-c.setFont("Helvetica", 8)
-c.drawString(letter[0] - 3 * inch, inch - 0.2 * inch, "VetSmart Authenticated")
-c.drawString(letter[0] - 3 * inch, inch - 0.4 * inch, barcode_value)
-
-# Footer (Left-aligned)
-c.setFont("Helvetica", 8)
-c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
-
-c.save()
-buffer.seek(0)
-
-st.download_button(
-label="Download Diagnosis Report",
-data=buffer,
-file_name=f"{animal_name}_diagnosis_report.pdf",
-mime="application/pdf"
-)
+            st.download_button(
+                label="Download Diagnosis Report",
+                data=pdf_buffer,
+                file_name=f"{animal_name}_diagnosis_report.pdf",
+                mime="application/pdf"
+            )
 
 def display_health_tips():
     """Displays general health tips for selected livestock."""
