@@ -205,73 +205,14 @@ def display_diagnosis():
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
+pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
 
-# Generate PDF Report
-            buffer = BytesIO()
-            c = canvas.Canvas(buffer, pagesize=letter)
-            styles = getSampleStyleSheet()
-            title_style = styles['Heading1']
-            normal_style = styles['Normal']
-
-            # VetSmart Report Title
-            p = Paragraph("<b>VetSmart Diagnosis Report</b>", centered_title_style)
-            p.wrapOn(c, letter[0] - 2 * inch, letter[1])
-            p.drawOn(c, inch, letter[1] - 1.5 * inch)
-            c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
-            c.setFont("Helvetica-Bold", 12)
-            c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
-            c.setFont("Helvetica", 10)
-
-# Prepare the data
-data = [
-    ['Animal Tag', animal_data['Name']],
-    ['Type', animal_data['Type']],
-    ['Age (years)', animal_data['Age']],
-    ['Weight (kg)', animal_data['Weight']],
-]
-
-# Create the table
-table = Table(data, colWidths=[letter[0] / 2.0] * 2)  # Four equal-width columns across the page
-
-# Style the table
-table.setStyle(TableStyle([
-    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-    ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 0), (-1, -1), 10),
-    ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-    ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-]))
-
-# Draw section line and title
-c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
-c.setFont("Helvetica-Bold", 12)
-c.drawString(inch, letter[1] - 2 * inch, "Diagnosis:")
-c.setFont("Helvetica", 10)
-
-# Diagnosis data with hidden SPAN row
-diagnosis_data = [
-    [' '],  # Hidden row for full-width span
-    ['Predicted Disease', disease],
-    ['Recommendation', recommendation],
-]
-
-# Create the table
-diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
-
-# Style the table
-diagnosis_table.setStyle(TableStyle([
-    ('SPAN', (0, 0), (-1, 0)),  # Full-width SPAN
-    ('BACKGROUND', (0, 0), (-1, 0), colors.white),  # Match background to hide it
-    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),   # Hide text
-    ('FONTSIZE', (0, 0), (-1, 0), 1),               # Reduce font size
-    ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
-    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 1), (-1, -1), 10),
-    ('INNERGRID', (0, 1), (-1, -1), 0.25, colors.grey),
-    ('BOX', (0, 1), (-1, -1), 0.25, colors.black),
-]))
+            st.download_button(
+                label="Download Diagnosis Report",
+                data=pdf_buffer,
+                file_name=f"{animal_name}_diagnosis_report.pdf",
+                mime="application/pdf"
+            )
 
 # VetSmart Authentication Barcode
 barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
