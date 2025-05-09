@@ -10,6 +10,9 @@ import streamlit as st
 from vetchat import run_vetchat  # 👈 Add this line
 run_vetchat()
 
+# ========== Page Setup ==========
+st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+
 # Run chatbot sidebar
 run_vetchat()  # 👈 This ensures the chatbot appears on all pages
 
