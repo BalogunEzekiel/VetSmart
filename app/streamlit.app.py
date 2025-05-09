@@ -60,7 +60,7 @@ return df
 
 def save_livestock_data(name, animal_type, age, weight, vaccination):
 conn = get_sqlite_connection()
-    query = """
+query = """
     INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
     VALUES (?, ?, ?, ?, ?, ?)
     """
