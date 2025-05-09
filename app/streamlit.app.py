@@ -153,6 +153,7 @@ def save_feedback(name, feedback_text):
     conn.close()
     
 # Feedback Form Handling
+if selected_page_key == "Home":
 elif selected_page_key == "feedback":
     st.subheader("📝 We value your feedback!")
     
