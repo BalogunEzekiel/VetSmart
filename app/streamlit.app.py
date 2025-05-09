@@ -272,9 +272,6 @@ selected_page = st.sidebar.selectbox("Choose a page", list(pages.keys()))
 selected_page_function = pages[selected_page]
 selected_page_function()
 
-# ========== Display Selected Page ==========
-selected_page_function()
-
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
 if st.sidebar.button("Download SQLite Data as CSV"):
