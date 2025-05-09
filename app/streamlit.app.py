@@ -2,33 +2,51 @@ import streamlit as st
 import pandas as pd
 import datetime
 import random
-from fpdf import FPDF
-import base64
-import os
-import pickle
-
-# Google Drive API
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+import sqlite3
+import pymysql
+from sqlalchemy import create_engine
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
-CSV_FILE = "livestock_data.csv"
 
-# ========== Load & Save Data ==========
+# ========== Database Configuration ==========
+# MySQL Database Configuration
+MYSQL_HOST = 'your_mysql_host'
+MYSQL_PORT = 3306
+MYSQL_DATABASE = 'your_database_name'
+MYSQL_USER = 'your_username'
+MYSQL_PASSWORD = 'your_password'
+
+# SQLite Database Configuration
+SQLITE_DB = 'livestock_data.db'
+
+# ========== Database Connection Functions ==========
+# Connect to MySQL
+def get_mysql_connection():
+    engine = create_engine(f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}")
+    return engine.connect()
+
+# Connect to SQLite
+def get_sqlite_connection():
+    return sqlite3.connect(SQLITE_DB)
+
+# ========== Load & Save Data Functions ==========
+# Load data from MySQL
 def load_data():
-    if os.path.exists(CSV_FILE):
-        return pd.read_csv(CSV_FILE)
-    return pd.DataFrame(columns=["Name", "Type", "Age", "Weight", "Vaccination", "Added On"])
+    conn = get_mysql_connection()
+    df = pd.read_sql("SELECT * FROM livestock", conn)
+    conn.close()
+    return df
 
-def save_data(df):
-    df.to_csv(CSV_FILE, index=False)
-
-if "livestock_data" not in st.session_state:
-    st.session_state["livestock_data"] = load_data()
+# Save data to MySQL
+def save_data(name, animal_type, age, weight, vaccination):
+    conn = get_mysql_connection()
+    query = f"""
+    INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
+    VALUES ('{name}', '{animal_type}', {age}, {weight}, '{vaccination}', '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+    """
+    conn.execute(query)
+    conn.close()
 
 # ========== Custom CSS ==========
 st.markdown("""
@@ -47,48 +65,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ========== Google Drive Authentication ==========
-def authenticate_drive():
-    creds = None
-    if os.path.exists("token.pkl"):
-        with open("token.pkl", "rb") as token:
-            creds = pickle.load(token)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            try:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'client_secret.json',
-                    scopes=["https://www.googleapis.com/auth/drive.file"]
-                )
-                creds = flow.run_local_server(port=0)
-            except Exception as e:
-                st.error(f"Google Drive Authentication failed: {e}")
-                return None
-
-        # Save credentials for future use
-        with open("token.pkl", "wb") as token:
-            pickle.dump(creds, token)
-
-    return creds
-
-def upload_file_to_drive(file_path, file_name):
-    creds = authenticate_drive()
-    if not creds:
-        return None
-    try:
-        service = build('drive', 'v3', credentials=creds)
-        file_metadata = {'name': file_name}
-        media = MediaFileUpload(file_path, resumable=True)
-        file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-        return file.get('id')
-    except Exception as e:
-        st.error(f"Failed to upload file to Google Drive: {e}")
-        return None
-
-# ========== Disease Prediction ==========
+# ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
     prediction = random.choice(diseases[:-1]) if symptoms else 'None'
@@ -100,25 +77,6 @@ def predict_disease(symptoms):
         "None": "No disease detected."
     }
     return prediction, treatments[prediction]
-
-# ========== PDF Generator ==========
-def generate_pdf(data):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt="VetSmart Diagnosis Report", ln=1, align="C")
-    pdf.ln(5)
-    for key, value in data.items():
-        pdf.multi_cell(0, 10, txt=f"{key}: {value}")
-    file_name = "diagnosis_report.pdf"
-    pdf.output(file_name)
-    return file_name
-
-# ========== Simple Chatbot ==========
-def chatbot_response(user_input):
-    if 'fever' in user_input.lower():
-        return "Fever may indicate infection. Ensure proper hydration and consult a vet."
-    return "🤖 I'm still learning. Please consult a veterinarian for urgent concerns."
 
 # ========== Sidebar ==========
 st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
@@ -151,62 +109,27 @@ if selected_page_key == "dashboard":
         if name.strip() == "":
             st.warning("Animal Tag cannot be empty.")
         else:
-            new_entry = pd.DataFrame([{
-                "Name": name,
-                "Type": animal_type,
-                "Age": age,
-                "Weight": weight,
-                "Vaccination": vaccination,
-                "Added On": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }])
-            st.session_state["livestock_data"] = pd.concat(
-                [st.session_state["livestock_data"], new_entry], ignore_index=True
-            )
-            save_data(st.session_state["livestock_data"])
+            save_data(name, animal_type, age, weight, vaccination)
             st.success(f"{animal_type} '{name}' saved successfully!")
 
-    if not st.session_state["livestock_data"].empty:
-        st.dataframe(st.session_state["livestock_data"])
-        csv = st.session_state["livestock_data"].to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Download CSV", csv, "livestock_data.csv", "text/csv")
-
-        if st.button("🧹 Clear All Livestock Records"):
-            st.session_state["livestock_data"] = pd.DataFrame(
-                columns=["Name", "Type", "Age", "Weight", "Vaccination", "Added On"]
-            )
-            save_data(st.session_state["livestock_data"])
-            st.experimental_rerun()
+    # Display data from MySQL
+    df = load_data()
+    if not df.empty:
+        st.dataframe(df)
 
 elif selected_page_key == "diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
-    if st.session_state["livestock_data"].empty:
+    df = load_data()
+    if df.empty:
         st.warning("No livestock registered yet. Please add animals to the dashboard first.")
     else:
-        animal_name = st.selectbox("Select Registered Animal", st.session_state["livestock_data"]["Name"])
+        animal_name = st.selectbox("Select Registered Animal", df["name"])
         symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
 
         if st.button("🧠 Predict Disease"):
             disease, recommendation = predict_disease(symptoms)
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
-
-            pdf_data = {
-                "Animal Name": animal_name,
-                "Symptoms": ", ".join(symptoms),
-                "Predicted Disease": disease,
-                "Recommendation": recommendation,
-                "Date": str(datetime.date.today())
-            }
-            file_path = generate_pdf(pdf_data)
-            with open(file_path, "rb") as f:
-                b64 = base64.b64encode(f.read()).decode('utf-8')
-            st.markdown(f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">📄 Download Diagnosis Report</a>', unsafe_allow_html=True)
-
-            drive_file_id = upload_file_to_drive(file_path, file_path)
-            if drive_file_id:
-                st.success(f"📁 Uploaded to Google Drive! [Open File](https://drive.google.com/file/d/{drive_file_id})")
-            if os.path.exists(file_path):
-                os.remove(file_path)
 
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
@@ -220,4 +143,20 @@ elif selected_page_key == "tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
-# Add more pages as needed...
+elif selected_page_key == "feedback":
+    st.subheader("📝 We value your feedback!")
+    with st.form("feedback_form"):
+        feedback_text = st.text_area("Please provide your feedback here:")
+        submitted = st.form_submit_button("Submit Feedback")
+        if submitted:
+            # Here you can define how to handle the feedback, e.g., save to a database or send an email
+            st.success("Thank you for your feedback!")
+
+# ========== SQLite Database Download ==========
+st.sidebar.markdown("## Download Data")
+if st.sidebar.button("Download SQLite Database"):
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM livestock", conn)
+    conn.close()
+    df.to_csv("livestock_data
+::contentReference[oaicite:0]{index=0}
