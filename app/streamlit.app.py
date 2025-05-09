@@ -20,7 +20,7 @@ if 'show' not in st.session_state:
 
 # Ensure that each key is unique by including a dynamic element like a unique ID
 toggle_label = "🧠 Chat with VetChat" if not st.session_state.show else "❌ Close Chat"
-unique_key = f"vetchat_toggle_btn_{st.session_state.show}_{uuid.uuid4()}"
+unique_key = f"vetchat_toggle_btn_{st.session_state.show}"
 
 # Render the button with a unique key
 if st.button(toggle_label, key=unique_key):
@@ -33,9 +33,13 @@ SQLITE_DB = 'livestock_data.db'
 # ========== Database Connection Functions ==========
 # Connect to SQLite
 def get_sqlite_connection():
-    return sqlite3.connect(SQLITE_DB)
+    try:
+        return sqlite3.connect(SQLITE_DB)
+    except sqlite3.Error as e:
+        st.error(f"Error connecting to the database: {e}")
+        return None
 
-# ========== Initialize Database and Tables ==========
+``````````````````````````````````# ========== Initialize Database and Tables ==========
 def initialize_database():
     conn = get_sqlite_connection()
     cursor = conn.cursor()
@@ -160,14 +164,17 @@ elif selected_page_key == "diagnosis":
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
-            # Generate PDF Report
-            c = canvas.Canvas(f"{animal_name}_diagnosis_report.pdf", pagesize=letter)
-            c.setFont("Helvetica", 12)
-            c.drawString(100, 750, f"Animal Tag: {animal_name}")
-            c.drawString(100, 730, f"Predicted Disease: {disease}")
-            c.drawString(100, 710, f"Recommendation: {recommendation}")
-            c.save()
-            st.download_button(label="Download Diagnosis Report", data=open(f"{animal_name}_diagnosis_report.pdf", "rb").read(), file_name=f"{animal_name}_diagnosis_report.pdf", mime="application/pdf")
+# Generate PDF Report
+@st.cache
+def generate_pdf(animal_name, disease, recommendation):
+    c = canvas.Canvas(f"{animal_name}_diagnosis_report.pdf", pagesize=letter)
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 750, f"Animal Tag: {animal_name}")
+    c.drawString(100, 730, f"Predicted Disease: {disease}")
+    c.drawString(100, 710, f"Recommendation: {recommendation}")
+    c.save()
+
+    return f"{animal_name}_diagnosis_report.pdf"
 
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
