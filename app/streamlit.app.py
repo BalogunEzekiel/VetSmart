@@ -11,6 +11,8 @@ from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
+from vetbot import run_vetbot
+run_vetbot()
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
@@ -113,6 +115,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
     c.setFont("Helvetica", 10)
 
+    
     # Animal Information Table
     data = [
         ['Animal Tag', animal_data['Name']],
