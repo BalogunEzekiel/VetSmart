@@ -11,7 +11,7 @@ from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
-from vetbot import run_vetchat
+from vetchat import run_vetchat
 run_vetchat()
 
 # ========== Page Setup ==========
