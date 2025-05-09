@@ -3,54 +3,26 @@ import pandas as pd
 import datetime
 import random
 import sqlite3
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 # ========== Database Configuration ==========
-# SQLite Database Configuration
 SQLITE_DB = 'livestock_data.db'
 
 # ========== Database Connection Functions ==========
-# Connect to SQLite
 def get_sqlite_connection():
     return sqlite3.connect(SQLITE_DB)
 
-# ========== Load & Save Data Functions ==========
-# Load data from SQLite
+# ========== Load Data Function ==========
 def load_data():
     conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM livestock", conn)
     conn.close()
     return df
-
-# Save data to SQLite
-def save_data(name, animal_type, age, weight, vaccination):
-    conn = get_sqlite_connection()
-    query = f"""
-    INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
-    VALUES ('{name}', '{animal_type}', {age}, {weight}, '{vaccination}', '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
-    """
-    conn.execute(query)
-    conn.commit()
-    conn.close()
-
-# ========== Custom CSS ==========
-st.markdown("""
-<style>
-.stApp {
-    background-image: url('https://images.unsplash.com/photo-1601749111324-82e873f9f9d4');
-    background-size: cover;
-    background-attachment: fixed;
-}
-.title {
-    font-size: 48px;
-    font-weight: bold;
-    color: #2E8B57;
-    text-shadow: 1px 1px #ffffff;
-}
-</style>
-""", unsafe_allow_html=True)
 
 # ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
@@ -64,6 +36,24 @@ def predict_disease(symptoms):
         "None": "No disease detected."
     }
     return prediction, treatments[prediction]
+
+# ========== PDF Generation ==========
+def generate_pdf_report(disease, recommendation):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.setFont("Helvetica", 12)
+    
+    c.drawString(100, 750, "🐄 VetSmart - Livestock Disease Diagnosis Report")
+    c.drawString(100, 730, f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    c.drawString(100, 690, f"**Predicted Disease:** 🐾 {disease}")
+    c.drawString(100, 670, f"**Recommendation:** 💊 {recommendation}")
+    
+    c.showPage()
+    c.save()
+
+    buffer.seek(0)
+    return buffer
 
 # ========== Sidebar ==========
 st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
@@ -84,26 +74,8 @@ st.subheader("Livestock Monitoring, Disease Prevention and Diagnosis")
 # ========== Pages ==========
 if selected_page_key == "dashboard":
     st.subheader("📋 Add and Monitor Your Livestock")
-    with st.form("livestock_form"):
-        name = st.text_input("Animal Tag")
-        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
-        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
-        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
-        vaccination = st.text_area("Vaccination History")
-        submit = st.form_submit_button("💾 Save")
-
-    if submit:
-        if name.strip() == "":
-            st.warning("Animal Tag cannot be empty.")
-        else:
-            save_data(name, animal_type, age, weight, vaccination)
-            st.success(f"{animal_type} '{name}' saved successfully!")
-
-    # Display data from SQLite
-    df = load_data()
-    if not df.empty:
-        st.dataframe(df)
-
+    st.write("Livestock details have been removed from this section.")
+    
 elif selected_page_key == "diagnosis":
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     df = load_data()
@@ -118,6 +90,15 @@ elif selected_page_key == "diagnosis":
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
+            # Generate and download PDF report
+            pdf_report = generate_pdf_report(disease, recommendation)
+            st.download_button(
+                label="Download Diagnosis Report as PDF",
+                data=pdf_report,
+                file_name="Livestock_Diagnosis_Report.pdf",
+                mime="application/pdf"
+            )
+    
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
