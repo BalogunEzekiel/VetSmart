@@ -5,24 +5,20 @@ import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
-from reportlab.platypus import Image
 from io import BytesIO
-from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 # ========== Database Configuration ==========
-# SQLite Database Configuration
 SQLITE_DB = 'livestock_data.db'
 
 # ========== Database Connection Functions ==========
-# Connect to SQLite
 def get_sqlite_connection():
     return sqlite3.connect(SQLITE_DB)
 
@@ -55,17 +51,15 @@ def initialize_database():
 initialize_database()
 
 # ========== Load & Save Data Functions ==========
-# Load data from SQLite
 def load_data():
     conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM livestock", conn)
     conn.close()
     return df
 
-# Save data to SQLite
-def save_data(name, animal_type, age, weight, vaccination):
+def save_livestock_data(name, animal_type, age, weight, vaccination):
     conn = get_sqlite_connection()
-    query = f"""
+    query = """
     INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
     VALUES (?, ?, ?, ?, ?, ?)
     """
@@ -103,24 +97,82 @@ def predict_disease(symptoms):
     }
     return prediction, treatments[prediction]
 
-# ========== Sidebar ==========
-st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
-st.sidebar.markdown("## VetSmart Navigation")
-pages = {
-    "📊 Livestock Dashboard": "dashboard",
-    "🦠 Disease Diagnosis": "diagnosis",
-    "💡 Health Tips": "tips",
-    "📝 Feedback": "feedback"
-}
-selected_page = st.sidebar.radio("Go to", list(pages.keys()))
-selected_page_key = pages[selected_page]
+# ========== PDF Generation Function ==========
+def generate_diagnosis_report(animal_data, disease, recommendation):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    centered_title_style = ParagraphStyle(name='CenteredTitle', parent=styles['Heading1'], alignment=1)
 
-# ========== Title ==========
-st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
-st.markdown("<h3 style='font-weight: normal; font-size: 20px;'>Livestock Monitoring, Disease Prevention and Diagnosis</h3>", unsafe_allow_html=True)
+    # VetSmart Report Title
+    p = Paragraph("<b>VetSmart Diagnosis Report</b>", centered_title_style)
+    p.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    p.drawOn(c, inch, letter[1] - 1.5 * inch)
+    c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
+    c.setFont("Helvetica", 10)
 
-# ========== Pages ==========
-if selected_page_key == "dashboard":
+    # Animal Information Table
+    data = [
+        ['Animal Tag', animal_data['Name']],
+        ['Type', animal_data['type']],
+        ['Age (years)', animal_data['age']],
+        ['Weight (kg)', animal_data['weight']],
+    ]
+    table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+    ]))
+    table.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    table.drawOn(c, inch, letter[1] - 2.5 * inch)
+    c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
+    c.setFont("Helvetica", 10)
+
+    # Diagnosis Table
+    diagnosis_data = [
+        ['Predicted Disease', disease],
+        ['Recommendation', recommendation],
+    ]
+    diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
+    diagnosis_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+    ]))
+    diagnosis_table.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    diagnosis_table.drawOn(c, inch, letter[1] - 4 * inch)
+
+    # VetSmart Authentication Barcode
+    barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+    barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
+    barcode.drawOn(c, letter[0] - 3 * inch, inch)
+    c.setFont("Helvetica", 8)
+    c.drawString(letter[0] - 3 * inch, inch - 0.2 * inch, "VetSmart Authenticated")
+    c.drawString(letter[0] - 3 * inch, inch - 0.4 * inch, barcode_value)
+
+    # Footer
+    c.setFont("Helvetica", 8)
+    c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
+
+    c.save()
+    buffer.seek(0)
+    return buffer
+
+# ========== Page Functions ==========
+def display_dashboard():
+    """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
     with st.form("livestock_form"):
         name = st.text_input("Animal Tag")
@@ -134,10 +186,11 @@ if selected_page_key == "dashboard":
         if name.strip() == "":
             st.warning("Animal Tag cannot be empty.")
         else:
-            save_data(name, animal_type, age, weight, vaccination)
+            save_livestock_data(name, animal_type, age, weight, vaccination)
             st.success(f"{animal_type} '{name}' saved successfully!")
 
-elif selected_page_key == "diagnosis":
+def display_diagnosis():
+    """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     df = load_data()
     if df.empty:
@@ -152,97 +205,17 @@ elif selected_page_key == "diagnosis":
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
-            # Generate PDF Report
-            buffer = BytesIO()
-            c = canvas.Canvas(buffer, pagesize=letter)
-            styles = getSampleStyleSheet()
-            title_style = styles['Heading1']
-            normal_style = styles['Normal']
+            pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
 
-            # VetSmart Report Title
-            p = Paragraph("<b>VetSmart Diagnosis Report</b>", centered_title_style)
-            p.wrapOn(c, letter[0] - 2 * inch, letter[1])
-            p.drawOn(c, inch, letter[1] - 1.5 * inch)
-            c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
-            c.setFont("Helvetica-Bold", 12)
-            c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
-            c.setFont("Helvetica", 10)
+            st.download_button(
+                label="Download Diagnosis Report",
+                data=pdf_buffer,
+                file_name=f"{animal_name}_diagnosis_report.pdf",
+                mime="application/pdf"
+            )
 
-# Prepare the data
-data = [
-    ['Animal Tag', animal_data['Name']],
-    ['Type', animal_data['Type']],
-    ['Age (years)', animal_data['Age']],
-    ['Weight (kg)', animal_data['Weight']],
-]
-
-# Create the table
-table = Table(data, colWidths=[letter[0] / 2.0] * 2)  # Four equal-width columns across the page
-
-# Style the table
-table.setStyle(TableStyle([
-    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-    ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 0), (-1, -1), 10),
-    ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-    ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-]))
-
-# Draw section line and title
-c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
-c.setFont("Helvetica-Bold", 12)
-c.drawString(inch, letter[1] - 2 * inch, "Diagnosis:")
-c.setFont("Helvetica", 10)
-
-# Diagnosis data with hidden SPAN row
-diagnosis_data = [
-    [' '],  # Hidden row for full-width span
-    ['Predicted Disease', disease],
-    ['Recommendation', recommendation],
-]
-
-# Create the table
-diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
-
-# Style the table
-diagnosis_table.setStyle(TableStyle([
-    ('SPAN', (0, 0), (-1, 0)),  # Full-width SPAN
-    ('BACKGROUND', (0, 0), (-1, 0), colors.white),  # Match background to hide it
-    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),   # Hide text
-    ('FONTSIZE', (0, 0), (-1, 0), 1),               # Reduce font size
-    ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
-    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 1), (-1, -1), 10),
-    ('INNERGRID', (0, 1), (-1, -1), 0.25, colors.grey),
-    ('BOX', (0, 1), (-1, -1), 0.25, colors.black),
-]))
-
-# VetSmart Authentication Barcode
-barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
-barcode.drawOn(c, letter[0] - 3 * inch, inch)
-c.setFont("Helvetica", 8)
-c.drawString(letter[0] - 3 * inch, inch - 0.2 * inch, "VetSmart Authenticated")
-c.drawString(letter[0] - 3 * inch, inch - 0.4 * inch, barcode_value)
-
-# Footer (Left-aligned)
-c.setFont("Helvetica", 8)
-c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
-
-c.save()
-buffer.seek(0)
-
-st.download_button(
-label="Download Diagnosis Report",
-data=buffer,
-file_name=f"{animal_name}_diagnosis_report.pdf",
-mime="application/pdf"
-)
-
-elif selected_page_key == "tips":
+def display_health_tips():
+    """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
     tips = {
@@ -254,9 +227,8 @@ elif selected_page_key == "tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
-elif selected_page_key == "feedback":
-    st.subheader("📝 We value your feedback!")
-
+def handle_feedback_submission():
+    """Handles the feedback submission process."""
     with st.form("feedback_form"):
         name = st.text_input("Your Name")
         feedback_text = st.text_area("Please provide your feedback here:")
@@ -266,17 +238,35 @@ elif selected_page_key == "feedback":
             if name.strip() == "" or feedback_text.strip() == "":
                 st.warning("Name and Feedback cannot be empty.")
             else:
-                # Save feedback to the database
                 conn = get_sqlite_connection()
+                cursor = conn.cursor()
                 query = """
                 INSERT INTO feedback (name, feedback, submitted_on)
                 VALUES (?, ?, ?)
                 """
-                # Use parameterized query to prevent SQL injection
-                conn.execute(query, (name, feedback_text, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                now = datetime.datetime.now()
+                cursor.execute(query, (name, feedback_text, now))
                 conn.commit()
                 conn.close()
-                st.success("Thank you for your feedback. Hope to see you again soon!")
+                st.success("Thank you for your feedback!")
+
+# ========== Sidebar ==========
+st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
+st.sidebar.markdown("## VetSmart Navigation")
+pages = {
+    "📊 Livestock Dashboard": display_dashboard,
+    "🦠 Disease Diagnosis": display_diagnosis,
+    "💡 Health Tips": display_health_tips,
+    "📝 Feedback": handle_feedback_submission
+}
+selected_page_function = pages[selected_page]
+
+# ========== Title ==========
+st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-weight: normal; font-size: 20px;'>Livestock Monitoring, Disease Prevention and Diagnosis</h3>", unsafe_allow_html=True)
+
+# ========== Display Selected Page ==========
+selected_page_function()
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
@@ -285,7 +275,6 @@ if st.sidebar.button("Download SQLite Data as CSV"):
     df = pd.read_sql("SELECT * FROM livestock", conn)
     conn.close()
 
-    # Convert to CSV in memory
     csv = df.to_csv(index=False)
     st.sidebar.download_button(
         label="📥 Download livestock_data.csv",
