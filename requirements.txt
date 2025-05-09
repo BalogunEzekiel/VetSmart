@@ -14,3 +14,4 @@ google-api-python-client
 pymysql==1.1.0
 SQLAlchemy==2.0.0
 reportlab==4.4.0
+streamlit-chat
