@@ -5,15 +5,18 @@ import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from vetchat import run_vetchat  # 👈 Add this line
 
 # Set the page configuration as the very first command
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
-# Run vetchat once
+# Then proceed with the rest of your code
+from vetchat import run_vetchat  # 👈 Add this line
 run_vetchat()
 
-# Now proceed with the rest of your code
+# Your code for running the app
+run_vetchat()  # If this is how you're using your chatbot function
+
+# Continue with the rest of the app code
 if 'show' not in st.session_state:
     st.session_state.show = False
 
