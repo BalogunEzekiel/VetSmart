@@ -55,7 +55,7 @@ initialize_database()
 def load_data():
 conn = get_sqlite_connection()
 df = pd.read_sql("SELECT * FROM livestock", conn)
-    conn.close()
+conn.close()
     return df
 
 def save_livestock_data(name, animal_type, age, weight, vaccination):
