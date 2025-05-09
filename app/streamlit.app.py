@@ -12,10 +12,11 @@ from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
 from vetchat import run_vetchat
-run_vetchat()
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+
+run_vetchat()
 
 # ========== Database Configuration ==========
 SQLITE_DB = 'livestock_data.db'
