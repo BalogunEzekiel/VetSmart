@@ -184,10 +184,10 @@ elif selected_page_key == "diagnosis":
             c.drawString(letter[0] - 3 * inch, inch - 0.2 * inch, "VetSmart Authenticated")
             c.drawString(letter[0] - 3 * inch, inch - 0.4 * inch, barcode_value)
 
-            # Footer
+            # Footer (Left-aligned)
             c.setFont("Helvetica", 8)
-            c.drawRightString(letter[0] - inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            c.drawRightString(letter[0] - inch, 0.6 * inch, "Powered by VetSmart")
+            c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
             c.save()
             buffer.seek(0)
