@@ -141,7 +141,7 @@ elif selected_page_key == "diagnosis":
     if df.empty:
         st.warning("No livestock registered yet. Please add animals to the dashboard first.")
     else:
-        animal_name = st.selectbox("Select Registered Animal", df["name"])
+        animal_name = st.selectbox("Select Registered Animal", df["Name"])
         animal_data = df[df["name"] == animal_name].iloc[0]
         symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
 
