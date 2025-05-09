@@ -219,18 +219,18 @@ diagnosis_table.setStyle(TableStyle([
     ('BOX', (0, 1), (-1, -1), 0.25, colors.black),
 ]))
 
-            # VetSmart Authentication Barcode
-            barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-            barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
-            barcode.drawOn(c, letter[0] - 3 * inch, inch)
-            c.setFont("Helvetica", 8)
-            c.drawString(letter[0] - 3 * inch, inch - 0.2 * inch, "VetSmart Authenticated")
-            c.drawString(letter[0] - 3 * inch, inch - 0.4 * inch, barcode_value)
+# VetSmart Authentication Barcode
+barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
+barcode.drawOn(c, letter[0] - 3 * inch, inch)
+c.setFont("Helvetica", 8)
+c.drawString(letter[0] - 3 * inch, inch - 0.2 * inch, "VetSmart Authenticated")
+c.drawString(letter[0] - 3 * inch, inch - 0.4 * inch, barcode_value)
 
-            # Footer (Left-aligned)
-            c.setFont("Helvetica", 8)
-            c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
+# Footer (Left-aligned)
+c.setFont("Helvetica", 8)
+c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
             c.save()
             buffer.seek(0)
