@@ -5,15 +5,15 @@ import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-# app/streamlit.app.py
-import streamlit as st
 from vetchat import run_vetchat  # 👈 Add this line
-run_vetchat()
 
-# Set the page configuration first
+# Set the page configuration as the very first command
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
-# Now proceed with the rest of the code
+# Run vetchat once
+run_vetchat()
+
+# Now proceed with the rest of your code
 if 'show' not in st.session_state:
     st.session_state.show = False
 
