@@ -25,7 +25,7 @@ return sqlite3.connect(SQLITE_DB)
 
 # ========== Initialize Database and Tables ==========
 def initialize_database():
-    conn = get_sqlite_connection()
+conn = get_sqlite_connection()
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS livestock (
@@ -53,13 +53,13 @@ initialize_database()
 
 # ========== Load & Save Data Functions ==========
 def load_data():
-    conn = get_sqlite_connection()
+conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM livestock", conn)
     conn.close()
     return df
 
 def save_livestock_data(name, animal_type, age, weight, vaccination):
-    conn = get_sqlite_connection()
+conn = get_sqlite_connection()
     query = """
     INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
     VALUES (?, ?, ?, ?, ?, ?)
