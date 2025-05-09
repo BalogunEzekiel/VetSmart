@@ -232,15 +232,15 @@ c.setFont("Helvetica", 8)
 c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
-            c.save()
-            buffer.seek(0)
+c.save()
+buffer.seek(0)
 
-            st.download_button(
-                label="Download Diagnosis Report",
-                data=buffer,
-                file_name=f"{animal_name}_diagnosis_report.pdf",
-                mime="application/pdf"
-            )
+st.download_button(
+label="Download Diagnosis Report",
+data=buffer,
+file_name=f"{animal_name}_diagnosis_report.pdf",
+mime="application/pdf"
+)
 
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
