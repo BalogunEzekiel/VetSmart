@@ -168,6 +168,11 @@ elif selected_page_key == "feedback":
                 # Save feedback to the database
                 save_feedback(name, feedback_text)
                 st.success("Thank you for your feedback. Hope to see you again soon!")
+
+# Display feedback (this could be in the "About" or another section)
+if selected_page_key == "About":
+    st.title("About VetSmart")
+    st.write("This app helps with livestock monitoring and disease prevention.")
                 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
