@@ -222,7 +222,7 @@ def display_health_tips():
     """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
-        tips = {
+tips = {
         "Cattle": [
             "✅ Provide clean water daily.",
             "💉 Schedule regular vaccinations and deworming.",
