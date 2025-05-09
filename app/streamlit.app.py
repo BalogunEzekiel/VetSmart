@@ -154,21 +154,21 @@ def save_feedback(name, feedback_text):
     
 # Feedback Form Handling
 if selected_page_key == "Home":
-elif selected_page_key == "feedback":
-        st.subheader("📝 We value your feedback!")
-    
-    with st.form("feedback_form"):
-        name = st.text_input("Your Name")
-        feedback_text = st.text_area("Please provide your feedback here:")
-        submitted = st.form_submit_button("Submit Feedback")
+    elif selected_page_key == "feedback":
+            st.subheader("📝 We value your feedback!")
         
-        if submitted:
-            if name.strip() == "" or feedback_text.strip() == "":
-                st.warning("Name and Feedback cannot be empty.")
-            else:
-                # Save feedback to the database
-                save_feedback(name, feedback_text)
-                st.success("Thank you for your feedback. Hope to see you again soon!")
+        with st.form("feedback_form"):
+            name = st.text_input("Your Name")
+            feedback_text = st.text_area("Please provide your feedback here:")
+            submitted = st.form_submit_button("Submit Feedback")
+            
+            if submitted:
+                if name.strip() == "" or feedback_text.strip() == "":
+                    st.warning("Name and Feedback cannot be empty.")
+                else:
+                    # Save feedback to the database
+                    save_feedback(name, feedback_text)
+                    st.success("Thank you for your feedback. Hope to see you again soon!")
 
 # Display feedback (this could be in the "About" or another section)
 if selected_page_key == "About":
