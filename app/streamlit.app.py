@@ -222,32 +222,33 @@ def display_health_tips():
     """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
-tips = {
+    tips = {
         "Cattle": [
             "✅ Provide clean water daily.",
             "💉 Schedule regular vaccinations and deworming.",
-            "🍀 Feed high-quality forage and supplements.",
-            "🏡 Maintain a clean and dry shelter.",
-            "🧼 Regularly check for ticks and wounds."
+            "🍀 Maintain a balanced diet with adequate minerals.",
+            "🧼 Keep barns and feeding areas clean.",
+            "👩‍⚕️ Regularly check for signs of disease or injury."
         ],
         "Goat": [
-            "🍼 Ensure young goats receive colostrum.",
-            "🌾 Provide a diet rich in fiber.",
-            "🏞 Avoid overcrowding to prevent stress.",
-            "💉 Vaccinate against common diseases like PPR.",
-            "🧽 Keep hooves trimmed and housing clean."
+            "🥛 Supply clean water and mineral-rich feed.",
+            "🏡 Keep shelters dry and well-ventilated.",
+            "🔍 Inspect hooves and trim regularly.",
+            "🧪 Perform periodic fecal exams for parasites.",
+            "💉 Vaccinate against common diseases like PPR and Enterotoxemia."
         ],
         "Sheep": [
-            "🌿 Rotate pastures to avoid parasites.",
-            "💊 Deworm based on fecal tests.",
-            "🐏 Monitor for foot rot and lameness.",
-            "🩺 Conduct regular health check-ups.",
-            "🌬 Ensure ventilation in housing areas."
+            "🍃 Rotate pastures to prevent parasite buildup.",
+            "🧽 Ensure shearing is done at least once a year.",
+            "🩺 Monitor for foot rot and respiratory issues.",
+            "🐏 Provide high-quality forage and clean bedding.",
+            "💊 Deworm and vaccinate on a regular schedule."
         ]
     }
 
-for tip in tips.get(animal, []):
-        st.write(tip)
+    st.markdown("### 🐾 Recommended Tips:")
+    for tip in tips[animal]:
+        st.markdown(f"- {tip}")
 
 def handle_feedback_submission():
     """Handles the feedback submission process."""
@@ -309,3 +310,12 @@ if st.sidebar.button("Download SQLite Data as CSV"):
         mime="text/csv"
     )
 
+st.sidebar.title("VetSmart Navigation")
+choice = st.sidebar.radio("Go to", ["Dashboard", "Diagnosis", "Health Tips"])
+
+if choice == "Dashboard":
+    display_dashboard()
+elif choice == "Diagnosis":
+    display_diagnosis()
+elif choice == "Health Tips":
+    display_health_tips()
