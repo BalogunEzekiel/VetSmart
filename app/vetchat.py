@@ -1,6 +1,9 @@
 from streamlit_chat import message
 import streamlit as st
 
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
 def run_vetchat():
     # Initialize session state
     if "show_chatbot" not in st.session_state:
