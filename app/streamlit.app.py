@@ -16,6 +16,9 @@ from reportlab.lib import colors
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
 # ========== Database Configuration ==========
 SQLITE_DB = 'livestock_data.db'
 
