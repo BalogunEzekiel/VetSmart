@@ -3,49 +3,36 @@ import pandas as pd
 import datetime
 import random
 import sqlite3
-import pymysql
-from sqlalchemy import create_engine
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 # ========== Database Configuration ==========
-# MySQL Database Configuration
-MYSQL_HOST = 'your_mysql_host'
-MYSQL_PORT = 3306
-MYSQL_DATABASE = 'your_database_name'
-MYSQL_USER = 'your_username'
-MYSQL_PASSWORD = 'your_password'
-
 # SQLite Database Configuration
 SQLITE_DB = 'livestock_data.db'
 
 # ========== Database Connection Functions ==========
-# Connect to MySQL
-def get_mysql_connection():
-    engine = create_engine(f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}")
-    return engine.connect()
-
 # Connect to SQLite
 def get_sqlite_connection():
     return sqlite3.connect(SQLITE_DB)
 
 # ========== Load & Save Data Functions ==========
-# Load data from MySQL
+# Load data from SQLite
 def load_data():
-    conn = get_mysql_connection()
+    conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM livestock", conn)
     conn.close()
     return df
 
-# Save data to MySQL
+# Save data to SQLite
 def save_data(name, animal_type, age, weight, vaccination):
-    conn = get_mysql_connection()
+    conn = get_sqlite_connection()
     query = f"""
     INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
     VALUES ('{name}', '{animal_type}', {age}, {weight}, '{vaccination}', '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     """
     conn.execute(query)
+    conn.commit()
     conn.close()
 
 # ========== Custom CSS ==========
@@ -112,7 +99,7 @@ if selected_page_key == "dashboard":
             save_data(name, animal_type, age, weight, vaccination)
             st.success(f"{animal_type} '{name}' saved successfully!")
 
-    # Display data from MySQL
+    # Display data from SQLite
     df = load_data()
     if not df.empty:
         st.dataframe(df)
