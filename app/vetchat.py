@@ -94,7 +94,7 @@ def run_vetchat():
 for i, (speaker, text) in enumerate(st.session_state.chat_history):
     message(text, is_user=(speaker == "user"), key=f"chat_{i}")
 
-        st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
     # JavaScript to enable dragging
     st.components.v1.html("""
