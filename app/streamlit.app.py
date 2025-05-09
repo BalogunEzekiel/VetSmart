@@ -39,7 +39,7 @@ def get_sqlite_connection():
         st.error(f"Error connecting to the database: {e}")
         return None
 
-``````````````````````````````````# ========== Initialize Database and Tables ==========
+# ========== Initialize Database and Tables ==========
 def initialize_database():
     conn = get_sqlite_connection()
     cursor = conn.cursor()
