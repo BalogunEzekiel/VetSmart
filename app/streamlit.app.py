@@ -305,13 +305,3 @@ if st.sidebar.button("Download SQLite Data as CSV"):
         mime="text/csv"
     )
 
-# ========== Main App ==========
-st.sidebar.title("🐾 VetSmart Menu")
-page = st.sidebar.radio("Navigate to:", ["Dashboard", "Disease Diagnosis", "Health Tips"])
-
-if page == "Dashboard":
-    display_dashboard()
-elif page == "Disease Diagnosis":
-    display_diagnosis()
-elif page == "Health Tips":
-    display_health_tips()
