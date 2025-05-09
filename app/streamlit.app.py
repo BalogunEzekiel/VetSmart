@@ -194,8 +194,6 @@ def generate_vetsmart_report(animal_data, disease, recommendation):
         ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
         ('TOPPADDING', (0, 0), (-1, -1), 12),
     ]))
-    diagnosis_table.wrapOn(c, width - 2 * inch, height)
-    diagnosis_table.drawOn(c, inch, height - 6.2 * inch)
 
     # Finalize and return PDF
     c.save()
