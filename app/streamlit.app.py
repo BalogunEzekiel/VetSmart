@@ -154,8 +154,8 @@ elif selected_page_key == "diagnosis":
             buffer = BytesIO()
             c = canvas.Canvas(buffer, pagesize=letter)
             styles = getSampleStyleSheet()
-            title_style = styles['h1']
-            normal_style = styles['normal']
+            title_style = styles['Heading1']
+            normal_style = styles['Normal']
 
             # VetSmart Report Title
             p = Paragraph("<b>VetSmart Diagnosis Report</b>", title_style)
