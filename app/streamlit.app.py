@@ -177,7 +177,7 @@ elif selected_page_key == "diagnosis":
             c.drawString(inch + 0.2 * inch, letter[1] - 3.6 * inch, f"Recommendation: {recommendation}")
 
             # VetSmart Authentication Barcode
-            barcode_value = f"VS-DR-{animal_data['name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+            barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
             barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
             barcode.drawOn(c, letter[0] - 3 * inch, inch)
             c.setFont("Helvetica", 8)
