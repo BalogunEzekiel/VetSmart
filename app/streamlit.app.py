@@ -5,6 +5,15 @@ import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+# app/streamlit.app.py
+import streamlit as st
+from vetbot import run_vetbot  # 👈 Add this line
+
+# Run chatbot sidebar
+run_vetbot()  # 👈 This ensures the chatbot appears on all pages
+
+# Your existing code below (page routing, etc.)
+
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
