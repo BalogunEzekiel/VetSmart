@@ -3,6 +3,7 @@ import pandas as pd
 import datetime
 import random
 import sqlite3
+from vetchat import run_vetchat
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -11,7 +12,6 @@ from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
-from vetchat import run_vetchat
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
