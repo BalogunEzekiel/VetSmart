@@ -3,15 +3,42 @@ from streamlit_chat import message
 import streamlit as st
 
 def run_vetbot():
-    with st.sidebar:
-        st.markdown("### 💬 VetBot Assistant")
+    # Inject custom CSS for floating chat box
+    st.markdown("""
+    <style>
+        .chatbot-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 320px;
+            max-height: 400px;
+            background-color: #ffffff;
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+        .chatbot-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0e1117;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    with st.container():
+        st.markdown('<div class="chatbot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="chatbot-header">💬 VetBot Assistant</div>', unsafe_allow_html=True)
+
         if 'chat_history' not in st.session_state:
             st.session_state.chat_history = []
 
-        # Input from the user
-        user_input = st.text_input("Ask VetBot something:", key="vetbot_input", label_visibility="collapsed")
+        # Input from user
+        user_input = st.text_input("", placeholder="Ask something...", key="vetbot_input")
 
-        # Generate response
+        # Generate bot response
         def generate_response(prompt):
             if "sick" in prompt.lower():
                 return "Please bring the animal for a checkup. What symptoms have you observed?"
@@ -27,3 +54,5 @@ def run_vetbot():
 
         for speaker, text in st.session_state.chat_history:
             message(text, is_user=(speaker == "user"))
+
+        st.markdown('</div>', unsafe_allow_html=True)
