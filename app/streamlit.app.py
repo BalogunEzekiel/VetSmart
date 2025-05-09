@@ -166,9 +166,9 @@ elif selected_page_key == "diagnosis":
             c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
             c.setFont("Helvetica", 10)
             c.drawString(inch + 0.2 * inch, letter[1] - 2.2 * inch, f"Animal Tag: {animal_data['Name']}")
-            c.drawString(inch + 0.2 * inch, letter[1] - 2.4 * inch, f"Type: {animal_data['type']}")
-            c.drawString(inch + 0.2 * inch, letter[1] - 2.6 * inch, f"Age: {animal_data['age']} years")
-            c.drawString(inch + 0.2 * inch, letter[1] - 2.8 * inch, f"Weight: {animal_data['weight']} kg")
+            c.drawString(inch + 0.2 * inch, letter[1] - 2.4 * inch, f"Type: {animal_data['Type']}")
+            c.drawString(inch + 0.2 * inch, letter[1] - 2.6 * inch, f"Age: {animal_data['Age']} years")
+            c.drawString(inch + 0.2 * inch, letter[1] - 2.8 * inch, f"Weight: {animal_data['Weight']} kg")
 
             c.setFont("Helvetica-Bold", 12)
             c.drawString(inch, letter[1] - 3.2 * inch, "Diagnosis:")
