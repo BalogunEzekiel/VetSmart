@@ -219,11 +219,29 @@ def display_health_tips():
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
     tips = {
-        "Cattle": ["✅ Provide clean water", "💉 Regular deworming", "🧼 Maintain hygiene in sheds"],
-        "Goat": ["🚫 Avoid overcrowding", "🥗 Feed balanced diet", "✂️ Trim hooves regularly"],
-        "Sheep": ["✂️ Shear fleece annually", "🧼 Prevent foot rot", "🧪 Use mineral supplements"]
+        "Cattle": [
+            "✅ Provide clean water daily.",
+            "💉 Schedule regular vaccinations and deworming.",
+            "🧼 Maintain proper hygiene in sheds.",
+            "🌱 Ensure access to quality feed and pasture.",
+            "📋 Monitor body condition and behavior regularly."
+        ],
+        "Goat": [
+            "🚫 Avoid overcrowding in pens.",
+            "🥗 Feed balanced diet with minerals and vitamins.",
+            "🧽 Clean water containers daily.",
+            "📆 Conduct routine hoof trimming.",
+            "💉 Deworm and vaccinate periodically."
+        ],
+        "Sheep": [
+            "🧴 Shear regularly to prevent overheating.",
+            "💊 Monitor for signs of parasites.",
+            "🌾 Provide nutritious forage.",
+            "👀 Check for eye infections and foot rot.",
+            "🛏️ Keep bedding dry and clean."
+        ]
     }
-    st.write("🐾 Here are some expert tips:")
+
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
@@ -286,3 +304,14 @@ if st.sidebar.button("Download SQLite Data as CSV"):
         file_name="livestock_data.csv",
         mime="text/csv"
     )
+
+# ========== Main App ==========
+st.sidebar.title("🐾 VetSmart Menu")
+page = st.sidebar.radio("Navigate to:", ["Dashboard", "Disease Diagnosis", "Health Tips"])
+
+if page == "Dashboard":
+    display_dashboard()
+elif page == "Disease Diagnosis":
+    display_diagnosis()
+elif page == "Health Tips":
+    display_health_tips()
