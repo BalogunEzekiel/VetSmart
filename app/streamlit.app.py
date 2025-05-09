@@ -5,26 +5,9 @@ import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-import uuid
 
-# Set the page configuration as the very first command
+# ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
-
-# Then proceed with the rest of your code
-from vetchat import run_vetchat  # 👈 Add this line
-run_vetchat()
-
-# Continue with the rest of the app code
-if 'show' not in st.session_state:
-    st.session_state.show = False
-
-# Ensure that each key is unique by including a dynamic element like a unique ID
-toggle_label = "🧠 Chat with VetChat" if not st.session_state.show else "❌ Close Chat"
-unique_key = f"vetchat_toggle_btn_{st.session_state.show}"
-
-# Render the button with a unique key
-if st.button(toggle_label, key=unique_key):
-    st.session_state.show = not st.session_state.show  # Toggle the 'show' value
 
 # ========== Database Configuration ==========
 # SQLite Database Configuration
@@ -33,39 +16,7 @@ SQLITE_DB = 'livestock_data.db'
 # ========== Database Connection Functions ==========
 # Connect to SQLite
 def get_sqlite_connection():
-    try:
-        return sqlite3.connect(SQLITE_DB)
-    except sqlite3.Error as e:
-        st.error(f"Error connecting to the database: {e}")
-        return None
-
-# ========== Initialize Database and Tables ==========
-def initialize_database():
-    conn = get_sqlite_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS livestock (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            type TEXT NOT NULL,
-            age REAL NOT NULL,
-            weight REAL NOT NULL,
-            vaccination TEXT,
-            added_on DATETIME
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS feedback (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            feedback TEXT NOT NULL,
-            submitted_on DATETIME
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-initialize_database()
+    return sqlite3.connect(SQLITE_DB)
 
 # ========== Load & Save Data Functions ==========
 # Load data from SQLite
@@ -80,9 +31,9 @@ def save_data(name, animal_type, age, weight, vaccination):
     conn = get_sqlite_connection()
     query = f"""
     INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
-    VALUES (?, ?, ?, ?, ?, ?)
+    VALUES ('{name}', '{animal_type}', {age}, {weight}, '{vaccination}', '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     """
-    conn.execute(query, (name, animal_type, age, weight, vaccination, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    conn.execute(query)
     conn.commit()
     conn.close()
 
@@ -163,18 +114,15 @@ elif selected_page_key == "diagnosis":
             disease, recommendation = predict_disease(symptoms)
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
-
-# Generate PDF Report
-@st.cache
-def generate_pdf(animal_name, disease, recommendation):
-    c = canvas.Canvas(f"{animal_name}_diagnosis_report.pdf", pagesize=letter)
-    c.setFont("Helvetica", 12)
-    c.drawString(100, 750, f"Animal Tag: {animal_name}")
-    c.drawString(100, 730, f"Predicted Disease: {disease}")
-    c.drawString(100, 710, f"Recommendation: {recommendation}")
-    c.save()
-
-    return f"{animal_name}_diagnosis_report.pdf"
+            
+            # Generate PDF Report
+            c = canvas.Canvas(f"{animal_name}_diagnosis_report.pdf", pagesize=letter)
+            c.setFont("Helvetica", 12)
+            c.drawString(100, 750, f"Animal Tag: {animal_name}")
+            c.drawString(100, 730, f"Predicted Disease: {disease}")
+            c.drawString(100, 710, f"Recommendation: {recommendation}")
+            c.save()
+            st.download_button(label="Download Diagnosis Report", data=open(f"{animal_name}_diagnosis_report.pdf", "rb").read(), file_name=f"{animal_name}_diagnosis_report.pdf", mime="application/pdf")
 
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
@@ -188,30 +136,44 @@ elif selected_page_key == "tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
+# Function to get the SQLite connection
+def get_sqlite_connection():
+    return sqlite3.connect('livestock_data.db')
+
+# Save feedback to the database
+def save_feedback(name, feedback_text):
+    conn = get_sqlite_connection()
+    query = """
+    INSERT INTO feedback (name, feedback, submitted_on)
+    VALUES (?, ?, ?)
+    """
+    # Use parameterized query to prevent SQL injection
+    conn.execute(query, (name, feedback_text, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    conn.commit()
+    conn.close()
+    
+# Feedback Form Handling
 elif selected_page_key == "feedback":
     st.subheader("📝 We value your feedback!")
-
+    
     with st.form("feedback_form"):
         name = st.text_input("Your Name")
         feedback_text = st.text_area("Please provide your feedback here:")
         submitted = st.form_submit_button("Submit Feedback")
-
+        
         if submitted:
             if name.strip() == "" or feedback_text.strip() == "":
                 st.warning("Name and Feedback cannot be empty.")
             else:
                 # Save feedback to the database
-                conn = get_sqlite_connection()
-                query = """
-                INSERT INTO feedback (name, feedback, submitted_on)
-                VALUES (?, ?, ?)
-                """
-                # Use parameterized query to prevent SQL injection
-                conn.execute(query, (name, feedback_text, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-                conn.commit()
-                conn.close()
+                save_feedback(name, feedback_text)
                 st.success("Thank you for your feedback. Hope to see you again soon!")
 
+# Display feedback (this could be in the "About" or another section)
+if selected_page_key == "About":
+    st.title("About VetSmart")
+    st.write("This app helps with livestock monitoring and disease prevention.")
+                
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
 if st.sidebar.button("Download SQLite Data as CSV"):
