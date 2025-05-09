@@ -68,7 +68,7 @@ def run_vetchat():
     # Toggle button
     toggle_label = "🧠 Chat with VetChat" if not st.session_state.show_chatbot else "❌ Close VetChat"
     if st.button(toggle_label, key="vetchat_toggle_btn"):
-        st.session_state.show_chatbot = not st.session_state.show_chatchat
+        st.session_state.show_chatbot = not st.session_state.show_chatbot
 
     # Chatbot popup window
     if st.session_state.show_chatbot:
