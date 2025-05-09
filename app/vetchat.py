@@ -91,7 +91,7 @@ def run_vetchat():
             response = generate_response(user_input)
             st.session_state.chat_history.append(("bot", response))
 
-        for i, (speaker, text) in enumerate(st.session_state.chat_history):
+for i, (speaker, text) in enumerate(st.session_state.chat_history):
     message(text, is_user=(speaker == "user"), key=f"chat_{i}")
 
         st.markdown('</div>', unsafe_allow_html=True)
