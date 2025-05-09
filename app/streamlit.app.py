@@ -7,11 +7,11 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 # app/streamlit.app.py
 import streamlit as st
-from vetbot import run_vetbot  # 👈 Add this line
-run_vetbot()
+from vetbot import run_vetchat  # 👈 Add this line
+run_vetchat()
 
 # Run chatbot sidebar
-run_vetbot()  # 👈 This ensures the chatbot appears on all pages
+run_vetchat()  # 👈 This ensures the chatbot appears on all pages
 
 # Your existing code below (page routing, etc.)
 
