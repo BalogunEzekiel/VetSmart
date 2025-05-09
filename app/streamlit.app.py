@@ -8,6 +8,7 @@ from reportlab.pdfgen import canvas
 # app/streamlit.app.py
 import streamlit as st
 from vetbot import run_vetbot  # 👈 Add this line
+run_vetbot()
 
 # Run chatbot sidebar
 run_vetbot()  # 👈 This ensures the chatbot appears on all pages
