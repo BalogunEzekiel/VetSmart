@@ -253,13 +253,20 @@ def handle_feedback_submission():
 # ========== Sidebar ==========
 st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
 st.sidebar.markdown("## VetSmart Navigation")
+
 pages = {
     "📊 Livestock Dashboard": display_dashboard,
     "🦠 Disease Diagnosis": display_diagnosis,
     "💡 Health Tips": display_health_tips,
     "📝 Feedback": handle_feedback_submission
 }
+
+# 🛠️ This line was missing
+selected_page = st.sidebar.selectbox("Choose a page", list(pages.keys()))
+
+# Call the corresponding function
 selected_page_function = pages[selected_page]
+selected_page_function()
 
 # ========== Title ==========
 st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
