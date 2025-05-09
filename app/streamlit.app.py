@@ -195,11 +195,13 @@ def display_dashboard():
     df = load_data()
     st.dataframe(df)
 
-# ========== Main Page ==========
-def main():
-    st.title("🐄 VetSmart - Livestock Monitoring")
-    run_vetchat()  # Now indented within main()
-    display_dashboard()
+# ========== Main Navigation ==========
+st.sidebar.title("📌 VetSmart Menu")
+page = st.sidebar.radio("Navigate to:", ["Dashboard", "Disease Diagnosis", "Health Tips"])
 
-if __name__ == "__main__":
-    main()
+if page == "Dashboard":
+    display_dashboard()
+elif page == "Disease Diagnosis":
+    display_diagnosis()
+elif page == "Health Tips":
+    display_health_tips()
