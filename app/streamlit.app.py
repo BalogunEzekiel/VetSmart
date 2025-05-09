@@ -10,17 +10,19 @@ import streamlit as st
 from vetchat import run_vetchat  # 👈 Add this line
 run_vetchat()
 
-# ========== Page Setup ==========
+# Set the page configuration first
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
-# Run chatbot sidebar
-run_vetchat()  # 👈 This ensures the chatbot appears on all pages
+# Now proceed with the rest of the code
+if 'show' not in st.session_state:
+    st.session_state.show = False
 
-# Your existing code below (page routing, etc.)
+toggle_label = "🧠 Chat with VetChat" if not st.session_state.show else "❌ Close Chat"
+unique_key = f"vetchat_toggle_btn_{st.session_state.show}"
 
-
-# ========== Page Setup ==========
-st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+# Render the button with a unique key
+if st.button(toggle_label, key=unique_key):
+    st.session_state.show = not st.session_state.show  # Toggle the 'show' value
 
 # ========== Database Configuration ==========
 # SQLite Database Configuration
