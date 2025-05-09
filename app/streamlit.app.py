@@ -207,12 +207,12 @@ def display_diagnosis():
 
 pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
 
-            st.download_button(
-                label="Download Diagnosis Report",
-                data=pdf_buffer,
-                file_name=f"{animal_name}_diagnosis_report.pdf",
-                mime="application/pdf"
-            )
+st.download_button(
+label="Download Diagnosis Report",
+data=pdf_buffer,
+file_name=f"{animal_name}_diagnosis_report.pdf",
+mime="application/pdf"
+)
 
 # VetSmart Authentication Barcode
 barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
