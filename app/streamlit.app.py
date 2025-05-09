@@ -246,7 +246,7 @@ tips = {
         ]
     }
 
-    for tip in tips.get(animal, []):
+for tip in tips.get(animal, []):
         st.write(tip)
 
 def handle_feedback_submission():
