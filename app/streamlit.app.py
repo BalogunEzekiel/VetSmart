@@ -222,32 +222,32 @@ def display_health_tips():
     """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
-    tips = {
+        tips = {
         "Cattle": [
             "✅ Provide clean water daily.",
             "💉 Schedule regular vaccinations and deworming.",
-            "🧼 Maintain proper hygiene in sheds.",
-            "🌱 Ensure access to quality feed and pasture.",
-            "📋 Monitor body condition and behavior regularly."
+            "🍀 Feed high-quality forage and supplements.",
+            "🏡 Maintain a clean and dry shelter.",
+            "🧼 Regularly check for ticks and wounds."
         ],
         "Goat": [
-            "🚫 Avoid overcrowding in pens.",
-            "🥗 Feed balanced diet with minerals and vitamins.",
-            "🧽 Clean water containers daily.",
-            "📆 Conduct routine hoof trimming.",
-            "💉 Deworm and vaccinate periodically."
+            "🍼 Ensure young goats receive colostrum.",
+            "🌾 Provide a diet rich in fiber.",
+            "🏞 Avoid overcrowding to prevent stress.",
+            "💉 Vaccinate against common diseases like PPR.",
+            "🧽 Keep hooves trimmed and housing clean."
         ],
         "Sheep": [
-            "🧴 Shear regularly to prevent overheating.",
-            "💊 Monitor for signs of parasites.",
-            "🌾 Provide nutritious forage.",
-            "👀 Check for eye infections and foot rot.",
-            "🛏️ Keep bedding dry and clean."
+            "🌿 Rotate pastures to avoid parasites.",
+            "💊 Deworm based on fecal tests.",
+            "🐏 Monitor for foot rot and lameness.",
+            "🩺 Conduct regular health check-ups.",
+            "🌬 Ensure ventilation in housing areas."
         ]
     }
 
-    for tip in tips[animal]:
-        st.markdown(f"- {tip}")
+    for tip in tips.get(animal, []):
+        st.write(tip)
 
 def handle_feedback_submission():
     """Handles the feedback submission process."""
