@@ -38,7 +38,7 @@ cursor.execute("""
             added_on DATETIME
         )
     """)
-    cursor.execute("""
+cursor.execute("""
         CREATE TABLE IF NOT EXISTS feedback (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
