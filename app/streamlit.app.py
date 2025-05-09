@@ -154,9 +154,16 @@ elif selected_page_key == "feedback":
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
-if st.sidebar.button("Download SQLite Database"):
+if st.sidebar.button("Download SQLite Data as CSV"):
     conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM livestock", conn)
     conn.close()
-    df.to_csv("livestock_data
-::contentReference[oaicite:0]{index=0}
+
+    # Convert to CSV in memory
+    csv = df.to_csv(index=False)
+    st.sidebar.download_button(
+        label="📥 Download livestock_data.csv",
+        data=csv,
+        file_name="livestock_data.csv",
+        mime="text/csv"
+    )
