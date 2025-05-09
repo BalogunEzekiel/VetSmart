@@ -133,7 +133,6 @@ st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
 st.markdown("<h3 style='font-weight: normal; font-size: 20px;'>Livestock Monitoring, Disease Prevention and Diagnosis</h3>", unsafe_allow_html=True)
 
 # ========== Pages ==========
-# ========== Pages ==========
 if selected_page_key == "dashboard":
     st.subheader("📋 Add and Monitor Your Livestock")
     with st.form("livestock_form"):
@@ -165,19 +164,26 @@ elif selected_page_key == "diagnosis":
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
+# Generate PDF Report
+@st.cache
+def generate_pdf(animal_name, disease, recommendation):
+    c = canvas.Canvas(f"{animal_name}_diagnosis_report.pdf", pagesize=letter)
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 750, f"Animal Tag: {animal_name}")
+    c.drawString(100, 730, f"Predicted Disease: {disease}")
+    c.drawString(100, 710, f"Recommendation: {recommendation}")
+    c.save()
+
+    return f"{animal_name}_diagnosis_report.pdf"
+
 elif selected_page_key == "tips":
-    # Integrated code for the 'Tips' section
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
-    
-    # Tips dictionary for different animals
     tips = {
         "Cattle": ["✅ Provide clean water", "💉 Regular deworming", "🧼 Maintain hygiene in sheds"],
         "Goat": ["🚫 Avoid overcrowding", "🥗 Feed balanced diet", "✂️ Trim hooves regularly"],
         "Sheep": ["✂️ Shear fleece annually", "🧼 Prevent foot rot", "🧪 Use mineral supplements"]
     }
-    
-    # Displaying tips based on the selected animal
     st.write("🐾 Here are some expert tips:")
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
@@ -205,18 +211,6 @@ elif selected_page_key == "feedback":
                 conn.commit()
                 conn.close()
                 st.success("Thank you for your feedback. Hope to see you again soon!")
-
-# Generate PDF Report
-@st.cache
-def generate_pdf(animal_name, disease, recommendation):
-    c = canvas.Canvas(f"{animal_name}_diagnosis_report.pdf", pagesize=letter)
-    c.setFont("Helvetica", 12)
-    c.drawString(100, 750, f"Animal Tag: {animal_name}")
-    c.drawString(100, 730, f"Predicted Disease: {disease}")
-    c.drawString(100, 710, f"Recommendation: {recommendation}")
-    c.save()
-
-    return f"{animal_name}_diagnosis_report.pdf"
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
