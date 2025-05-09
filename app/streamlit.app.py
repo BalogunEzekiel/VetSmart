@@ -5,6 +5,12 @@ import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, Spacer
+from reportlab.lib.units import inch
+from reportlab.graphics.barcode import code128
+from reportlab.platypus import Image
+from io import BytesIO
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
@@ -136,6 +142,7 @@ elif selected_page_key == "diagnosis":
         st.warning("No livestock registered yet. Please add animals to the dashboard first.")
     else:
         animal_name = st.selectbox("Select Registered Animal", df["name"])
+        animal_data = df[df["name"] == animal_name].iloc[0]
         symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
 
         if st.button("🧠 Predict Disease"):
@@ -144,13 +151,53 @@ elif selected_page_key == "diagnosis":
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
             # Generate PDF Report
-            c = canvas.Canvas(f"{animal_name}_diagnosis_report.pdf", pagesize=letter)
-            c.setFont("Helvetica", 12)
-            c.drawString(100, 750, f"Animal Tag: {animal_name}")
-            c.drawString(100, 730, f"Predicted Disease: {disease}")
-            c.drawString(100, 710, f"Recommendation: {recommendation}")
+            buffer = BytesIO()
+            c = canvas.Canvas(buffer, pagesize=letter)
+            styles = getSampleStyleSheet()
+            title_style = styles['h1']
+            normal_style = styles['normal']
+
+            # VetSmart Report Title
+            p = Paragraph("<b>VetSmart Diagnosis Report</b>", title_style)
+            p.wrapOn(c, letter[0] - 2 * inch, letter[1])
+            p.drawOn(c, inch, letter[1] - 1.5 * inch)
+            c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
+            c.setFont("Helvetica", 10)
+            c.drawString(inch + 0.2 * inch, letter[1] - 2.2 * inch, f"Animal Tag: {animal_data['name']}")
+            c.drawString(inch + 0.2 * inch, letter[1] - 2.4 * inch, f"Type: {animal_data['type']}")
+            c.drawString(inch + 0.2 * inch, letter[1] - 2.6 * inch, f"Age: {animal_data['age']} years")
+            c.drawString(inch + 0.2 * inch, letter[1] - 2.8 * inch, f"Weight: {animal_data['weight']} kg")
+
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(inch, letter[1] - 3.2 * inch, "Diagnosis:")
+            c.setFont("Helvetica", 10)
+            c.drawString(inch + 0.2 * inch, letter[1] - 3.4 * inch, f"Predicted Disease: {disease}")
+            c.drawString(inch + 0.2 * inch, letter[1] - 3.6 * inch, f"Recommendation: {recommendation}")
+
+            # VetSmart Authentication Barcode
+            barcode_value = f"VS-DR-{animal_data['name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+            barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
+            barcode.drawOn(c, letter[0] - 3 * inch, inch)
+            c.setFont("Helvetica", 8)
+            c.drawString(letter[0] - 3 * inch, inch - 0.2 * inch, "VetSmart Authenticated")
+            c.drawString(letter[0] - 3 * inch, inch - 0.4 * inch, barcode_value)
+
+            # Footer
+            c.setFont("Helvetica", 8)
+            c.drawRightString(letter[0] - inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            c.drawRightString(letter[0] - inch, 0.6 * inch, "Powered by VetSmart")
+
             c.save()
-            st.download_button(label="Download Diagnosis Report", data=open(f"{animal_name}_diagnosis_report.pdf", "rb").read(), file_name=f"{animal_name}_diagnosis_report.pdf", mime="application/pdf")
+            buffer.seek(0)
+
+            st.download_button(
+                label="Download Diagnosis Report",
+                data=buffer,
+                file_name=f"{animal_name}_diagnosis_report.pdf",
+                mime="application/pdf"
+            )
 
 elif selected_page_key == "tips":
     st.subheader("🌿 General Health Tips for Livestock")
