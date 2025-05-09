@@ -116,9 +116,9 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     # Animal Information Table
     data = [
         ['Animal Tag', animal_data['Name']],
-        ['Type', animal_data['type']],
-        ['Age (years)', animal_data['age']],
-        ['Weight (kg)', animal_data['weight']],
+        ['Type', animal_data['Type']],
+        ['Age (years)', animal_data['Age']],
+        ['Weight (kg)', animal_data['Weight']],
     ]
     table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     table.setStyle(TableStyle([
