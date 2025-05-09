@@ -1,4 +1,8 @@
 import streamlit as st
+
+# ========== Page Setup ==========
+st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+
 import pandas as pd
 import datetime
 import random
@@ -12,9 +16,6 @@ from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
-
-# ========== Page Setup ==========
-st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
