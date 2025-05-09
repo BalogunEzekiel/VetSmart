@@ -46,8 +46,8 @@ cursor.execute("""
             submitted_on DATETIME
         )
     """)
-    conn.commit()
-    conn.close()
+conn.commit()
+conn.close()
 
 initialize_database()
 
