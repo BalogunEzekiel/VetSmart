@@ -81,7 +81,7 @@ selected_page_key = pages[selected_page]
 
 # ========== Title ==========
 st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
-st.subheader("Livestock Monitoring, Disease Prevention and Diagnosis")
+st.markdown("<h3 style='font-weight: normal; font-size: 20px;'>Livestock Monitoring, Disease Prevention and Diagnosis</h3>", unsafe_allow_html=True)
 
 # ========== Pages ==========
 if selected_page_key == "dashboard":
