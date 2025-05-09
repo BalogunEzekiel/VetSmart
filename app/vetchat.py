@@ -97,7 +97,7 @@ for i, (speaker, text) in enumerate(st.session_state.chat_history):
 st.markdown('</div>', unsafe_allow_html=True)
 
     # JavaScript to enable dragging
-    st.components.v1.html("""
+st.components.v1.html("""
     <script>
     const dragElement = (elmnt) => {
         const popup = document.getElementById("chatbot-popup");
