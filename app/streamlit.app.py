@@ -26,7 +26,7 @@ return sqlite3.connect(SQLITE_DB)
 # ========== Initialize Database and Tables ==========
 def initialize_database():
 conn = get_sqlite_connection()
-    cursor = conn.cursor()
+cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS livestock (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
