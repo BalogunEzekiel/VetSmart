@@ -7,7 +7,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 # app/streamlit.app.py
 import streamlit as st
-from vetbot import run_vetchat  # 👈 Add this line
+from vetchat import run_vetchat  # 👈 Add this line
 run_vetchat()
 
 # Run chatbot sidebar
