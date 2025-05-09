@@ -136,6 +136,18 @@ elif selected_page_key == "tips":
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
+# Save feedback to the database
+def save_feedback(name, feedback_text):
+    conn = get_sqlite_connection()
+    query = f"""
+    INSERT INTO feedback (name, feedback, submitted_on)
+    VALUES ('{name}', '{feedback_text}', '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+    """
+    conn.execute(query)
+    conn.commit()
+    conn.close()
+
+# Feedback Form Handling
 elif selected_page_key == "feedback":
     st.subheader("📝 We value your feedback!")
     with st.form("feedback_form"):
@@ -143,8 +155,11 @@ elif selected_page_key == "feedback":
         feedback_text = st.text_area("Please provide your feedback here:")
         submitted = st.form_submit_button("Submit Feedback")
         if submitted:
-            # Here you can define how to handle the feedback, e.g., save to a database or send an email
-            st.success("Thank you for your feedback!")
+            if name.strip() == "" or feedback_text.strip() == "":
+                st.warning("Name and Feedback cannot be empty.")
+            else:
+                save_feedback(name, feedback_text)
+                st.success("Thank you for your feedback!")
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
