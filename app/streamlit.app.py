@@ -54,7 +54,7 @@ initialize_database()
 # ========== Load & Save Data Functions ==========
 def load_data():
 conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM livestock", conn)
+df = pd.read_sql("SELECT * FROM livestock", conn)
     conn.close()
     return df
 
