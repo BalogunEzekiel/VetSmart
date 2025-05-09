@@ -254,7 +254,7 @@ def display_diagnosis():
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
-            pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
+            pdf_buffer = generate_vetsmart_report(animal_data, disease, recommendation)
 
             st.download_button(
                 label="Download Diagnosis Report",
