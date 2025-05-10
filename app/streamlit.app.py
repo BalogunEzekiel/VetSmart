@@ -209,18 +209,18 @@ def display_dashboard():
         submit = st.form_submit_button("💾 Save")
 
     if submit:
-        if st.session_state.name.strip() == "":
-            st.warning("Animal Tag cannot be empty.")
-        else:
-            save_livestock_data(
-                st.session_state.name,
-                st.session_state.animal_type,
-                st.session_state.age,
-                st.session_state.weight,
-                st.session_state.vaccination
-            )
-            st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
-            reset_form()
+    if st.session_state.name.strip() == "":
+        st.warning("Animal Tag cannot be empty.")
+    else:
+        save_livestock_data(
+            st.session_state.name,
+            st.session_state.animal_type,
+            st.session_state.age,
+            st.session_state.weight,
+            st.session_state.vaccination
+        )
+        reset_form()  # <- Move this BEFORE the st.success()
+        st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
 
 # ============================ Diagnosis ==================================
 def display_diagnosis():
