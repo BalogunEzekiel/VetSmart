@@ -425,24 +425,23 @@ import requests
 import openai
 import streamlit_js_eval
 
-
 # Set OpenAI API Key
-openai.api_key = 'YOUR_OPENAI_API_KEY'
+# openai.api_key = 'YOUR_OPENAI_API_KEY'
 
 # Initialize session state if not already present
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
 # Function to interact with OpenAI API
-""" def get_openai_response(user_input):
-    # Call OpenAI API to generate a response
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=user_input,
-        max_tokens=150
-    )
-    return response.choices[0].text.strip()
-"""
+# def get_openai_response(user_input):
+#    # Call OpenAI API to generate a response
+#    response = openai.Completion.create(
+#        engine="text-davinci-003",
+#        prompt=user_input,
+#        max_tokens=150
+#    )
+#    return response.choices[0].text.strip()
+
 # Function to interact with Rasa API
 def get_rasa_response(user_input):
     # Send the user input to the Rasa server for a response
