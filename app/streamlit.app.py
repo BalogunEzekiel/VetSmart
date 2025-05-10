@@ -381,3 +381,6 @@ def chatbot_widget():
             st.session_state.chat_history.append(("You", user_input))
             st.session_state.chat_history.append(("VetSmart", response))
             st.session_state.chat_input = ""  # Clear input field
+
+# ========== Main App ==========
+st.title("VetSmart: Livestock Care Assistant")
