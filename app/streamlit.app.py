@@ -423,6 +423,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 import requests
 import openai
+import streamlit_js_eval
+
 
 # Set OpenAI API Key
 openai.api_key = 'YOUR_OPENAI_API_KEY'
