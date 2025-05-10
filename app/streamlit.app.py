@@ -280,7 +280,7 @@ st.sidebar.markdown("## VetSmart Navigation")
 st.markdown(
     """
     <div style="text-align: center;">
-        <img src="logo.jpeg" width="150" alt="VetSmart Logo">
+        <img src="Logo.jpeg" width="150" alt="VetSmart Logo">
     </div>
     """,
     unsafe_allow_html=True
