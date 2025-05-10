@@ -275,8 +275,20 @@ def handle_feedback_submission():
                 st.success("Thank you for your feedback!")
 
 # ========== Sidebar ==========
-st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
-st.sidebar.markdown("## VetSmart Navigation")
+with st.sidebar:
+    st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
+    st.markdown("## 🐄 About VetSmart")
+    st.markdown("""
+    **VetSmart** is an intelligent livestock health monitoring and management app designed to help farmers and veterinary professionals track, assess, and predict the health status of their animals in real-time.
+
+    With features like livestock registration, disease prediction based on symptoms, vaccination records, and downloadable diagnosis reports, VetSmart enhances the efficiency and accuracy of animal healthcare decisions.
+
+    **Contributors:**
+    - **Ezekiel BALOGUN** – Data Scientist/Lead  
+    - **Oluwakemi Adesanwo** – Data Analyst  
+    - **Damilare Abayomi** – Software Developer  
+    - **Boluwatife Adeagbo** – Veterinary Doctor
+    """)
 
 # ========== Centered Logo ==========
 st.markdown(
