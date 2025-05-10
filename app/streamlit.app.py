@@ -116,10 +116,10 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
 
     # Animal Information Table
     data = [
-        ['Animal Tag:', animal_data['Name']],
-        ['Type:', animal_data['Type']],
-        ['Age (years):', animal_data['Age']],
-        ['Weight (kg):', animal_data['Weight']],
+        ['Animal Tag', animal_data['Name']],
+        ['Type', animal_data['Type']],
+        ['Age (years)', animal_data['Age']],
+        ['Weight (kg)', animal_data['Weight']],
     ]
     table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     table.setStyle(TableStyle([
@@ -135,13 +135,13 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     table.drawOn(c, inch, letter[1] - 2.5 * inch)
     c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 3.5 * inch, "<b>Diagnosis<b>", centered_title_style)
+    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis", centered_style)
     c.setFont("Helvetica", 10)
 
     # Diagnosis Table
     diagnosis_data = [
-        ['Predicted Disease:', disease],
-        ['Recommendation:', recommendation],
+        ['Predicted Disease', disease],
+        ['Recommendation', recommendation],
     ]
     diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     diagnosis_table.setStyle(TableStyle([
