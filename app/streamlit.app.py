@@ -208,7 +208,7 @@ def display_dashboard():
         st.text_area("Vaccination History", key="vaccination")
         submit = st.form_submit_button("💾 Save")
 
-    if submit:
+if submit:
     if st.session_state.name.strip() == "":
         st.warning("Animal Tag cannot be empty.")
     else:
@@ -219,7 +219,7 @@ def display_dashboard():
             st.session_state.weight,
             st.session_state.vaccination
         )
-        reset_form()  # <- Move this BEFORE the st.success()
+        reset_form()  # This resets the form before showing success message
         st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
 
 # ============================ Diagnosis ==================================
@@ -309,11 +309,11 @@ with st.sidebar:
     st.markdown("## 🐄Livestock Focus:")
     st.markdown("""
     
-    ***Cattle***
+👉 *Cattle*
     
-    ***Goat***
+👉 *Goat*
     
-    ***Sheep***
+👉 *Sheep*
     """)    
     st.markdown("## About VetSmart")
     st.markdown("""
