@@ -165,14 +165,14 @@ c.setFont("Helvetica", 8)
 c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
 c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
 
-# Footer
-c.setFont("Helvetica", 8)
-c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
+    # Footer
+    c.setFont("Helvetica", 8)
+    c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
-c.save()
-buffer.seek(0)
-return buffer
+    c.save()
+    buffer.seek(0)
+    return buffer
 
 # ========== Page Functions ==========
 def display_dashboard():
