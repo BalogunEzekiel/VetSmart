@@ -176,6 +176,8 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     return buffer
 
 # ========== Page Functions ==========
+import streamlit as st
+
 def display_dashboard():
     """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
@@ -190,12 +192,20 @@ def display_dashboard():
             else:
                 st.session_state[key] = ""
 
+    def reset_form():
+        st.session_state["name"] = ""
+        st.session_state["animal_type"] = "Cattle"
+        st.session_state["age"] = 0.0
+        st.session_state["weight"] = 0.0
+        st.session_state["vaccination"] = ""
+        st.experimental_rerun()
+
     with st.form("livestock_form"):
-        name = st.text_input("Animal Tag", key="name")
-        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"], key="animal_type")
-        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1, key="age")
-        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0, key="weight")
-        vaccination = st.text_area("Vaccination History", key="vaccination")
+        st.text_input("Animal Tag", key="name")
+        st.selectbox("Type", ["Cattle", "Goat", "Sheep"], key="animal_type")
+        st.number_input("Age (years)", 0.0, 20.0, step=0.1, key="age")
+        st.number_input("Weight (kg)", 0.0, 500.0, step=1.0, key="weight")
+        st.text_area("Vaccination History", key="vaccination")
         submit = st.form_submit_button("💾 Save")
 
     if submit:
@@ -210,13 +220,7 @@ def display_dashboard():
                 st.session_state.vaccination
             )
             st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
-
-            # Clear the form fields
-            st.session_state.name = ""
-            st.session_state.animal_type = "Cattle"
-            st.session_state.age = 0.0
-            st.session_state.weight = 0.0
-            st.session_state.vaccination = ""
+            reset_form()
 
 # ============================ Diagnosis ==================================
 def display_diagnosis():
