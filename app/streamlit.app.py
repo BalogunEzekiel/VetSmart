@@ -222,9 +222,6 @@ def display_dashboard():
                 reset_form()
                 st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
 
-# Don't forget to call the function to run it
-display_dashboard()
-
 # ============================ Diagnosis ==================================
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
