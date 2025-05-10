@@ -1,4 +1,8 @@
 import streamlit as st
+
+# ========== Page Setup ==========
+st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+
 import pandas as pd
 import datetime
 import random
@@ -11,9 +15,6 @@ from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
-
-# ========== Page Setup ==========
-st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 # ========== Database Configuration ==========
 SQLITE_DB = 'livestock_data.db'
@@ -296,19 +297,17 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-pages = {
-    "📊 Livestock Dashboard": display_dashboard,
-    "🦠 Disease Diagnosis": display_diagnosis,
-    "💡 Health Tips": display_health_tips,
-    "📝 Feedback": handle_feedback_submission
-}
-
-# 🛠️ This line was missing
-selected_page = st.sidebar.selectbox("Choose a page", list(pages.keys()))
-
-# Call the corresponding function
-selected_page_function = pages[selected_page]
-selected_page_function()
+# ========== Main ==========
+st.title("🐄 VetSmart - Livestock Health Monitoring")
+tab1, tab2 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
+with tab1:
+    display_dashboard()
+with tab2:
+    display_diagnosis()
+with tab3:
+    display_diagnosis()
+with tab4:
+    display_diagnosis()
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
