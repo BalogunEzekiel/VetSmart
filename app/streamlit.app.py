@@ -252,6 +252,7 @@ def display_health_tips():
 
 def handle_feedback_submission():
     """Handles the feedback submission process."""
+    st.subheader("We Value Your Feedback 📝")
     with st.form("feedback_form"):
         name = st.text_input("Your Name")
         feedback_text = st.text_area("Please provide your feedback here:")
