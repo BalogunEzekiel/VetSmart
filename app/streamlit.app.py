@@ -417,18 +417,43 @@ def chatbot_widget():
 
 chatbot_widget()
 
+
+# ======================RasaVetChat=============================
 import streamlit as st
 import streamlit.components.v1 as components
-import streamlit_js_eval
+import requests
+import openai
+
+# Set OpenAI API Key
+openai.api_key = 'YOUR_OPENAI_API_KEY'
 
 # Initialize session state if not already present
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
-# Chatbot logic function (simple echo in this case)
-def chatbot_response(user_input):
-    # You can replace this with any chatbot logic or API call
-    return f"VetChat: You said: {user_input}"
+# Function to interact with OpenAI API
+""" def get_openai_response(user_input):
+    # Call OpenAI API to generate a response
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=user_input,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+"""
+# Function to interact with Rasa API
+def get_rasa_response(user_input):
+    # Send the user input to the Rasa server for a response
+    rasa_url = "http://localhost:5005/webhooks/rest/webhook"
+    payload = {"message": user_input}
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(rasa_url, json=payload, headers=headers)
+    response_json = response.json()
+
+    if response_json:
+        return response_json[0]['text']
+    else:
+        return "Sorry, I didn't understand that."
 
 # Custom HTML + JS + CSS to float the chatbot
 chat_html = f"""
@@ -550,8 +575,12 @@ event = streamlit_js_eval.streamlit_js_eval(js_expressions="parent.postMessage({
 if event and event.get("type") == "chatMessage":
     user_input = event.get("message", "")
     if user_input:
-        # Get a response from the chatbot (you can replace this with actual logic)
-        response = chatbot_response(user_input)
+        # Use Rasa or OpenAI to get a response
+        # Uncomment the next line to use Rasa
+        # response = get_rasa_response(user_input)
+        
+        # Use OpenAI for response generation
+        response = get_openai_response(user_input)
 
         # Store the user input and response in the chat history
         st.session_state.chat_history.append(("You", user_input))
