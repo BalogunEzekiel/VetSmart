@@ -355,7 +355,6 @@ from datetime import datetime
 
 # ========== Simple Rule-Based Chatbot ==========
 def chatbot_response(user_input):
-    user_input = user_input.lower()
     responses = {
         "hello": "Hi there! How can I assist you with your livestock today?",
         "hi": "Hello! What would you like help with?",
@@ -376,59 +375,52 @@ def chatbot_response(user_input):
         "temperature": "The normal body temperature for a cow is between 101.5°F and 103.5°F (38.6°C - 39.7°C)",
         "not eating": "Loss of appetite may be due to heat stress, illness, pain, poor-quality feed. Diagnose your animal symptoms on the Diagnosis tab.",
         "deworm": "Generally, cattle should be dewormed 2–4 times a year, depending on local parasite load, grazing conditions.",
-        "Milk production in my dairy cow?": "Ensure proper nutrition (high-quality forage and supplements), regular milking, clean water access, and stress-free housing.",
+        "milk production in my dairy cow?": "Ensure proper nutrition (high-quality forage and supplements), regular milking, clean water access, and stress-free housing.",
         "diet for goats": "Goats thrive on a mix of good-quality hay, browse (leaves, twigs), grains, minerals, and clean water. Avoid moldy feed.",
         "goat coughing": "Common causes include respiratory infections (like pneumonia), dusty feed, or lungworms. Isolate and consult a vet.",
         "vaccinate": "Livestock should be vaccinated regularly. Goats should receive the CDT (Clostridium perfringens C & D and tetanus) vaccine initially at 6–8 weeks, with boosters annually.",
         "sign of pregnancy": "Signs include increased appetite, abdominal enlargement, and behavior change. Take proper care of your animal at this time.",
         "causes of bloating in goats": "Rapid consumption of lush legumes, overeating grain, or digestive blockage. Try gentle walking or simethicone. Severe cases need a vet.",
         "ideal temperature range for sheep": "Normal temperature is about 102.3°F (39.1°C), give or take a degree.",
-        "How often should sheep be sheared": "At least once a year, typically in spring, to keep them comfortable and avoid overheating.",
-        "What are common diseases in sheep": "Foot rot, pneumonia, enterotoxemia (overeating disease), and internal parasites are prevalent. Prevent with vaccines and hygiene.",
-        "How do I treat foot rot in sheep": "Trim the hoof, clean the wound, and soak the foot in a zinc sulfate solution. Isolate affected animals.",
-        "Why is my sheep limping": "Likely causes: foot rot, injuries, or joint infections. Check the hoof for wounds or swelling.",
+        "how often should sheep be sheared": "At least once a year, typically in spring, to keep them comfortable and avoid overheating.",
+        "what are common diseases in sheep": "Foot rot, pneumonia, enterotoxemia (overeating disease), and internal parasites are prevalent. Prevent with vaccines and hygiene.",
+        "how do i treat foot rot in sheep": "Trim the hoof, clean the wound, and soak the foot in a zinc sulfate solution. Isolate affected animals.",
+        "why is my sheep limping": "Likely causes: foot rot, injuries, or joint infections. Check the hoof for wounds or swelling.",
     }
+
+    # Match input with keys (basic keyword match)
     for key in responses:
-        if key in user_input:
+        if key in user_input.lower():
             return responses[key]
     return "Sorry, I didn't understand that. Please try asking something else."
 
-# ========== Persistent Chatbot Widget ==========
-# Function to simulate chatbot response (for demo purposes)
-def chatbot_response(user_input):
-    return f" "
-
-# Function to reset the chat input field (clear after submission)
+# ========== Helper Functions ==========
 def clear_input():
     if "chat_input" in st.session_state:
-        st.session_state.chat_input = ""  # This will reset the chat input field
+        st.session_state.chat_input = ""
 
-# Initialize session state values
+# ========== Streamlit App ==========
 if "chat_input" not in st.session_state:
-    st.session_state.chat_input = ""  # Default empty chat input
+    st.session_state.chat_input = ""
 
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []  # Initialize chat history
+    st.session_state.chat_history = []
 
 def chatbot_widget():
     with st.sidebar.expander("💬 VetChat", expanded=True):
         st.markdown("*Ask me anything about livestock care!*")
 
-        # Display chat history
         for sender, message in st.session_state.chat_history:
-            if sender == "You":
-                st.markdown(f"**You:** {message}")
-            else:
-                st.markdown(f"🤖 **VetChat:** {message}")
+            st.markdown(f"**You:** {message}" if sender == "You" else f"🤖 **VetChat:** {message}")
 
-        # User input field (outside the loop)
-        user_input = st.text_input("You:", key="chat_input", label_visibility="collapsed")
+        with st.form("chat_form", clear_on_submit=True):
+            user_input = st.text_input("You:", key="chat_input", label_visibility="collapsed")
+            submitted = st.form_submit_button("Send")
 
-        # Process user input and generate response if there's input
-        if user_input:
+        if submitted and user_input:
             response = chatbot_response(user_input)
             st.session_state.chat_history.append(("You", user_input))
             st.session_state.chat_history.append(("VetChat", response))
-            clear_input()  # Clear input field after sending the message
+            clear_input()
 
 chatbot_widget()
