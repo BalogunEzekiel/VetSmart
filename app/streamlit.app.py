@@ -1,7 +1,7 @@
 import streamlit as st
 
 # ========== Page Setup ==========
-st.set_page_config(page_title="VetSmart", layout="wide")
+st.set_page_config(page_title="VetSmart", page_icon="🐄" layout="wide")
 
 import pandas as pd
 import datetime
