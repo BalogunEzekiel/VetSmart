@@ -299,7 +299,7 @@ st.markdown(
 )
 # ========== Main ==========
 st.title("🐄 VetSmart - Livestock Health Monitoring")
-tab1, tab2 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
 with tab1:
     display_dashboard()
 with tab2:
