@@ -407,7 +407,7 @@ def chatbot_widget():
             else:
                 st.markdown(f"🤖 **VetSmart:** {message}")
 
-        user_input = st.text_input("You:", key="chat_input", label_visibility="collapsed")
+        user_input = st.text_input("You:", key="chat_input", on_change=clear_input)
 
         if user_input:
             response = chatbot_response(user_input)
