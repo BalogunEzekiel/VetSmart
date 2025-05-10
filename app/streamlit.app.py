@@ -356,7 +356,7 @@ from datetime import datetime
 # ========== Simple Rule-Based Chatbot ==========
 def chatbot_response(user_input):
     user_input = user_input.lower()
-    responses = {
+    responses = 
         "hello": "Hi there! How can I assist you with your livestock today?",
         "hi": "Hello! What would you like help with?",
         "how are you": "I'm just AI-VetChat, your animal health assistant, but I'm well trained and functioning properly!",
@@ -396,7 +396,7 @@ def chatbot_response(user_input):
 # ========== Persistent Chatbot Widget ==========
 # Function to simulate chatbot response (for demo purposes)
 def chatbot_response(user_input):
-    return f"Got your message: {user_input}. How can I assist further?"
+    return f" "
 
 # Function to reset the chat input field (clear after submission)
 def clear_input():
