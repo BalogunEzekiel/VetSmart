@@ -276,10 +276,26 @@ def handle_feedback_submission():
 st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
 st.sidebar.markdown("## VetSmart Navigation")
 
-# ========== Title ==========
-st.markdown("<div class='title'>🐮 VetSmart</div>", unsafe_allow_html=True)
-st.markdown("<h3 style='font-weight: normal; font-size: 20px;'>Livestock Monitoring, Disease Prevention and Diagnosis</h3>", unsafe_allow_html=True)
+# ========== Centered Logo ==========
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="logo.jpeg" width="150" alt="VetSmart Logo">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
+# ========== Title & Subtitle ==========
+st.markdown(
+    """
+    <div style="text-align: center; margin-top: 10px;">
+        <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 0;">🐮 VetSmart</h1>
+        <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 pages = {
     "📊 Livestock Dashboard": display_dashboard,
     "🦠 Disease Diagnosis": display_diagnosis,
