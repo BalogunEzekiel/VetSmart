@@ -2,6 +2,7 @@ import streamlit as st
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
+st.set_page_config(page_title="VetSmart", layout="wide")
 
 import pandas as pd
 import datetime
@@ -384,7 +385,6 @@ def chatbot_widget():
 
 
 # ========== Main App ==========
-st.set_page_config(page_title="VetSmart", layout="wide")
 st.title("VetSmart: Livestock Care Assistant")
 
 # Sidebar Navigation
