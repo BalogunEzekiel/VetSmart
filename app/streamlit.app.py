@@ -417,7 +417,18 @@ def chatbot_widget():
 
 chatbot_widget()
 
+import streamlit as st
 import streamlit.components.v1 as components
+import streamlit_js_eval
+
+# Initialize session state if not already present
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
+
+# Chatbot logic function (simple echo in this case)
+def chatbot_response(user_input):
+    # You can replace this with any chatbot logic or API call
+    return f"VetChat: You said: {user_input}"
 
 # Custom HTML + JS + CSS to float the chatbot
 chat_html = f"""
@@ -530,16 +541,19 @@ chat_html = f"""
 </script>
 """
 
+# Display the chat HTML
 components.html(chat_html, height=500, width=0)
 
-import streamlit_js_eval
-
+# Handling the user input and response
 event = streamlit_js_eval.streamlit_js_eval(js_expressions="parent.postMessage({ type: 'ready' }, '*')", key="chat_eval")
 
 if event and event.get("type") == "chatMessage":
     user_input = event.get("message", "")
     if user_input:
+        # Get a response from the chatbot (you can replace this with actual logic)
         response = chatbot_response(user_input)
+
+        # Store the user input and response in the chat history
         st.session_state.chat_history.append(("You", user_input))
         st.session_state.chat_history.append(("VetChat", response))
 
