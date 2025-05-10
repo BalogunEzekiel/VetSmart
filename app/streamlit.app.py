@@ -339,3 +339,50 @@ if st.sidebar.button("Download SQLite Data as CSV"):
         file_name="livestock_data.csv",
         mime="text/csv"
     )
+
+# ================VetChat==================
+import streamlit as st
+from datetime import datetime
+
+# ========== Simple Rule-Based Chatbot ==========
+def chatbot_response(user_input):
+    user_input = user_input.lower()
+    responses = {
+        "hello": "Hi there! How can I assist you with your livestock today?",
+        "hi": "Hello! What would you like help with?",
+        "how are you": "I'm just a bot, but I'm functioning properly!",
+        "disease": "You can go to the 'Disease Prediction' tab to analyze symptoms.",
+        "vaccination": "Vaccination records can be managed in the 'Livestock Records' tab.",
+        "bye": "Goodbye! Stay healthy and safe!",
+    }
+    for key in responses:
+        if key in user_input:
+            return responses[key]
+    return "Sorry, I didn't understand that. Please try asking something else."
+
+# ========== Streamlit App Layout ==========
+st.title("VetSmart: Livestock Care Assistant")
+
+# Sidebar Navigation
+st.sidebar.title("VetSmart Navigation")
+tabs = ["Home", "Disease Prediction", "Livestock Records"]
+selected_tab = st.sidebar.radio("Select a Tab", tabs)
+
+# Home Tab with Chatbot
+if selected_tab == "Home":
+    with st.expander("💬 VetSmart Assistant Chatbot"):
+        st.markdown("*Ask me anything about livestock care!*")
+        chat_history = st.session_state.get("chat_history", [])
+        user_input = st.text_input("You:", key="chat_input")
+
+        if user_input:
+            response = chatbot_response(user_input)
+            chat_history.append(("You", user_input))
+            chat_history.append(("VetSmart", response))
+            st.session_state.chat_history = chat_history
+
+        for sender, message in chat_history:
+            if sender == "You":
+                st.markdown(f"*You:* {message}")
+            else:
+                st.markdown(f"🤖 VetSmart: {message}")
