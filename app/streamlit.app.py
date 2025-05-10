@@ -360,7 +360,31 @@ def chatbot_response(user_input):
             return responses[key]
     return "Sorry, I didn't understand that. Please try asking something else."
 
-# ========== Streamlit App Layout ==========
+# ========== Persistent Chatbot Widget ==========
+def chatbot_widget():
+    with st.sidebar.expander("💬 VetSmart Chatbot", expanded=True):
+        st.markdown("*Ask me anything about livestock care!*")
+
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
+        for sender, message in st.session_state.chat_history:
+            if sender == "You":
+                st.markdown(f"**You:** {message}")
+            else:
+                st.markdown(f"🤖 **VetSmart:** {message}")
+
+        user_input = st.text_input("You:", key="chat_input", label_visibility="collapsed")
+
+        if user_input:
+            response = chatbot_response(user_input)
+            st.session_state.chat_history.append(("You", user_input))
+            st.session_state.chat_history.append(("VetSmart", response))
+            st.session_state.chat_input = ""  # Clear input field
+
+
+# ========== Main App ==========
+st.set_page_config(page_title="VetSmart", layout="wide")
 st.title("VetSmart: Livestock Care Assistant")
 
 # Sidebar Navigation
@@ -368,21 +392,18 @@ st.sidebar.title("VetSmart Navigation")
 tabs = ["Home", "Disease Prediction", "Livestock Records"]
 selected_tab = st.sidebar.radio("Select a Tab", tabs)
 
-# Home Tab with Chatbot
+# Include chatbot in the sidebar for all tabs
+chatbot_widget()
+
+# Content for each tab
 if selected_tab == "Home":
-    with st.expander("💬 VetSmart Assistant Chatbot"):
-        st.markdown("*Ask me anything about livestock care!*")
-        chat_history = st.session_state.get("chat_history", [])
-        user_input = st.text_input("You:", key="chat_input")
+    st.header("Welcome to VetSmart!")
+    st.write("This is your go-to assistant for livestock care.")
 
-        if user_input:
-            response = chatbot_response(user_input)
-            chat_history.append(("You", user_input))
-            chat_history.append(("VetSmart", response))
-            st.session_state.chat_history = chat_history
+elif selected_tab == "Disease Prediction":
+    st.header("Disease Prediction")
+    st.write("Predict livestock diseases based on symptoms.")
 
-        for sender, message in chat_history:
-            if sender == "You":
-                st.markdown(f"*You:* {message}")
-            else:
-                st.markdown(f"🤖 VetSmart: {message}")
+elif selected_tab == "Livestock Records":
+    st.header("Livestock Records")
+    st.write("Manage your livestock information and vaccination history.")
