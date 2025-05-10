@@ -17,3 +17,5 @@ reportlab==4.4.0
 streamlit-chat
 streamlit-chat
 streamlit_js_eval
+requests
+openai
