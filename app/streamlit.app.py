@@ -119,7 +119,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.rect(0, height - header_height, width, header_height, fill=1, stroke=0)
 
     # Draw VetSmart logo
-    logo_path = "path/to/vetsmart_logo.png"  # Replace with your actual logo path
+    logo_path = "logo.png"  # Replace with your actual logo path
     logo_width = 1 * inch
     logo_height = 1 * inch
     c.drawImage(logo_path, inch / 2, height - logo_height - (header_height - logo_height) / 2,
@@ -322,7 +322,7 @@ st.sidebar.markdown("## VetSmart Navigation")
 st.markdown(
     """
     <div style="text-align: center;">
-        <img src="Logo.jpeg" width="150" alt="VetSmart Logo">
+        <img src="Logo.png" width="150" alt="VetSmart Logo">
     </div>
     """,
     unsafe_allow_html=True
