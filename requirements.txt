@@ -18,5 +18,3 @@ streamlit-chat
 streamlit-chat
 streamlit_js_eval
 requests
-openai
-streamlit_js_eval
