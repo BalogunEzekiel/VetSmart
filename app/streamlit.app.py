@@ -1,8 +1,7 @@
 import streamlit as st
 
 # ========== Page Setup ==========
-st.set_page_config(page_title="🐄 VetSmart - 
-Livestock Monitoring", layout="wide")
+st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 import pandas as pd
 import datetime
