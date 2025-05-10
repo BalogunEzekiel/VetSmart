@@ -1,7 +1,7 @@
 import streamlit as st
 
 # ========== Page Setup ==========
-st.set_page_config(page_title="VetSmart", page_icon="🐄", layout="wide")
+st.set_page_config(page_title="VetSmart", layout="wide")
 
 import pandas as pd
 import datetime
@@ -391,9 +391,6 @@ def chatbot_response(user_input):
         if key in user_input.lower():
             return responses[key]
     return "Sorry, I didn't understand that. Please try asking something else."
-
-# ========== Streamlit App ==========
-st.set_page_config(page_title="VetSmart", page_icon="🐄", layout="wide")
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
