@@ -1,8 +1,3 @@
-#####
-
-
-
-
 import streamlit as st
 
 # ========== Page Setup ==========
@@ -111,20 +106,20 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     centered_title_style = ParagraphStyle(name='CenteredTitle', parent=styles['Heading1'], alignment=1)
 
     # VetSmart Report Title
-    p = Paragraph("<b>VetSmart Diagnosis Report</b>", centered_title_style)
+    p = Paragraph("<b>Animal Information</b>", centered_title_style)
     p.wrapOn(c, letter[0] - 2 * inch, letter[1])
     p.drawOn(c, inch, letter[1] - 1.5 * inch)
     c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
+    c.drawString(inch, letter[1] - 2 * inch, ":")
     c.setFont("Helvetica", 10)
 
     # Animal Information Table
     data = [
-        ['Animal Tag', animal_data['Name']],
-        ['Type', animal_data['Type']],
-        ['Age (years)', animal_data['Age']],
-        ['Weight (kg)', animal_data['Weight']],
+        ['Animal Tag:<b>', animal_data['Name']],
+        ['Type:<b>', animal_data['Type']],
+        ['Age (years):<b>', animal_data['Age']],
+        ['Weight (kg):<b>', animal_data['Weight']],
     ]
     table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     table.setStyle(TableStyle([
@@ -140,13 +135,13 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     table.drawOn(c, inch, letter[1] - 2.5 * inch)
     c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
+    c.drawString(inch, letter[1] - 3.5 * inch, "<b>Diagnosis<b>", centered_title_style")
     c.setFont("Helvetica", 10)
 
     # Diagnosis Table
     diagnosis_data = [
-        ['Predicted Disease', disease],
-        ['Recommendation', recommendation],
+        ['<b>Predicted Disease:<b>', disease],
+        ['<b>Recommendation:<b>', recommendation],
     ]
     diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     diagnosis_table.setStyle(TableStyle([
