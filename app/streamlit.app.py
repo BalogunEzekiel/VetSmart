@@ -416,3 +416,133 @@ def chatbot_widget():
                 st.session_state.chat_history.append(("VetChat", response))
 
 chatbot_widget()
+
+import streamlit.components.v1 as components
+
+# Custom HTML + JS + CSS to float the chatbot
+chat_html = f"""
+<style>
+    #chat-container {{
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        max-height: 400px;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+        z-index: 9999;
+        resize: both;
+        overflow: hidden;
+    }}
+    #chat-header {{
+        background-color: #2e7bcf;
+        color: white;
+        padding: 10px;
+        cursor: move;
+        user-select: none;
+        font-weight: bold;
+    }}
+    #chat-messages {{
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column-reverse;
+    }}
+    #chat-input {{
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+    }}
+    #chat-input input {{
+        flex: 1;
+        padding: 5px;
+    }}
+    #chat-input button {{
+        margin-left: 5px;
+        padding: 5px 10px;
+    }}
+</style>
+
+<div id="chat-container">
+    <div id="chat-header" onclick="toggleChat()">💬 VetChat</div>
+    <div id="chat-body">
+        <div id="chat-messages">
+            {"".join([f"<div><b>{s}:</b> {m}</div>" for s, m in reversed(st.session_state.chat_history)])}
+        </div>
+        <div id="chat-input">
+            <input type="text" id="user-input" placeholder="Ask VetChat..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let dragging = false;
+    let offset = [0, 0];
+    const chatBox = document.getElementById("chat-container");
+    const header = document.getElementById("chat-header");
+
+    header.addEventListener("mousedown", function(e) {{
+        dragging = true;
+        offset = [
+            chatBox.offsetLeft - e.clientX,
+            chatBox.offsetTop - e.clientY
+        ];
+    }});
+
+    document.addEventListener("mouseup", function() {{
+        dragging = false;
+    }});
+
+    document.addEventListener("mousemove", function(e) {{
+        e.preventDefault();
+        if (dragging) {{
+            chatBox.style.left = (e.clientX + offset[0]) + "px";
+            chatBox.style.top = (e.clientY + offset[1]) + "px";
+        }}
+    }});
+
+    function toggleChat() {{
+        const body = document.getElementById("chat-body");
+        body.style.display = body.style.display === "none" ? "block" : "none";
+    }}
+
+    function sendMessage() {{
+        const input = document.getElementById("user-input");
+        const msg = input.value;
+        if (msg) {{
+            window.parent.postMessage({{type: "chatMessage", message: msg}}, "*");
+            input.value = "";
+        }}
+    }}
+
+    window.addEventListener("message", (event) => {{
+        if (event.data.type === "updateChat") {{
+            const chatDiv = document.getElementById("chat-messages");
+            chatDiv.innerHTML = event.data.html;
+        }}
+    }});
+</script>
+"""
+
+components.html(chat_html, height=500, width=0)
+
+import streamlit_js_eval
+
+event = streamlit_js_eval.streamlit_js_eval(js_expressions="parent.postMessage({ type: 'ready' }, '*')", key="chat_eval")
+
+if event and event.get("type") == "chatMessage":
+    user_input = event.get("message", "")
+    if user_input:
+        response = chatbot_response(user_input)
+        st.session_state.chat_history.append(("You", user_input))
+        st.session_state.chat_history.append(("VetChat", response))
+
+        # Trigger JS to update the chat window dynamically
+        chat_update = "".join([f"<div><b>{s}:</b> {m}</div>" for s, m in reversed(st.session_state.chat_history)])
+        st.components.v1.html(f"<script>window.parent.postMessage({{type: 'updateChat', html: `{chat_update}`}}, '*');</script>", height=0)
