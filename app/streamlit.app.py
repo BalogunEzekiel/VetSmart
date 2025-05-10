@@ -305,9 +305,9 @@ with tab1:
 with tab2:
     display_diagnosis()
 with tab3:
-    display_diagnosis()
+    display_health_tips()
 with tab4:
-    display_diagnosis()
+    handle_feedback_submission()
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
