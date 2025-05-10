@@ -3,6 +3,8 @@ import streamlit as st
 # ========== Page Setup ==========
 st.set_page_config(page_title="VetSmart", layout="wide")
 
+chatbot_widget()
+
 import pandas as pd
 import datetime
 import random
@@ -277,7 +279,7 @@ def handle_feedback_submission():
 # ========== Sidebar ==========
 with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
-    st.markdown("#### 🐄Livestock Focus:")
+    st.markdown("## 🐄Livestock Focus:")
     st.markdown("""
     
     **Cattle**
