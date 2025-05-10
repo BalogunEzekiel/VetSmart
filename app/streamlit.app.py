@@ -394,6 +394,14 @@ def chatbot_response(user_input):
     return "Sorry, I didn't understand that. Please try asking something else."
 
 # ========== Persistent Chatbot Widget ==========
+# Function to simulate chatbot response (for demo purposes)
+def chatbot_response(user_input):
+    return f"Got your message: {user_input}. How can I assist further?"
+
+# Function to reset the chat input field (clear after submission)
+def clear_input():
+    st.session_state.chat_input = ""  # This will reset the chat input field
+
 def chatbot_widget():
     with st.sidebar.expander("💬 VetChat", expanded=True):
         st.markdown("*Ask me anything about livestock care!*")
@@ -401,18 +409,21 @@ def chatbot_widget():
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
 
+        # Display chat history
         for sender, message in st.session_state.chat_history:
             if sender == "You":
                 st.markdown(f"**You:** {message}")
             else:
-                st.markdown(f"🤖 **VetSmart:** {message}")
+                st.markdown(f"🤖 **VetChat:** {message}")
 
-        user_input = st.text_input("You:", key="chat_input", label_visibility="collapsed", on_change=clear_input)
+        # User input field (outside the loop)
+        user_input = st.text_input("You:", key="chat_input", label_visibility="collapsed")
 
+        # Process user input and generate response if there's input
         if user_input:
             response = chatbot_response(user_input)
             st.session_state.chat_history.append(("You", user_input))
             st.session_state.chat_history.append(("VetChat", response))
-            st.session_state.chat_input = ""  # Clear input field
+            clear_input()  # Clear input field
 
 chatbot_widget()
