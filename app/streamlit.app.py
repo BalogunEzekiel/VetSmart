@@ -386,7 +386,7 @@ def chatbot_response(user_input):
 
 # ========== Persistent Chatbot Widget ==========
 def chatbot_widget():
-    with st.sidebar.expander("💬 VetSmart Chatbot", expanded=True):
+    with st.sidebar.expander("💬 VetChat", expanded=True):
         st.markdown("*Ask me anything about livestock care!*")
 
         if "chat_history" not in st.session_state:
@@ -403,30 +403,9 @@ def chatbot_widget():
         if user_input:
             response = chatbot_response(user_input)
             st.session_state.chat_history.append(("You", user_input))
-            st.session_state.chat_history.append(("VetSmart", response))
+            st.session_state.chat_history.append(("VetChat", response))
             st.session_state.chat_input = ""  # Clear input field
 
 
-# ========== Main App ==========
-st.title("VetSmart: Livestock Care Assistant")
-
-# Sidebar Navigation
-st.sidebar.title("VetSmart Navigation")
-tabs = ["Home", "Disease Prediction", "Livestock Records"]
-selected_tab = st.sidebar.radio("Select a Tab", tabs)
-
 # Include chatbot in the sidebar for all tabs
 chatbot_widget()
-
-# Content for each tab
-if selected_tab == "Home":
-    st.header("Welcome to VetSmart!")
-    st.write("This is your go-to assistant for livestock care.")
-
-elif selected_tab == "Disease Prediction":
-    st.header("Disease Prediction")
-    st.write("Predict livestock diseases based on symptoms.")
-
-elif selected_tab == "Livestock Records":
-    st.header("Livestock Records")
-    st.write("Manage your livestock information and vaccination history.")
