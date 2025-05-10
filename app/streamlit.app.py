@@ -208,19 +208,22 @@ def display_dashboard():
         st.text_area("Vaccination History", key="vaccination")
         submit = st.form_submit_button("💾 Save")
 
-if submit:
-    if st.session_state.name.strip() == "":
-        st.warning("Animal Tag cannot be empty.")
-    else:
-        save_livestock_data(
-            st.session_state.name,
-            st.session_state.animal_type,
-            st.session_state.age,
-            st.session_state.weight,
-            st.session_state.vaccination
-        )
-        reset_form()  # This resets the form before showing success message
-        st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
+        if submit:
+            if st.session_state.name.strip() == "":
+                st.warning("Animal Tag cannot be empty.")
+            else:
+                save_livestock_data(
+                    st.session_state.name,
+                    st.session_state.animal_type,
+                    st.session_state.age,
+                    st.session_state.weight,
+                    st.session_state.vaccination
+                )
+                reset_form()
+                st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
+
+# Don't forget to call the function to run it
+display_dashboard()
 
 # ============================ Diagnosis ==================================
 def display_diagnosis():
