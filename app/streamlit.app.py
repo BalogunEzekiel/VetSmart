@@ -279,16 +279,26 @@ def display_health_tips():
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
+import datetime
+import streamlit as st
+
 def handle_feedback_submission():
     """Handles the feedback submission process."""
     st.subheader("We Value Your Feedback 📝")
+
+    # Initialize session state for form fields
+    if "feedback_name" not in st.session_state:
+        st.session_state.feedback_name = ""
+    if "feedback_text" not in st.session_state:
+        st.session_state.feedback_text = ""
+
     with st.form("feedback_form"):
-        name = st.text_input("Your Name")
-        feedback_text = st.text_area("Please provide your feedback here:")
+        name = st.text_input("Your Name", key="feedback_name")
+        feedback_text = st.text_area("Please provide your feedback here:", key="feedback_text")
         submitted = st.form_submit_button("Submit Feedback")
 
         if submitted:
-            if name.strip() == "" or feedback_text.strip() == "":
+            if st.session_state.feedback_name.strip() == "" or st.session_state.feedback_text.strip() == "":
                 st.warning("Name and Feedback cannot be empty.")
             else:
                 conn = get_sqlite_connection()
@@ -298,10 +308,14 @@ def handle_feedback_submission():
                 VALUES (?, ?, ?)
                 """
                 now = datetime.datetime.now()
-                cursor.execute(query, (name, feedback_text, now))
+                cursor.execute(query, (st.session_state.feedback_name, st.session_state.feedback_text, now))
                 conn.commit()
                 conn.close()
                 st.success("Thank you for your feedback!")
+
+                # Clear the form fields
+                st.session_state.feedback_name = ""
+                st.session_state.feedback_text = ""
 
 # ========== Sidebar ==========
 with st.sidebar:
