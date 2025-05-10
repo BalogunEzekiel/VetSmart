@@ -153,23 +153,23 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     diagnosis_table.wrapOn(c, letter[0] - 2 * inch, letter[1])
     diagnosis_table.drawOn(c, inch, letter[1] - 4 * inch)
 
-# VetSmart Authentication Barcode (Right-Aligned)
-barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
-barcode_width = barcode.wrap(0, 0)[0]  # Get barcode width
-right_margin = inch
-x_position = letter[0] - barcode_width - right_margin
-y_position = inch
-barcode.drawOn(c, x_position, y_position)
-c.setFont("Helvetica", 8)
-c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
-c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
+    # VetSmart Authentication Barcode (Right-Aligned)
+    barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+    barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
+    barcode_width = barcode.wrap(0, 0)[0]  # Get barcode width
+    right_margin = inch
+    x_position = letter[0] - barcode_width - right_margin
+    y_position = inch
+    barcode.drawOn(c, x_position, y_position)
+    c.setFont("Helvetica", 8)
+    c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
+    c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
 
-# Footer
-c.setFont("Helvetica", 8)
-c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
-
+    # Footer
+    c.setFont("Helvetica", 8)
+    c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
+    
     c.save()
     buffer.seek(0)
     return buffer
