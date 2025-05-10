@@ -110,7 +110,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     p.drawOn(c, inch, letter[1] - 1.5 * inch)
     c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 2 * inch, ":")
+    c.drawString(inch, letter[1] - 2 * inch, "")
     c.setFont("Helvetica", 10)
 
     # Animal Information Table
