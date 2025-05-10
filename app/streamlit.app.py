@@ -394,11 +394,6 @@ def chatbot_response(user_input):
             return responses[key]
     return "Sorry, I didn't understand that. Please try asking something else."
 
-# ========== Helper Functions ==========
-def clear_input():
-    if "chat_input" in st.session_state:
-        st.session_state.chat_input = ""
-
 # ========== Streamlit App ==========
 if "chat_input" not in st.session_state:
     st.session_state.chat_input = ""
