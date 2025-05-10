@@ -1,8 +1,4 @@
 import streamlit as st
-
-# ========== Page Setup ==========
-st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
-
 import pandas as pd
 import datetime
 import random
@@ -15,6 +11,9 @@ from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
+
+# ========== Page Setup ==========
+st.set_page_config(page_title="🐄 VetSmart - Livestock Monitoring", layout="wide")
 
 # ========== Database Configuration ==========
 SQLITE_DB = 'livestock_data.db'
@@ -135,7 +134,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     table.drawOn(c, inch, letter[1] - 2.5 * inch)
     c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis", centered_style)
+    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
     c.setFont("Helvetica", 10)
 
     # Diagnosis Table
@@ -305,4 +304,3 @@ if st.sidebar.button("Download SQLite Data as CSV"):
         file_name="livestock_data.csv",
         mime="text/csv"
     )
-
