@@ -280,11 +280,11 @@ with st.sidebar:
     st.markdown("## 🐄Livestock Focus:")
     st.markdown("""
     
-    **Cattle**
+    ***Cattle***
     
-    **Goat**
+    ***Goat***
     
-    **Sheep**
+    ***Sheep***
     """)    
     st.markdown("## About VetSmart")
     st.markdown("""
@@ -351,7 +351,6 @@ if st.sidebar.button("Download SQLite Data as CSV"):
 
 # ================VetChat==================
 import streamlit as st
-from datetime import datetime
 
 # ========== Simple Rule-Based Chatbot ==========
 def chatbot_response(user_input):
@@ -388,16 +387,12 @@ def chatbot_response(user_input):
         "why is my sheep limping": "Likely causes: foot rot, injuries, or joint infections. Check the hoof for wounds or swelling.",
     }
 
-    # Match input with keys (basic keyword match)
     for key in responses:
         if key in user_input.lower():
             return responses[key]
     return "Sorry, I didn't understand that. Please try asking something else."
 
 # ========== Streamlit App ==========
-if "chat_input" not in st.session_state:
-    st.session_state.chat_input = ""
-
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
@@ -405,16 +400,16 @@ def chatbot_widget():
     with st.sidebar.expander("💬 VetChat", expanded=True):
         st.markdown("*Ask me anything about livestock care!*")
 
+        # Display chat history
         for sender, message in st.session_state.chat_history:
             st.markdown(f"**You:** {message}" if sender == "You" else f"🤖 **VetChat:** {message}")
 
-        with st.form("chat_form", clear_on_submit=True):
-            user_input = st.text_input("You:", key="chat_input", label_visibility="collapsed")
-            submitted = st.form_submit_button("Send")
-
-        if submitted and user_input:
+        # Instant input
+        user_input = st.text_input("Ask VetChat:", "", key="chat_input")
+        if user_input:
             response = chatbot_response(user_input)
             st.session_state.chat_history.append(("You", user_input))
             st.session_state.chat_history.append(("VetChat", response))
+            st.experimental_rerun()  # Refresh instantly to show new message
 
 chatbot_widget()
