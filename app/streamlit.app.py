@@ -3,8 +3,6 @@ import streamlit as st
 # ========== Page Setup ==========
 st.set_page_config(page_title="VetSmart", layout="wide")
 
-chatbot_widget()
-
 import pandas as pd
 import datetime
 import random
@@ -417,4 +415,4 @@ def chatbot_widget():
             st.session_state.chat_history.append(("VetChat", response))
             st.session_state.chat_input = ""  # Clear input field
 
-# Include chatbot in the sidebar for all tabs
+chatbot_widget()
