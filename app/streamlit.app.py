@@ -97,30 +97,62 @@ def predict_disease(symptoms):
     }
     return prediction, treatments[prediction]
 
-# ========== PDF Generation Function ==========
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph, Table, TableStyle, Image
+from reportlab.pdfgen import canvas
+from reportlab.graphics.barcode import code128
+import datetime
+
 def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
     styles = getSampleStyleSheet()
     centered_title_style = ParagraphStyle(name='CenteredTitle', parent=styles['Heading1'], alignment=1)
 
-    # VetSmart Report Title
-    p = Paragraph("<b>Animal Information</b>", centered_title_style)
-    p.wrapOn(c, letter[0] - 2 * inch, letter[1])
-    p.drawOn(c, inch, letter[1] - 1.5 * inch)
-    c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 2 * inch, "")
-    c.setFont("Helvetica", 10)
+    # Draw header background
+    header_height = 1.5 * inch
+    c.setFillColor(colors.lightblue)  # Set your desired header background color
+    c.rect(0, height - header_height, width, header_height, fill=1, stroke=0)
 
-    # Animal Information Table
+    # Draw VetSmart logo
+    logo_path = "path/to/vetsmart_logo.png"  # Replace with your actual logo path
+    logo_width = 1 * inch
+    logo_height = 1 * inch
+    c.drawImage(logo_path, inch / 2, height - logo_height - (header_height - logo_height) / 2,
+                width=logo_width, height=logo_height, mask='auto')
+
+    # Draw title
+    title = "VetSmart Diagnosis Report"
+    c.setFont("Helvetica-Bold", 16)
+    c.setFillColor(colors.white)
+    title_width = c.stringWidth(title, "Helvetica-Bold", 16)
+    c.drawString((width - title_width) / 2, height - (header_height + c._leading) / 2, title)
+
+    # Move to the position below the header
+    y_position = height - header_height - inch
+
+    # Animal Information Section
+    c.setFont("Helvetica-Bold", 12)
+    c.setFillColor(colors.black)
+    c.drawString(inch, y_position, "Animal Information:")
+    y_position -= 0.2 * inch
+
+    # Prepare the data
     data = [
         ['Animal Tag', animal_data['Name']],
         ['Type', animal_data['Type']],
         ['Age (years)', animal_data['Age']],
         ['Weight (kg)', animal_data['Weight']],
     ]
+
+    # Create the table
     table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
+
+    # Style the table
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
@@ -130,19 +162,27 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
         ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
     ]))
-    table.wrapOn(c, letter[0] - 2 * inch, letter[1])
-    table.drawOn(c, inch, letter[1] - 2.5 * inch)
-    c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
-    c.setFont("Helvetica", 10)
 
-    # Diagnosis Table
+    # Draw the table
+    table.wrapOn(c, width - 2 * inch, height)
+    table.drawOn(c, inch, y_position - table._height)
+    y_position -= table._height + 0.5 * inch
+
+    # Diagnosis Section
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(inch, y_position, "Diagnosis:")
+    y_position -= 0.2 * inch
+
+    # Diagnosis data
     diagnosis_data = [
         ['Predicted Disease', disease],
         ['Recommendation', recommendation],
     ]
+
+    # Create the table
     diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
+
+    # Style the table
     diagnosis_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
@@ -150,26 +190,28 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
         ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
     ]))
-    diagnosis_table.wrapOn(c, letter[0] - 2 * inch, letter[1])
-    diagnosis_table.drawOn(c, inch, letter[1] - 4 * inch)
+
+    # Draw the diagnosis table
+    diagnosis_table.wrapOn(c, width - 2 * inch, height)
+    diagnosis_table.drawOn(c, inch, y_position - diagnosis_table._height)
+    y_position -= diagnosis_table._height + 0.5 * inch
 
     # VetSmart Authentication Barcode (Right-Aligned)
     barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
     barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
     barcode_width = barcode.wrap(0, 0)[0]  # Get barcode width
     right_margin = inch
-    x_position = letter[0] - barcode_width - right_margin
-    y_position = inch
-    barcode.drawOn(c, x_position, y_position)
+    x_position = width - barcode_width - right_margin
+    barcode.drawOn(c, x_position, inch)
     c.setFont("Helvetica", 8)
-    c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
-    c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
+    c.drawString(x_position, inch - 0.2 * inch, "VetSmart Authenticated")
+    c.drawString(x_position, inch - 0.4 * inch, barcode_value)
 
     # Footer
     c.setFont("Helvetica", 8)
     c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
-    
+
     c.save()
     buffer.seek(0)
     return buffer
