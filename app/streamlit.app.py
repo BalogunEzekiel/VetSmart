@@ -282,19 +282,28 @@ def display_health_tips():
 import datetime
 import streamlit as st
 
+# ==================================Feedback=========================================
+
+import streamlit as st
+import datetime
+
 def handle_feedback_submission():
     """Handles the feedback submission process."""
     st.subheader("We Value Your Feedback 📝")
 
     # Initialize session state for form fields
-    if "feedback_name" not in st.session_state:
-        st.session_state.feedback_name = ""
-    if "feedback_text" not in st.session_state:
-        st.session_state.feedback_text = ""
+    for key in ["feedback_name", "feedback_text"]:
+        if key not in st.session_state:
+            st.session_state[key] = ""
+
+    def reset_feedback_form():
+        st.session_state["feedback_name"] = ""
+        st.session_state["feedback_text"] = ""
+        st.experimental_rerun()
 
     with st.form("feedback_form"):
-        name = st.text_input("Your Name", key="feedback_name")
-        feedback_text = st.text_area("Please provide your feedback here:", key="feedback_text")
+        st.text_input("Your Name", key="feedback_name")
+        st.text_area("Please provide your feedback here:", key="feedback_text")
         submitted = st.form_submit_button("Submit Feedback")
 
         if submitted:
@@ -304,18 +313,20 @@ def handle_feedback_submission():
                 conn = get_sqlite_connection()
                 cursor = conn.cursor()
                 query = """
-                INSERT INTO feedback (name, feedback, submitted_on)
-                VALUES (?, ?, ?)
+                    INSERT INTO feedback (name, feedback, submitted_on)
+                    VALUES (?, ?, ?)
                 """
                 now = datetime.datetime.now()
-                cursor.execute(query, (st.session_state.feedback_name, st.session_state.feedback_text, now))
+                cursor.execute(query, (
+                    st.session_state.feedback_name,
+                    st.session_state.feedback_text,
+                    now
+                ))
                 conn.commit()
                 conn.close()
                 st.success("Thank you for your feedback!")
 
-                # Clear the form fields
-                st.session_state.feedback_name = ""
-                st.session_state.feedback_text = ""
+                reset_feedback_form()
 
 # ========== Sidebar ==========
 with st.sidebar:
