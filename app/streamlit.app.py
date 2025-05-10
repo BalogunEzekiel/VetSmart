@@ -277,7 +277,13 @@ def handle_feedback_submission():
 # ========== Sidebar ==========
 with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
-    st.markdown("## 🐄 About VetSmart")
+    st.markdown("#### 🐄Livestock Focus:")
+    st.markdown("""
+    **Cattle**
+    **Goat**
+    **Sheep**
+    """)    
+    st.markdown("## About VetSmart")
     st.markdown("""
     **VetSmart** is an AI-powered livestock health monitoring, disease prevention and diagnosis app. It is designed to help farmers and veterinary experts monitor animal health, predict diseases, treatment recommendations and improve the health status of their animals in real-time.
     
