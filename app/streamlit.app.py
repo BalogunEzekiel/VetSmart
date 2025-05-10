@@ -416,6 +416,5 @@ def chatbot_widget():
             response = chatbot_response(user_input)
             st.session_state.chat_history.append(("You", user_input))
             st.session_state.chat_history.append(("VetChat", response))
-            clear_input()
 
 chatbot_widget()
