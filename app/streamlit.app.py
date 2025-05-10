@@ -279,8 +279,11 @@ with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
     st.markdown("#### 🐄Livestock Focus:")
     st.markdown("""
+    
     **Cattle**
+    
     **Goat**
+    
     **Sheep**
     """)    
     st.markdown("## About VetSmart")
