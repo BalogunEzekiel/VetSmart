@@ -179,21 +179,46 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
 def display_dashboard():
     """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
+
+    # Initialize session state for inputs
+    for key in ["name", "animal_type", "age", "weight", "vaccination"]:
+        if key not in st.session_state:
+            if key == "animal_type":
+                st.session_state[key] = "Cattle"
+            elif key in ["age", "weight"]:
+                st.session_state[key] = 0.0
+            else:
+                st.session_state[key] = ""
+
     with st.form("livestock_form"):
-        name = st.text_input("Animal Tag")
-        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
-        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
-        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
-        vaccination = st.text_area("Vaccination History")
+        name = st.text_input("Animal Tag", key="name")
+        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"], key="animal_type")
+        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1, key="age")
+        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0, key="weight")
+        vaccination = st.text_area("Vaccination History", key="vaccination")
         submit = st.form_submit_button("💾 Save")
 
     if submit:
-        if name.strip() == "":
+        if st.session_state.name.strip() == "":
             st.warning("Animal Tag cannot be empty.")
         else:
-            save_livestock_data(name, animal_type, age, weight, vaccination)
-            st.success(f"{animal_type} '{name}' saved successfully!")
+            save_livestock_data(
+                st.session_state.name,
+                st.session_state.animal_type,
+                st.session_state.age,
+                st.session_state.weight,
+                st.session_state.vaccination
+            )
+            st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
 
+            # Clear the form fields
+            st.session_state.name = ""
+            st.session_state.animal_type = "Cattle"
+            st.session_state.age = 0.0
+            st.session_state.weight = 0.0
+            st.session_state.vaccination = ""
+
+# ============================ Diagnosis ==================================
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
