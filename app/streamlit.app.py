@@ -98,107 +98,61 @@ def predict_disease(symptoms):
     }
     return prediction, treatments[prediction]
 
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import Table, TableStyle, Paragraph
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
-from io import BytesIO
-
-def generate_vetsmart_report(animal_data, disease, recommendation):
+# ========== PDF Generation Function ==========
+def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
-
-    # Styles
     styles = getSampleStyleSheet()
-    centered_title_style = ParagraphStyle(
-        name='CenteredTitle',
-        parent=styles['Heading1'],
-        alignment=1,  # center
-        fontSize=18,
-        spaceAfter=20,
-    )
-    section_title_style = ParagraphStyle(
-        name='SectionTitle',
-        parent=styles['Heading2'],
-        alignment=1,  # center
-        fontSize=14,
-        textColor=colors.HexColor('#003366'),
-        spaceBefore=10,
-        spaceAfter=10,
-    )
+    centered_title_style = ParagraphStyle(name='CenteredTitle', parent=styles['Heading1'], alignment=1)
 
-    # Draw watermark
-    c.saveState()
-    c.setFont("Helvetica-Bold", 60)
-    c.setFillColorRGB(0.9, 0.9, 0.9, alpha=0.2)
-    c.translate(width / 2, height / 2)
-    c.rotate(45)
-    c.drawCentredString(0, 0, "VetSmart")
-    c.restoreState()
-
-    # Report Title
+    # VetSmart Report Title
     p = Paragraph("<b>VetSmart Diagnosis Report</b>", centered_title_style)
-    p.wrapOn(c, width - 2 * inch, height)
-    p.drawOn(c, inch, height - 1.2 * inch)
+    p.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    p.drawOn(c, inch, letter[1] - 1.5 * inch)
+    c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(inch, letter[1] - 2 * inch, "Animal Information:")
+    c.setFont("Helvetica", 10)
 
-    # Animal Information Section Title
-    p = Paragraph("Animal Information", section_title_style)
-    p.wrapOn(c, width - 2 * inch, height)
-    p.drawOn(c, inch, height - 1.8 * inch)
-
-    # Prepare Animal Info Data
+    # Animal Information Table
     data = [
-        ['Animal Tag', animal_data.get('Name', '')],
-        ['Type', animal_data.get('Type', '')],
-        ['Age (years)', animal_data.get('Age', '')],
-        ['Weight (kg)', animal_data.get('Weight', '')],
+        ['Animal Tag', animal_data['Name']],
+        ['Type', animal_data['Type']],
+        ['Age (years)', animal_data['Age']],
+        ['Weight (kg)', animal_data['Weight']],
     ]
-
-    table = Table(data, colWidths=[width * 0.3, width * 0.6])
+    table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (0, -1), colors.lightblue),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
-        ('TOPPADDING', (0, 0), (-1, -1), 12),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
     ]))
-    table.wrapOn(c, width - 2 * inch, height)
-    table.drawOn(c, inch, height - 3.3 * inch)
+    table.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    table.drawOn(c, inch, letter[1] - 2.5 * inch)
+    c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
+    c.setFont("Helvetica", 10)
 
-    # Diagnosis Section Title
-    p = Paragraph("Diagnosis", section_title_style)
-    p.wrapOn(c, width - 2 * inch, height)
-    p.drawOn(c, inch, height - 4.8 * inch)
-
+    # Diagnosis Table
     diagnosis_data = [
         ['Predicted Disease', disease],
         ['Recommendation', recommendation],
     ]
-
-    diagnosis_table = Table(diagnosis_data, colWidths=[width * 0.3, width * 0.6])
+    diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     diagnosis_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (0, -1), colors.lightgreen),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
-        ('TOPPADDING', (0, 0), (-1, -1), 12),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
     ]))
-
-    # Finalize and return PDF
-    c.save()
-    buffer.seek(0)
-    return buffer
+    diagnosis_table.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    diagnosis_table.drawOn(c, inch, letter[1] - 4 * inch)
 
     # VetSmart Authentication Barcode
     barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
