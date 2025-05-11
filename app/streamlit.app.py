@@ -326,7 +326,18 @@ def display_feedback():
                 save_feedback(st.session_state.feedback_name, st.session_state.feedback_text)
                 st.success("Thank you for your feedback!")
                 reset_feedback_form()
-       
+
+# ========== Main ==========
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
+with tab1:
+    display_dashboard()
+with tab2:
+    display_diagnosis()
+with tab3:
+    display_health_tips()
+with tab4:
+    display_feedback()
+
 # ========== Sidebar ==========
 with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
@@ -376,16 +387,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-# ========== Main ==========
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
-with tab1:
-    display_dashboard()
-with tab2:
-    display_diagnosis()
-with tab3:
-    display_health_tips()
-with tab4:
-    display_feedback()
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
