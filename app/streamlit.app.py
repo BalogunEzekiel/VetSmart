@@ -360,42 +360,17 @@ if st.sidebar.button("Download SQLite Data as CSV"):
         mime="text/csv"
     )
 
-# ================VetChat==================
 import streamlit as st
+import streamlit.components.v1 as components
 
-# ========== Simple Rule-Based Chatbot ==========
+# ========== Chatbot Response Logic ==========
 def chatbot_response(user_input):
     responses = {
         "hello": "Hi there! How can I assist you with your livestock today?",
         "hi": "Hello! What would you like help with?",
         "how are you": "I'm just AI-VetChat, your animal health assistant, but I'm well trained and functioning properly!",
-        "disease": "You can go to the Diagnosis tab to analyze your animal symptoms.",
-        "vaccination": "Vaccination records can be managed in the Dashboard tab.",
         "bye": "Goodbye! Monitor your animal health regularly!",
-        "thank you": "You're welcome! I'm here to support your livestock needs.",
-        "thanks": "Glad I could help! Let me know if you need anything else.",
-        "help": "Sure! You can ask about disease, feeding, breeding or medication.",
-        "what can you do": "I can help track health, feeding, vaccination, and suggest care tips for your animals.",
-        "symptom checker": "Use the 'Diagnosis' tab to enter symptoms and get insights.",
-        "medication": "Go to the 'Medication History' section to add or view past treatments.",
-        "health tips": "Check daily health tips for your livestock on the Health Tips tab.",
-        "heat detection": "Use the 'Breeding Records' to note and monitor heat cycles.",
-        "track health": "Go to 'Health Monitoring' for trends and medical logs.",
-        "pasture rotation": "Check the 'Feeding & Grazing' tips for best pasture practices.",
-        "temperature": "The normal body temperature for a cow is between 101.5°F and 103.5°F (38.6°C - 39.7°C)",
-        "not eating": "Loss of appetite may be due to heat stress, illness, pain, poor-quality feed. Diagnose your animal symptoms on the Diagnosis tab.",
-        "deworm": "Generally, cattle should be dewormed 2–4 times a year, depending on local parasite load, grazing conditions.",
-        "milk production in my dairy cow?": "Ensure proper nutrition (high-quality forage and supplements), regular milking, clean water access, and stress-free housing.",
-        "diet for goats": "Goats thrive on a mix of good-quality hay, browse (leaves, twigs), grains, minerals, and clean water. Avoid moldy feed.",
-        "goat coughing": "Common causes include respiratory infections (like pneumonia), dusty feed, or lungworms. Isolate and consult a vet.",
-        "vaccinate": "Livestock should be vaccinated regularly. Goats should receive the CDT (Clostridium perfringens C & D and tetanus) vaccine initially at 6–8 weeks, with boosters annually.",
-        "sign of pregnancy": "Signs include increased appetite, abdominal enlargement, and behavior change. Take proper care of your animal at this time.",
-        "causes of bloating in goats": "Rapid consumption of lush legumes, overeating grain, or digestive blockage. Try gentle walking or simethicone. Severe cases need a vet.",
-        "ideal temperature range for sheep": "Normal temperature is about 102.3°F (39.1°C), give or take a degree.",
-        "how often should sheep be sheared": "At least once a year, typically in spring, to keep them comfortable and avoid overheating.",
-        "what are common diseases in sheep": "Foot rot, pneumonia, enterotoxemia (overeating disease), and internal parasites are prevalent. Prevent with vaccines and hygiene.",
-        "how do i treat foot rot in sheep": "Trim the hoof, clean the wound, and soak the foot in a zinc sulfate solution. Isolate affected animals.",
-        "why is my sheep limping": "Likely causes: foot rot, injuries, or joint infections. Check the hoof for wounds or swelling.",
+        # Add more responses...
     }
 
     for key in responses:
@@ -406,28 +381,139 @@ def chatbot_response(user_input):
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
+# ========== Collapsible Floating Chatbox ==========
 def chatbot_widget():
-    with st.sidebar.expander("💬 VetChat", expanded=True):
-        st.markdown("*Ask me anything about livestock care!*")
+    st.markdown("""
+        <style>
+        #chat-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
 
-        # Display chat history
-        for sender, message in st.session_state.chat_history:
-            if sender == "You":
-                st.markdown(f"**You:** {message}")
-            else:
-                st.markdown(f"🤖 **VetChat:** {message}")
+        #chatbox {
+            display: none;
+            position: fixed;
+            bottom: 70px;
+            right: 30px;
+            width: 320px;
+            max-height: 500px;
+            background-color: white;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            padding: 12px;
+            z-index: 9999;
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+            overflow-y: auto;
+            resize: both;
+            cursor: move;
+        }
 
-        # Input form to avoid st.experimental_rerun() bug
-        with st.form("chat_form", clear_on_submit=True):
-            user_input = st.text_input("Ask VetChat:", key="chat_input")
-            submitted = st.form_submit_button("Send")
-            if submitted and user_input:
-                response = chatbot_response(user_input)
-                st.session_state.chat_history.append(("You", user_input))
-                st.session_state.chat_history.append(("VetChat", response))
+        #chat-messages {
+            max-height: 280px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        #chatbox input[type="text"] {
+            width: 100%;
+            padding: 6px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        #chatbox input[type="submit"] {
+            margin-top: 5px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 6px;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        </style>
+
+        <button id="chat-toggle-btn" onclick="toggleChat()">💬 VetChat</button>
+        <div id="chatbox">
+            <strong>💬 VetChat</strong>
+            <div id="chat-messages">
+                <!-- Chat messages will be filled by Streamlit -->
+            </div>
+            <form action="" method="POST">
+                <input name="user_input" type="text" placeholder="Ask something..." />
+                <input type="submit" value="Send" />
+            </form>
+        </div>
+
+        <script>
+        function toggleChat() {
+            var box = document.getElementById("chatbox");
+            if (box.style.display === "none" || box.style.display === "") {
+                box.style.display = "block";
+            } else {
+                box.style.display = "none";
+            }
+        }
+
+        dragElement(document.getElementById("chatbox"));
+        function dragElement(elmnt) {
+          var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+          elmnt.onmousedown = dragMouseDown;
+          function dragMouseDown(e) {
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+          }
+          function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+          }
+          function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+          }
+        }
+        </script>
+    """, unsafe_allow_html=True)
+
+    # Render chat content dynamically using Streamlit
+    chat_html = "".join([
+        f"<p><b>{sender}:</b> {message}</p>"
+        for sender, message in st.session_state.chat_history
+    ])
+    components.html(f"""
+        <script>
+        document.getElementById("chat-messages").innerHTML = `{chat_html}`;
+        </script>
+    """, height=0)
+
+    # Input form (actual processing logic)
+    with st.form("chat_form", clear_on_submit=True):
+        user_input = st.text_input("Ask VetChat", key="chat_input")
+        submitted = st.form_submit_button("Send")
+        if submitted and user_input:
+            response = chatbot_response(user_input)
+            st.session_state.chat_history.append(("You", user_input))
+            st.session_state.chat_history.append(("VetChat", response))
 
 chatbot_widget()
-
 
 # ======================RasaVetChat=============================
 import streamlit as st
