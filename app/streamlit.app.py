@@ -15,6 +15,7 @@ from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
+import nltk
 
 # ========== Centered Logo ==========
 
