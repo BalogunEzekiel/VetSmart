@@ -370,48 +370,54 @@ def register_vet():
             conn.close()
             st.success("Veterinarian registered successfully!")
 
+def get_sqlite_connection():
+    return sqlite3.connect("livestock_data.db")  # Change to your DB file
+
 def request_vet_service():
     st.subheader("📞 Request Veterinary Services")
     conn = get_sqlite_connection()
 
-    vets = pd.read_sql("SELECT * FROM veterinarians", conn)
-    animals = pd.read_sql("SELECT tag FROM livestock", conn)  # Assuming `tag` is the animal ID column
+    try:
+        vets = pd.read_sql("SELECT * FROM veterinarians", conn)
+        animals = pd.read_sql("SELECT tag FROM livestock", conn)
 
-    if vets.empty:
-        st.info("No registered veterinarians available at the moment.")
+        if vets.empty:
+            st.info("No registered veterinarians available at the moment.")
+            return
+
+        if animals.empty:
+            st.info("No animals are currently registered.")
+            return
+
+        vet_names = ["-- Select a Vet --"] + vets['name'].tolist()
+        animal_tags = ["-- Select an Animal --"] + animals['tag'].tolist()
+
+        with st.form("vet_service_form", clear_on_submit=True):
+            farmer_name = st.text_input("Your Name")
+            selected_animal = st.selectbox("Animal Tag (Select a pre-registered animal)", animal_tags)
+            selected_vet = st.selectbox("Select a Vet", vet_names)
+            request_reason = st.text_area("Reason for Request")
+            submitted = st.form_submit_button("Submit Request")
+
+            if submitted:
+                if not farmer_name.strip():
+                    st.warning("Please enter your name.")
+                elif selected_animal == "-- Select an Animal --":
+                    st.warning("Please select a valid animal.")
+                elif selected_vet == "-- Select a Vet --":
+                    st.warning("Please select a valid vet.")
+                else:
+                    vet_id = vets[vets['name'] == selected_vet]['id'].values[0]
+                    conn.execute("""
+                        INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (farmer_name, selected_animal, vet_id, request_reason, datetime.datetime.now()))
+                    conn.commit()
+                    st.success("Vet service requested successfully!")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+    finally:
         conn.close()
-        return
-
-    if animals.empty:
-        st.info("No animals are currently registered.")
-        conn.close()
-        return
-
-    vet_names = ["-- Select a Vet --"] + vets['name'].tolist()
-    animal_tags = ["-- Select an Animal --"] + animals['tag'].tolist()
-
-    with st.form("vet_service_form", clear_on_submit=True):
-        farmer_name = st.text_input("Your Name")
-        selected_animal = st.selectbox("Animal Tag (Select a pre-registered animal)", animal_tags)
-        selected_vet = st.selectbox("Select a Vet", vet_names)
-        request_reason = st.text_area("Reason for Request")
-        submitted = st.form_submit_button("Submit Request")
-
-        if submitted:
-            if selected_animal == "-- Select an Animal --":
-                st.warning("Please select a valid animal.")
-            elif selected_vet == "-- Select a Vet --":
-                st.warning("Please select a valid vet.")
-            else:
-                vet_id = vets[vets['name'] == selected_vet]['id'].values[0]
-                conn.execute("""
-                    INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (farmer_name, selected_animal, vet_id, request_reason, datetime.datetime.now()))
-                conn.commit()
-                st.success("Vet service requested successfully!")
-
-    conn.close()
     
 # ========== Main ==========
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "👨‍⚕️ Vet Doc", "📞 Request Service", "📝 Feedback"])
