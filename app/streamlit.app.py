@@ -131,11 +131,11 @@ def predict_disease(symptoms):
     return prediction, treatments[prediction]
 
 # ========== PDF Generation Function ========== 
-# ========== PDF Generation Function (No Tables) ==========
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.graphics.barcode import code128
 from PIL import Image
@@ -145,63 +145,91 @@ import datetime
 def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
     styles = getSampleStyleSheet()
+
+    # Custom styles
     centered_title_style = ParagraphStyle(
         name='CenteredTitle',
-        parent=styles['Heading1'],
+        parent=styles['Heading2'],
         alignment=1,
         fontName='Times-Roman',
-        fontSize=20,
-        textColor=colors.green
+        fontSize=16,
+        textColor=colors.green,
+        leading=28  # double line spacing
     )
 
-    # Header Customization (Logo + Title)
-    try:
-        logo = Image.open("logoo.png")
-        c.drawImage("logoo.png", inch, letter[1] - 50, width=100, height=30)
-    except Exception as e:
-        c.setFont("Helvetica", 12)
-        c.drawString(inch, letter[1] - 50, "Logo could not be loaded")
-
-    # Title Header
+    # Draw green header background (taller)
+    header_height = 70
     c.setFillColor(colors.green)
-    c.rect(0, letter[1] - 45, letter[0], 45, fill=True)
-    c.setFont("Times-Roman", 30)
+    c.rect(0, height - header_height, width, header_height, fill=True, stroke=0)
+
+    # Add logo on top of header background
+    try:
+        c.drawImage("logoo.png", inch, height - header_height + 10, width=100, height=40, mask='auto')
+    except:
+        c.setFont("Helvetica", 12)
+        c.setFillColor(colors.white)
+        c.drawString(inch, height - 40, "Logo could not be loaded")
+
+    # Title text (on top of header)
+    c.setFont("Times-Roman", 20)
     c.setFillColor(colors.white)
-    c.drawString(150, letter[1] - 20, "VetSmart Diagnosis Report")
+    c.drawString(160, height - 40, "VetSmart Diagnosis Report")
 
-    c.setFont("Helvetica", 10)
-    c.setFillColor(colors.black)
-    c.line(inch, letter[1] - 60, letter[0] - inch, letter[1] - 60)
+    # Section: Animal Information Heading
+    animal_info_title = Paragraph("<b>Animal Information</b>", centered_title_style)
+    animal_info_title.wrapOn(c, width - 2 * inch, 50)
+    animal_info_title.drawOn(c, inch, height - 130)
 
-    # Animal Info Section
-    p = Paragraph("<b>Animal Information</b>", centered_title_style)
-    p.wrapOn(c, letter[0] - 2 * inch, [1])
-    p.drawOn(c, inch, letter[1] - 1.5 * inch)
-    c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
+    # Create Animal Information table
+    animal_table_data = [
+        ["Animal Tag", animal_data.get("Name", "")],
+        ["Type", animal_data.get("Type", "")],
+        ["Age (years)", animal_data.get("Age", "")],
+        ["Weight (kg)", animal_data.get("Weight", "")]
+    ]
 
-    # Manually draw animal info instead of using a table
-    text_y = letter[1] - 2 * inch
-    line_spacing = 14
-    c.setFont("Helvetica", 10)
-    c.drawString(inch, text_y, f"Animal Tag: {animal_data['Name']}")
-    c.drawString(inch, text_y - line_spacing, f"Type: {animal_data['Type']}")
-    c.drawString(inch, text_y - 2 * line_spacing, f"Age (years): {animal_data['Age']}")
-    c.drawString(inch, text_y - 3 * line_spacing, f"Weight (kg): {animal_data['Weight']}")
+    animal_table = Table(animal_table_data, colWidths=[2.5 * inch, 3.5 * inch], hAlign='CENTER')
+    animal_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('LINEBELOW', (0, 0), (-1, -1), 0.25, colors.grey),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),  # double spacing
+        ('TOPPADDING', (0, 0), (-1, -1), 12),
+    ]))
+    animal_table.wrapOn(c, width - 2 * inch, height)
+    animal_table.drawOn(c, inch, height - 300)
 
-    # Diagnosis Section
-    c.line(inch, text_y - 3.8 * line_spacing, letter[0] - inch, text_y - 3.8 * line_spacing)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, text_y - 4.2 * line_spacing, "Diagnosis:")
-    c.setFont("Helvetica", 10)
-    c.drawString(inch, text_y - 5.2 * line_spacing, f"Predicted Disease: {disease}")
-    c.drawString(inch, text_y - 6.2 * line_spacing, f"Recommendation: {recommendation}")
+    # Section: Diagnosis Heading
+    diagnosis_title = Paragraph("<b>Diagnosis</b>", centered_title_style)
+    diagnosis_title.wrapOn(c, width - 2 * inch, 50)
+    diagnosis_title.drawOn(c, inch, height - 330)
+
+    # Create Diagnosis table
+    diagnosis_table_data = [
+        ["Predicted Diagnosis", disease],
+        ["Recommendation", recommendation]
+    ]
+
+    diagnosis_table = Table(diagnosis_table_data, colWidths=[2.5 * inch, 3.5 * inch], hAlign='CENTER')
+    diagnosis_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('LINEBELOW', (0, 0), (-1, -1), 0.25, colors.grey),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ('TOPPADDING', (0, 0), (-1, -1), 12),
+    ]))
+    diagnosis_table.wrapOn(c, width - 2 * inch, height)
+    diagnosis_table.drawOn(c, inch, height - 420)
 
     # Barcode
     barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
     barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
     barcode_width = barcode.wrap(0, 0)[0]
-    x_position = letter[0] - barcode_width - inch
+    x_position = width - barcode_width - inch
     y_position = inch
     barcode.drawOn(c, x_position, y_position)
     c.setFont("Helvetica", 8)
