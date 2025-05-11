@@ -92,7 +92,10 @@ def initialize_database():
 
     conn.commit()
     conn.close()
-    
+
+# Initialize the database and tables
+initialize_database()
+
 # ========== Load & Save Data Functions ==========
 def load_data():
     conn = get_sqlite_connection()
@@ -384,7 +387,7 @@ def request_vet_service():
     conn.close()
 
 # ========== Main ==========
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "👨‍⚕️ Vet Doc", "📞Request Service", "📝 Feedback"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "👨‍⚕️ Vet Doc", "📞 Request Service", "📝 Feedback"])
 
 with tab1:
     display_dashboard()
