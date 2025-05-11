@@ -167,12 +167,18 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.setFont("Helvetica", 10)
 
     # Animal Information Table
-    data = [
-        ['Animal Tag', animal_data['Name']],
-        ['Type', animal_data['Type']],
-        ['Age (years)', animal_data['Age']],
-        ['Weight (kg)', animal_data['Weight]]', to 
-    ]
+
+    data = [
+
+        ['Animal Tag', animal_data['Name']],
+
+        ['Type', animal_data['Type']],
+
+        ['Age (years)', animal_data['Age']],
+
+        ['Weight (kg)', animal_data['Weight']],
+
+    ]
     table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
