@@ -379,21 +379,26 @@ def request_vet_service():
         st.info("No registered veterinarians available at the moment.")
         return
 
+    vet_names = ["-- Select a Vet --"] + vets['name'].tolist()
+
     with st.form("vet_service_form", clear_on_submit=True):
         farmer_name = st.text_input("Your Name")
         animal_tag = st.text_input("Animal Tag (e.g., from your livestock record)")
-        selected_vet = st.selectbox("Select a Vet", vets['name'].tolist())
+        selected_vet = st.selectbox("Select a Vet", vet_names)
         request_reason = st.text_area("Reason for Request")
         submitted = st.form_submit_button("Submit Request")
 
         if submitted:
-            vet_id = vets[vets['name'] == selected_vet]['id'].values[0]
-            conn.execute("""
-                INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
-                VALUES (?, ?, ?, ?, ?)
-            """, (farmer_name, animal_tag, vet_id, request_reason, datetime.datetime.now()))
-            conn.commit()
-            st.success("Vet service requested successfully!")
+            if selected_vet == "-- Select a Vet --":
+                st.warning("Please select a valid vet before submitting.")
+            else:
+                vet_id = vets[vets['name'] == selected_vet]['id'].values[0]
+                conn.execute("""
+                    INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (farmer_name, animal_tag, vet_id, request_reason, datetime.datetime.now()))
+                conn.commit()
+                st.success("Vet service requested successfully!")
 
     conn.close()
     
