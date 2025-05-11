@@ -74,6 +74,27 @@ def initialize_database():
             submitted_on DATETIME
         )
     """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS veterinarians (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        specialization TEXT NOT NULL,
+        phone TEXT,
+        email TEXT,
+        registered_on DATETIME
+    )
+""")
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS vet_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        farmer_name TEXT NOT NULL,
+        animal_tag TEXT NOT NULL,
+        vet_id INTEGER,
+        request_reason TEXT,
+        requested_on DATETIME,
+        FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
+    )
+""")
     conn.commit()
     conn.close()
 
@@ -305,7 +326,50 @@ def handle_feedback_submission():
                 conn.close()
                 st.success("Thank you for your feedback!")
 
-# ========== Main ==========
+def register_vet():
+    st.subheader("👨‍⚕️ Register as a Veterinary Doctor")
+    with st.form("vet_registration"):
+        name = st.text_input("Full Name")
+        specialization = st.selectbox("Specialization", ["Cattle", "Goat", "Sheep", "General"])
+        phone = st.text_input("Phone Number")
+        email = st.text_input("Email Address")
+        submitted = st.form_submit_button("Register")
+
+        if submitted:
+            conn = get_sqlite_connection()
+            conn.execute("""
+                INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
+                VALUES (?, ?, ?, ?, ?)
+            """, (name, specialization, phone, email, datetime.datetime.now()))
+            conn.commit()
+            conn.close()
+            st.success("Veterinarian registered successfully!")
+
+def request_vet_service():
+    st.subheader("📞 Request Veterinary Services")
+    conn = get_sqlite_connection()
+    vets = pd.read_sql("SELECT * FROM veterinarians", conn)
+
+    if vets.empty:
+        st.info("No registered veterinarians available at the moment.")
+        return
+
+    farmer_name = st.text_input("Your Name")
+    animal_tag = st.text_input("Animal Tag (e.g., from your livestock record)")
+    selected_vet = st.selectbox("Select a Vet", vets['name'].tolist())
+    request_reason = st.text_area("Reason for Request")
+
+    if st.button("Submit Request"):
+        vet_id = vets[vets['name'] == selected_vet]['id'].values[0]
+        conn.execute("""
+            INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
+            VALUES (?, ?, ?, ?, ?)
+        """, (farmer_name, animal_tag, vet_id, request_reason, datetime.datetime.now()))
+        conn.commit()
+        st.success("Vet service requested successfully!")
+    conn.close()
+
+# ========================= Main =====================================
 tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
 with tab1:
     display_dashboard()
@@ -315,6 +379,10 @@ with tab3:
     display_health_tips()
 with tab4:
     handle_feedback_submission()
+with tab5:
+    register_vet()
+with tab6:
+    request_vet_service()
 
 # ========== Sidebar ==========
 with st.sidebar:
@@ -369,8 +437,33 @@ def chatbot_response(user_input):
         "hello": "Hi there! How can I assist you with your livestock today?",
         "hi": "Hello! What would you like help with?",
         "how are you": "I'm just AI-VetChat, your animal health assistant, but I'm well trained and functioning properly!",
+        "disease": "You can go to the Diagnosis tab to analyze your animal symptoms.",
+        "vaccination": "Vaccination records can be managed in the Dashboard tab.",
         "bye": "Goodbye! Monitor your animal health regularly!",
-        # Add more responses...
+        "thank you": "You're welcome! I'm here to support your livestock needs.",
+        "thanks": "Glad I could help! Let me know if you need anything else.",
+        "help": "Sure! You can ask about disease, feeding, breeding or medication.",
+        "what can you do": "I can help track health, feeding, vaccination, and suggest care tips for your animals.",
+        "symptom checker": "Use the 'Diagnosis' tab to enter symptoms and get insights.",
+        "medication": "Go to the 'Medication History' section to add or view past treatments.",
+        "health tips": "Check daily health tips for your livestock on the Health Tips tab.",
+        "heat detection": "Use the 'Breeding Records' to note and monitor heat cycles.",
+        "track health": "Go to 'Health Monitoring' for trends and medical logs.",
+        "pasture rotation": "Check the 'Feeding & Grazing' tips for best pasture practices.",
+        "temperature": "The normal body temperature for a cow is between 101.5°F and 103.5°F (38.6°C - 39.7°C)",
+        "not eating": "Loss of appetite may be due to heat stress, illness, pain, poor-quality feed. Diagnose your animal symptoms on the Diagnosis tab.",
+        "deworm": "Generally, cattle should be dewormed 2–4 times a year, depending on local parasite load, grazing conditions.",
+        "milk production in my dairy cow?": "Ensure proper nutrition (high-quality forage and supplements), regular milking, clean water access, and stress-free housing.",
+        "diet for goats": "Goats thrive on a mix of good-quality hay, browse (leaves, twigs), grains, minerals, and clean water. Avoid moldy feed.",
+        "goat coughing": "Common causes include respiratory infections (like pneumonia), dusty feed, or lungworms. Isolate and consult a vet.",
+        "vaccinate": "Livestock should be vaccinated regularly. Goats should receive the CDT (Clostridium perfringens C & D and tetanus) vaccine initially at 6–8 weeks, with boosters annually.",
+        "sign of pregnancy": "Signs include increased appetite, abdominal enlargement, and behavior change. Take proper care of your animal at this time.",
+        "causes of bloating in goats": "Rapid consumption of lush legumes, overeating grain, or digestive blockage. Try gentle walking or simethicone. Severe cases need a vet.",
+        "ideal temperature range for sheep": "Normal temperature is about 102.3°F (39.1°C), give or take a degree.",
+        "how often should sheep be sheared": "At least once a year, typically in spring, to keep them comfortable and avoid overheating.",
+        "what are common diseases in sheep": "Foot rot, pneumonia, enterotoxemia (overeating disease), and internal parasites are prevalent. Prevent with vaccines and hygiene.",
+        "how do i treat foot rot in sheep": "Trim the hoof, clean the wound, and soak the foot in a zinc sulfate solution. Isolate affected animals.",
+        "why is my sheep limping": "Likely causes: foot rot, injuries, or joint infections. Check the hoof for wounds or swelling.",
     }
 
     for key in responses:
