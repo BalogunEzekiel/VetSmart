@@ -2,7 +2,7 @@ import streamlit as st
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="VetSmart", layout="wide")
-st.title("Welcome to VetSmart")
+st.title("VetSmart")
 
 import pandas as pd
 import datetime
