@@ -255,28 +255,6 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     return buffer
 
 # ========== Page Functions ==========
-def display_dashboard():
-    """Displays the livestock dashboard and add animal form."""
-    st.subheader("📋 Add and Monitor Your Livestock")
-
-    with st.form("livestock_form", clear_on_submit=True):
-        name = st.text_input("Animal Tag")
-        animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
-        animal_type = st.selectbox("Type", animal_types)
-        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
-        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
-        vaccination = st.text_area("Vaccination History")
-        submit = st.form_submit_button("💾 Save")
-
-    if submit:
-        if name.strip() == "":
-            st.warning("Animal Tag cannot be empty.")
-        elif animal_type == "-- Select Type --":
-            st.warning("Please select a valid animal type.")
-        else:
-            save_livestock_data(name, animal_type, age, weight, vaccination)
-            st.success(f"{animal_type} '{name}' saved successfully!")
-
 def display_visualization():
     """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
@@ -367,7 +345,7 @@ def display_diagnosis():
     
 def display_health_tips():
     """Displays general health tips for selected livestock."""
-    st.subheader("🌿 General Health Tips for Livestock")
+    st.subheader("🌿 General Daily Health Tips for Livestock")
 
     animal_options = ["-- Select Animal Type --", "Cattle", "Goat", "Sheep"]
     selected_animal = st.selectbox("Select Animal Type", animal_options)
