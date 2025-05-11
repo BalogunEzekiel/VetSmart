@@ -131,102 +131,113 @@ def predict_disease(symptoms):
     return prediction, treatments[prediction]
 
 # ========== PDF Generation Function ========== 
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph, Table, TableStyle
+from reportlab.graphics.barcode import code128
+from PIL import Image
+from reportlab.lib.units import inch
+import datetime
+
 def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     styles = getSampleStyleSheet()
-    centered_title_style = ParagraphStyle(name='CenteredTitle', parent=styles['Heading1'], alignment=1, fontName='Times-Roman', fontSize=20, textColor=colors.green)
-    
+    centered_title_style = ParagraphStyle(
+        name='CenteredTitle',
+        parent=styles['Heading1'],
+        alignment=1,
+        fontName='Times-Roman',
+        fontSize=20,
+        textColor=colors.green
+    )
+
     # Header Customization (Logo + Title)
     try:
         logo = Image.open("logoo.png")
-        c.drawImage("logoo.png", inch, letter[1] - 50, width=100, height=30)  # Align logo to the left
+        c.drawImage("logoo.png", inch, letter[1] - 50, width=100, height=30)
     except Exception as e:
         c.setFont("Helvetica", 12)
         c.drawString(inch, letter[1] - 50, "Logo could not be loaded")
-    
-    # Title with Calligraphic Font and Livestock Header Background
-    c.setFillColor(colors.green)  # Set header background color
-    c.rect(0, letter[1] - 45, letter[0], 45, fill=True)  # Draw rectangle for header background
-    
-    c.setFont("Times-Roman", 30)  # Calligraphic-like font style
+
+    # Title Header
+    c.setFillColor(colors.green)
+    c.rect(0, letter[1] - 45, letter[0], 45, fill=True)
+    c.setFont("Times-Roman", 30)
     c.setFillColor(colors.white)
-    c.drawString(150, letter[1] - 20, "VetSmart Diagnosis Report")  # Title text centralized
+    c.drawString(150, letter[1] - 20, "VetSmart Diagnosis Report")
 
     c.setFont("Helvetica", 10)
     c.setFillColor(colors.black)
-    c.line(inch, letter[1] - 60, letter[0] - inch, letter[1] - 60)  # Line under header
-    
-    # Animal Information
+    c.line(inch, letter[1] - 60, letter[0] - inch, letter[1] - 60)
+
+    # Animal Info Section
     p = Paragraph("<b>Animal Information</b>", centered_title_style)
     p.wrapOn(c, letter[0] - 2 * inch, [1])
     p.drawOn(c, inch, letter[1] - 1.5 * inch)
     c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
+
+    data = [
+        ['Animal Tag', animal_data['Name']],
+        ['Type', animal_data['Type']],
+        ['Age (years)', animal_data['Age']],
+        ['Weight (kg)', animal_data['Weight']],
+    ]
+    table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+    ]))
+    table.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    table.drawOn(c, inch, letter[1] - 2.5 * inch)
+
+    c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 2 * inch, "")
+    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
     c.setFont("Helvetica", 10)
 
-# Animal Information Table
-data = [
-    ['Animal Tag', animal_data['Name']],
-    ['Type', animal_data['Type']],
-    ['Age (years)', animal_data['Age']],
-    ['Weight (kg)', animal_data['Weight']],
-]
-table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
-table.setStyle(TableStyle([
-    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-    ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 0), (-1, -1), 10),
-    ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-    ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-]))
-table.wrapOn(c, letter[0] - 2 * inch, letter[1])
-table.drawOn(c, inch, letter[1] - 2.5 * inch)
+    diagnosis_data = [
+        ['Predicted Disease', disease],
+        ['Recommendation', recommendation],
+    ]
+    diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
+    diagnosis_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+    ]))
+    diagnosis_table.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    diagnosis_table.drawOn(c, inch, letter[1] - 4 * inch)
 
-c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
-c.setFont("Helvetica-Bold", 12)
-c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
-c.setFont("Helvetica", 10)
+    # Barcode
+    barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+    barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
+    barcode_width = barcode.wrap(0, 0)[0]
+    x_position = letter[0] - barcode_width - inch
+    y_position = inch
+    barcode.drawOn(c, x_position, y_position)
+    c.setFont("Helvetica", 8)
+    c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
+    c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
 
-# Diagnosis Table
-diagnosis_data = [
-    ['Predicted Disease', disease],
-    ['Recommendation', recommendation],
-]
-diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
-diagnosis_table.setStyle(TableStyle([
-    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 0), (-1, -1), 10),
-    ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-    ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-]))
-diagnosis_table.wrapOn(c, letter[0] - 2 * inch, letter[1])
-diagnosis_table.drawOn(c, inch, letter[1] - 4 * inch)
+    # Footer
+    c.setFont("Helvetica", 8)
+    c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
-# VetSmart Authentication Barcode (Right-Aligned)
-barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
-barcode_width = barcode.wrap(0, 0)[0]  # Get barcode width
-right_margin = inch
-x_position = letter[0] - barcode_width - right_margin
-y_position = inch
-barcode.drawOn(c, x_position, y_position)
-c.setFont("Helvetica", 8)
-c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
-c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
-
-# Footer (No Changes)
-c.setFont("Helvetica", 8)
-c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
-
-c.save()
-buffer.seek(0)
-return buffer
+    c.save()
+    buffer.seek(0)
+    return buffer
     
 # ========== Page Functions ==========
 def display_dashboard():
