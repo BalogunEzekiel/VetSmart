@@ -131,12 +131,12 @@ def predict_disease(symptoms):
     return prediction, treatments[prediction]
 
 # ========== PDF Generation Function ========== 
+# ========== PDF Generation Function (No Tables) ==========
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import Paragraph, Table, TableStyle
 from reportlab.graphics.barcode import code128
 from PIL import Image
 from reportlab.lib.units import inch
@@ -180,44 +180,22 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     p.drawOn(c, inch, letter[1] - 1.5 * inch)
     c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
 
-    data = [
-        ['Animal Tag', animal_data['Name']],
-        ['Type', animal_data['Type']],
-        ['Age (years)', animal_data['Age']],
-        ['Weight (kg)', animal_data['Weight']],
-    ]
-    table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-    ]))
-    table.wrapOn(c, letter[0] - 2 * inch, letter[1])
-    table.drawOn(c, inch, letter[1] - 2.5 * inch)
-
-    c.line(inch, letter[1] - 3.1 * inch, letter[0] - inch, letter[1] - 3.1 * inch)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, letter[1] - 3.5 * inch, "Diagnosis:")
+    # Manually draw animal info instead of using a table
+    text_y = letter[1] - 2 * inch
+    line_spacing = 14
     c.setFont("Helvetica", 10)
+    c.drawString(inch, text_y, f"Animal Tag: {animal_data['Name']}")
+    c.drawString(inch, text_y - line_spacing, f"Type: {animal_data['Type']}")
+    c.drawString(inch, text_y - 2 * line_spacing, f"Age (years): {animal_data['Age']}")
+    c.drawString(inch, text_y - 3 * line_spacing, f"Weight (kg): {animal_data['Weight']}")
 
-    diagnosis_data = [
-        ['Predicted Disease', disease],
-        ['Recommendation', recommendation],
-    ]
-    diagnosis_table = Table(diagnosis_data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
-    diagnosis_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.grey),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-    ]))
-    diagnosis_table.wrapOn(c, letter[0] - 2 * inch, letter[1])
-    diagnosis_table.drawOn(c, inch, letter[1] - 4 * inch)
+    # Diagnosis Section
+    c.line(inch, text_y - 3.8 * line_spacing, letter[0] - inch, text_y - 3.8 * line_spacing)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(inch, text_y - 4.2 * line_spacing, "Diagnosis:")
+    c.setFont("Helvetica", 10)
+    c.drawString(inch, text_y - 5.2 * line_spacing, f"Predicted Disease: {disease}")
+    c.drawString(inch, text_y - 6.2 * line_spacing, f"Recommendation: {recommendation}")
 
     # Barcode
     barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
