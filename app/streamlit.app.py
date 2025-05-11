@@ -31,7 +31,6 @@ except Exception as e:
 st.markdown(
     """
     <div style="text-align: center; margin-top: 10px;">
-        <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 0;">🐮 </h1>
         <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
     </div>
     """,
