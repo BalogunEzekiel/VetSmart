@@ -404,11 +404,6 @@ with tab6:
 
 # ========== Sidebar ==========
 with st.sidebar:
-    st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
-    st.markdown("## 🐄Livestock Focus:")
-
-# ========== Sidebar ==========
-with st.sidebar:
     st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
     st.markdown("## Livestock Focus")
     st.markdown("""
