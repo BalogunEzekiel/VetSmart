@@ -411,7 +411,7 @@ with tab3:
     display_health_tips()
 with tab4:
     register_vet()
-with tab4:
+with tab5:
     request_vet_service()
 with tab6:
     handle_feedback_submission()
