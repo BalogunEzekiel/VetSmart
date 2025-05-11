@@ -16,13 +16,14 @@ from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
 import nltk
+from PIL import Image
 
 # ========== Centered Logo ==========
 
 # Logo and title
 try:
     logo = Image.open("logoo.png")
-    st.image(logo, width=400)
+    st.image(logo, width=200)
 except Exception as e:
     st.warning(f"Logo could not be loaded: {e}")
 st.title("Welcome to VetSmart!")
