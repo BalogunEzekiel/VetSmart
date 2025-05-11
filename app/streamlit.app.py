@@ -256,7 +256,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
 def display_dashboard():
     """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
-    with st.form("livestock_form"):
+    with st.form("livestock_form", clear_on_submit=True):
         name = st.text_input("Animal Tag")
         animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
         age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
@@ -330,7 +330,7 @@ def display_health_tips():
 def handle_feedback_submission():
     """Handles the feedback submission process."""
     st.subheader("We Value Your Feedback 📝")
-    with st.form("feedback_form"):
+    with st.form("feedback_form", clear_on_submit=True):
         name = st.text_input("Your Name")
         feedback_text = st.text_area("Please provide your feedback here:")
         submitted = st.form_submit_button("Submit Feedback")
@@ -353,7 +353,7 @@ def handle_feedback_submission():
 
 def register_vet():
     st.subheader("👨‍⚕️ Register as a Veterinary Doctor")
-    with st.form("vet_registration"):
+    with st.form("vet_registration", clear_on_submit=True):
         name = st.text_input("Full Name")
         specialization = st.selectbox("Specialization", ["Cattle", "Goat", "Sheep", "General"])
         phone = st.text_input("Phone Number")
