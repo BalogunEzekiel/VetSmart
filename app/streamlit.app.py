@@ -21,13 +21,20 @@ from PIL import Image
 # ========== Centered Logo ==========
 
 # Logo and title
-try:
-    logo = Image.open("logoo.png")
-    st.image(logo, width=150)
-    st.title("VetSmart")
-except Exception as e:
-    st.warning(f"Logo could not be loaded: {e}")
+# Layout: 3 columns
+col1, col2, col3 = st.columns([1, 4, 1])  # Adjust ratios as needed
 
+with col1:
+    try:
+        logo = Image.open("logoo.png")
+        st.image(logo, width=120)
+    except Exception as e:
+        st.warning(f"Logo could not be loaded: {e}")
+
+with col2:
+    st.markdown("<h1 style='text-align: center;'>VetSmart</h1>", unsafe_allow_html=True)
+
+# Optional: leave col3 empty or use it for spacing/content
 # ========== Title & Subtitle ==========
 st.markdown(
     """
