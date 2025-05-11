@@ -18,3 +18,4 @@ streamlit-chat
 streamlit-chat
 streamlit_js_eval
 requests
+nltk
