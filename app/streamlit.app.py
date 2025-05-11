@@ -17,6 +17,8 @@ from io import BytesIO
 from reportlab.lib import colors
 import nltk
 from PIL import Image
+import plotly.express as px
+
 
 # ========== Centered Logo ==========
 
@@ -275,6 +277,58 @@ def display_dashboard():
             save_livestock_data(name, animal_type, age, weight, vaccination)
             st.success(f"{animal_type} '{name}' saved successfully!")
 
+def display_visualization():
+    """Displays the livestock dashboard and add animal form."""
+    st.subheader("📋 Add and Monitor Your Livestock")
+
+    # Form for adding livestock
+    with st.form("livestock_form", clear_on_submit=True):
+        name = st.text_input("Animal Tag")
+        animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
+        animal_type = st.selectbox("Type", animal_types)
+        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
+        weight = st.number_input("Weight (kg)", 0.0, 1000.0, step=1.0)
+        vaccination = st.text_input("Vaccination Details")
+        submitted = st.form_submit_button("Add Animal")
+
+        if submitted and name and animal_type != "-- Select Type --":
+            save_livestock_data(name, animal_type, age, weight, vaccination)
+            st.success(f"{name} added successfully!")
+
+    # Load data
+    df = load_data()
+
+    if not df.empty:
+        st.markdown("### 📊 Livestock Overview")
+
+        # KPIs
+        total_animals = df.shape[0]
+        avg_weight = df['weight'].mean()
+        avg_age = df['age'].mean()
+
+        kpi1, kpi2, kpi3 = st.columns(3)
+        kpi1.metric("Total Animals", total_animals)
+        kpi2.metric("Average Weight (kg)", f"{avg_weight:.1f}")
+        kpi3.metric("Average Age (yrs)", f"{avg_age:.1f}")
+
+        # Visualizations
+        chart1, chart2 = st.columns(2)
+
+        with chart1:
+            fig1 = px.histogram(df, x="type", title="Distribution by Animal Type", color="type")
+            st.plotly_chart(fig1, use_container_width=True)
+
+        with chart2:
+            fig2 = px.scatter(df, x="age", y="weight", color="type", 
+                              title="Age vs Weight by Animal Type", size_max=60)
+            st.plotly_chart(fig2, use_container_width=True)
+
+        st.markdown("### 🧾 Detailed Livestock Records")
+        st.dataframe(df)
+    else:
+        st.info("No livestock data available yet.")
+
+
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
@@ -434,7 +488,7 @@ def request_vet_service():
     conn.close()
     
 # ========== Main ==========
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "👨‍⚕️ Vet Doc", "📞 Request Service", "📝 Feedback"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "👨‍⚕️ Vet Doc", "📞 Request Service", "Visualization" "📝 Feedback"])
 
 with tab1:
     display_dashboard()
@@ -447,6 +501,8 @@ with tab4:
 with tab5:
     request_vet_service()
 with tab6:
+    display_visualization()
+with tab7:
     handle_feedback_submission()
 
 # ========== Sidebar ==========
