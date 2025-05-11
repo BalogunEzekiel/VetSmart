@@ -87,8 +87,6 @@ def initialize_database():
     conn.commit()
     conn.close()
     
-initialize_database()
-
 # ========== Load & Save Data Functions ==========
 def load_data():
     conn = get_sqlite_connection()
