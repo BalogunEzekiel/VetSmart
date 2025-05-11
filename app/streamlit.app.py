@@ -385,7 +385,7 @@ with tab2:
 with tab3:
     display_health_tips()
 with tab4:
-    handle_feedback_submission()
+    display_feedback()
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
