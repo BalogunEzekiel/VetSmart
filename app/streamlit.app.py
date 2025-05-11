@@ -38,17 +38,11 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-# ========== Database Configuration ==========
-SQLITE_DB = 'livestock_data.db'
-
-# ========== Database Connection Functions ==========
-def get_sqlite_connection():
-    return sqlite3.connect(SQLITE_DB)
-
 # ========== Initialize Database and Tables ==========
 def initialize_database():
     conn = get_sqlite_connection()
     cursor = conn.cursor()
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS livestock (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,30 +62,31 @@ def initialize_database():
             submitted_on DATETIME
         )
     """)
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS veterinarians (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        specialization TEXT NOT NULL,
-        phone TEXT,
-        email TEXT,
-        registered_on DATETIME
-    )
-""")
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS vet_requests (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        farmer_name TEXT NOT NULL,
-        animal_tag TEXT NOT NULL,
-        vet_id INTEGER,
-        request_reason TEXT,
-        requested_on DATETIME,
-        FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
-    )
-""")
-conn.commit()
-conn.close()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS veterinarians (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            specialization TEXT NOT NULL,
+            phone TEXT,
+            email TEXT,
+            registered_on DATETIME
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS vet_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            farmer_name TEXT NOT NULL,
+            animal_tag TEXT NOT NULL,
+            vet_id INTEGER,
+            request_reason TEXT,
+            requested_on DATETIME,
+            FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
+        )
+    """)
 
+    conn.commit()
+    conn.close()
+    
 initialize_database()
 
 # ========== Load & Save Data Functions ==========
