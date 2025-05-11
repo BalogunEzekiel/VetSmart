@@ -159,7 +159,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     
     # Animal Information
     p = Paragraph("<b>Animal Information</b>", centered_title_style)
-    p.wrapOn(c, letter[0] - 2 * inch, 💌 [1])
+    p.wrapOn(c, letter[0] - 2 * inch, [1])
     p.drawOn(c, inch, letter[1] - 1.5 * inch)
     c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
     c.setFont("Helvetica-Bold", 12)
