@@ -17,20 +17,20 @@ from io import BytesIO
 from reportlab.lib import colors
 
 # ========== Centered Logo ==========
-st.markdown(
-    """
-    <div style="text-align: center;">
-        <img src="Logo.png" width="150" alt="VetSmart Logo">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+
+# Logo and title
+try:
+    logo = Image.open("Logo.png")
+    st.image(logo, width=200)
+except Exception as e:
+    st.warning(f"Logo could not be loaded: {e}")
+st.title("Welcome to VetSmart!")
 
 # ========== Title & Subtitle ==========
 st.markdown(
     """
     <div style="text-align: center; margin-top: 10px;">
-        <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 0;">🐮 VetSmart</h1>
+        <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 0;">🐮 </h1>
         <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
     </div>
     """,
