@@ -126,14 +126,34 @@ def predict_disease(symptoms):
     }
     return prediction, treatments[prediction]
 
-# ========== PDF Generation Function ==========
+# ========== PDF Generation Function ========== 
 def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     styles = getSampleStyleSheet()
-    centered_title_style = ParagraphStyle(name='CenteredTitle', parent=styles['Heading1'], alignment=1)
+    centered_title_style = ParagraphStyle(name='CenteredTitle', parent=styles['Heading1'], alignment=1, fontName='Times-Roman', fontSize=20, textColor=colors.green)
+    
+    # Header Customization (Logo + Title)
+    try:
+        logo = Image.open("logoo.png")
+        c.drawImage("logoo.png", inch, letter[1] - 50, width=150, height=50)  # Align logo to the left
+    except Exception as e:
+        c.setFont("Helvetica", 12)
+        c.drawString(inch, letter[1] - 50, "Logo could not be loaded")
+    
+    # Title with Calligraphic Font and Livestock Header Background
+    c.setFillColor(colors.green)  # Set header background color
+    c.rect(0, letter[1] - 60, letter[0], 60, fill=True)  # Draw rectangle for header background
+    
+    c.setFont("Times-Roman", 36)  # Calligraphic-like font style
+    c.setFillColor(colors.white)
+    c.drawString(200, letter[1] - 25, "VetSmart Diagnosis Report")  # Title text centralized
 
-    # VetSmart Report Title
+    c.setFont("Helvetica", 10)
+    c.setFillColor(colors.black)
+    c.line(inch, letter[1] - 60, letter[0] - inch, letter[1] - 60)  # Line under header
+    
+    # Animal Information
     p = Paragraph("<b>Animal Information</b>", centered_title_style)
     p.wrapOn(c, letter[0] - 2 * inch, letter[1])
     p.drawOn(c, inch, letter[1] - 1.5 * inch)
@@ -194,15 +214,15 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
     c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
 
-    # Footer
+    # Footer (No Changes)
     c.setFont("Helvetica", 8)
     c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
-
+    
     c.save()
     buffer.seek(0)
     return buffer
-
+    
 # ========== Page Functions ==========
 import streamlit as st
 
