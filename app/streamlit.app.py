@@ -256,9 +256,11 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
 def display_dashboard():
     """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
+
     with st.form("livestock_form", clear_on_submit=True):
         name = st.text_input("Animal Tag")
-        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
+        animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
+        animal_type = st.selectbox("Type", animal_types)
         age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
         weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
         vaccination = st.text_area("Vaccination History")
@@ -267,6 +269,8 @@ def display_dashboard():
     if submit:
         if name.strip() == "":
             st.warning("Animal Tag cannot be empty.")
+        elif animal_type == "-- Select Type --":
+            st.warning("Please select a valid animal type.")
         else:
             save_livestock_data(name, animal_type, age, weight, vaccination)
             st.success(f"{animal_type} '{name}' saved successfully!")
@@ -275,14 +279,25 @@ def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     df = load_data()
+
     if df.empty:
         st.warning("No livestock registered yet. Please add animals to the dashboard first.")
     else:
-        animal_name = st.selectbox("Select Registered Animal", df["Name"])
-        animal_data = df[df["Name"] == animal_name].iloc[0]
+        animal_options = ["-- Select an Animal --"] + df["Name"].tolist()
+        selected_animal = st.selectbox("Select Registered Animal", animal_options)
+
+        if selected_animal == "-- Select an Animal --":
+            st.info("Please select a valid animal to proceed.")
+            return
+
+        animal_data = df[df["Name"] == selected_animal].iloc[0]
         symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
 
         if st.button("🧠 Predict Disease"):
+            if not symptoms:
+                st.warning("Please select at least one symptom.")
+                return
+
             disease, recommendation = predict_disease(symptoms)
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
@@ -292,10 +307,10 @@ def display_diagnosis():
             st.download_button(
                 label="Download Diagnosis Report",
                 data=pdf_buffer,
-                file_name=f"{animal_name}_diagnosis_report.pdf",
+                file_name=f"{selected_animal}_diagnosis_report.pdf",
                 mime="application/pdf"
             )
-
+    
 def display_health_tips():
     """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Health Tips for Livestock")
@@ -355,20 +370,30 @@ def register_vet():
     st.subheader("👨‍⚕️ Register as a Veterinary Doctor")
     with st.form("vet_registration", clear_on_submit=True):
         name = st.text_input("Full Name")
-        specialization = st.selectbox("Specialization", ["Cattle", "Goat", "Sheep", "General"])
+        specialization_options = ["-- Select Specialization --", "Cattle", "Goat", "Sheep", "General"]
+        specialization = st.selectbox("Specialization", specialization_options)
         phone = st.text_input("Phone Number")
         email = st.text_input("Email Address")
         submitted = st.form_submit_button("Register")
 
         if submitted:
-            conn = get_sqlite_connection()
-            conn.execute("""
-                INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
-                VALUES (?, ?, ?, ?, ?)
-            """, (name, specialization, phone, email, datetime.datetime.now()))
-            conn.commit()
-            conn.close()
-            st.success("Veterinarian registered successfully!")
+            if specialization == "-- Select Specialization --":
+                st.warning("Please select a valid specialization.")
+            elif not name.strip():
+                st.warning("Name cannot be empty.")
+            elif not phone.strip():
+                st.warning("Phone number cannot be empty.")
+            elif not email.strip():
+                st.warning("Email cannot be empty.")
+            else:
+                conn = get_sqlite_connection()
+                conn.execute("""
+                    INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (name, specialization, phone, email, datetime.datetime.now()))
+                conn.commit()
+                conn.close()
+                st.success("Veterinarian registered successfully!")
 
 def request_vet_service():
     st.subheader("📞 Request Veterinary Services")
