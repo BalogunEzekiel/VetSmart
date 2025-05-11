@@ -314,7 +314,10 @@ def display_diagnosis():
 def display_health_tips():
     """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Health Tips for Livestock")
-    animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
+
+    animal_options = ["-- Select Animal Type --", "Cattle", "Goat", "Sheep"]
+    selected_animal = st.selectbox("Select Animal Type", animal_options)
+
     tips = {
         "Cattle": [
             "✅ Provide clean water daily.",
@@ -339,8 +342,11 @@ def display_health_tips():
         ]
     }
 
-    for tip in tips[animal]:
-        st.markdown(f"- {tip}")
+    if selected_animal == "-- Select Animal Type --":
+        st.info("Please select a valid animal type to view health tips.")
+    else:
+        for tip in tips[selected_animal]:
+            st.markdown(f"- {tip}")
 
 def handle_feedback_submission():
     """Handles the feedback submission process."""
