@@ -166,7 +166,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.drawString(inch, letter[1] - 2 * inch, "")
     c.setFont("Helvetica", 10)
 
-    # Animal Information Table
+# Animal Information Table
     
     data = [
 
