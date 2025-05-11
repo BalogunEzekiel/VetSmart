@@ -26,7 +26,6 @@ try:
     st.image(logo, width=150)
 except Exception as e:
     st.warning(f"Logo could not be loaded: {e}")
-st.title("")
 
 # ========== Title & Subtitle ==========
 st.markdown(
