@@ -207,53 +207,24 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     return buffer
     
 # ========== Page Functions ==========
-import streamlit as st
-
 def display_dashboard():
     """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
-
-    # Initialize session state for inputs
-    for key in ["name", "animal_type", "age", "weight", "vaccination"]:
-        if key not in st.session_state:
-            if key == "animal_type":
-                st.session_state[key] = "Cattle"
-            elif key in ["age", "weight"]:
-                st.session_state[key] = 0.0
-            else:
-                st.session_state[key] = ""
-
-    def reset_form():
-        st.session_state["name"] = ""
-        st.session_state["animal_type"] = "Cattle"
-        st.session_state["age"] = 0.0
-        st.session_state["weight"] = 0.0
-        st.session_state["vaccination"] = ""
-        st.experimental_rerun()
-
     with st.form("livestock_form"):
-        st.text_input("Animal Tag", key="name")
-        st.selectbox("Type", ["Cattle", "Goat", "Sheep"], key="animal_type")
-        st.number_input("Age (years)", 0.0, 20.0, step=0.1, key="age")
-        st.number_input("Weight (kg)", 0.0, 500.0, step=1.0, key="weight")
-        st.text_area("Vaccination History", key="vaccination")
+        name = st.text_input("Animal Tag")
+        animal_type = st.selectbox("Type", ["Cattle", "Goat", "Sheep"])
+        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
+        weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
+        vaccination = st.text_area("Vaccination History")
         submit = st.form_submit_button("💾 Save")
 
-        if submit:
-            if st.session_state.name.strip() == "":
-                st.warning("Animal Tag cannot be empty.")
-            else:
-                save_livestock_data(
-                    st.session_state.name,
-                    st.session_state.animal_type,
-                    st.session_state.age,
-                    st.session_state.weight,
-                    st.session_state.vaccination
-                )
-                reset_form()
-                st.success(f"{st.session_state.animal_type} '{st.session_state.name}' saved successfully!")
+    if submit:
+        if name.strip() == "":
+            st.warning("Animal Tag cannot be empty.")
+        else:
+            save_livestock_data(name, animal_type, age, weight, vaccination)
+            st.success(f"{animal_type} '{name}' saved successfully!")
 
-# ============================ Diagnosis ==================================
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
@@ -310,64 +281,29 @@ def display_health_tips():
     for tip in tips[animal]:
         st.markdown(f"- {tip}")
 
-import datetime
-import streamlit as st
-
-# ==================================Feedback=========================================
-
-import streamlit as st
-import datetime
-
-def save_feedback(name, feedback):
-    conn = get_sqlite_connection()
-    cursor = conn.cursor()
-    query = """
-        INSERT INTO feedback (name, feedback, submitted_on)
-        VALUES (?, ?, ?)
-    """
-    now = datetime.datetime.now()
-    cursor.execute(query, (name, feedback, now))
-    conn.commit()
-    conn.close()
-
-def display_feedback():
-    """Displays the feedback form and handles submissions."""
+def handle_feedback_submission():
+    """Handles the feedback submission process."""
     st.subheader("We Value Your Feedback 📝")
-
-    # Initialize session state for form fields if not already present
-    if "feedback_name" not in st.session_state:
-        st.session_state["feedback_name"] = ""
-    if "feedback_text" not in st.session_state:
-        st.session_state["feedback_text"] = ""
-
-    def reset_feedback_form():
-        st.session_state["feedback_name"] = ""
-        st.session_state["feedback_text"] = ""
-        st.experimental_rerun()
-
     with st.form("feedback_form"):
-        st.text_input("Your Name", key="feedback_name")
-        st.text_area("Please provide your feedback here:", key="feedback_text")
+        name = st.text_input("Your Name")
+        feedback_text = st.text_area("Please provide your feedback here:")
         submitted = st.form_submit_button("Submit Feedback")
 
         if submitted:
-            if st.session_state.feedback_name.strip() == "" or st.session_state.feedback_text.strip() == "":
+            if name.strip() == "" or feedback_text.strip() == "":
                 st.warning("Name and Feedback cannot be empty.")
             else:
-                save_feedback(st.session_state.feedback_name, st.session_state.feedback_text)
+                conn = get_sqlite_connection()
+                cursor = conn.cursor()
+                query = """
+                INSERT INTO feedback (name, feedback, submitted_on)
+                VALUES (?, ?, ?)
+                """
+                now = datetime.datetime.now()
+                cursor.execute(query, (name, feedback_text, now))
+                conn.commit()
+                conn.close()
                 st.success("Thank you for your feedback!")
-                reset_feedback_form()
-
-# ========== Main ==========
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
-with tab1:
-    display_dashboard()
-with tab2:
-    display_diagnosis()
-with tab3:
-    display_health_tips()
-with tab4:
-    display_feedback()
 
 # ========== Sidebar ==========
 with st.sidebar:
