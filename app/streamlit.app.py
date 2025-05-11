@@ -170,7 +170,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.setFont("Helvetica", 8)
     c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
-    
+
     c.save()
     buffer.seek(0)
     return buffer
@@ -287,14 +287,27 @@ import streamlit as st
 import streamlit as st
 import datetime
 
-def handle_feedback_submission():
-    """Handles the feedback submission process."""
+def save_feedback(name, feedback):
+    conn = get_sqlite_connection()
+    cursor = conn.cursor()
+    query = """
+        INSERT INTO feedback (name, feedback, submitted_on)
+        VALUES (?, ?, ?)
+    """
+    now = datetime.datetime.now()
+    cursor.execute(query, (name, feedback, now))
+    conn.commit()
+    conn.close()
+
+def display_feedback():
+    """Displays the feedback form and handles submissions."""
     st.subheader("We Value Your Feedback 📝")
 
-    # Initialize session state for form fields
-    for key in ["feedback_name", "feedback_text"]:
-        if key not in st.session_state:
-            st.session_state[key] = ""
+    # Initialize session state for form fields if not already present
+    if "feedback_name" not in st.session_state:
+        st.session_state["feedback_name"] = ""
+    if "feedback_text" not in st.session_state:
+        st.session_state["feedback_text"] = ""
 
     def reset_feedback_form():
         st.session_state["feedback_name"] = ""
@@ -310,24 +323,24 @@ def handle_feedback_submission():
             if st.session_state.feedback_name.strip() == "" or st.session_state.feedback_text.strip() == "":
                 st.warning("Name and Feedback cannot be empty.")
             else:
-                conn = get_sqlite_connection()
-                cursor = conn.cursor()
-                query = """
-                    INSERT INTO feedback (name, feedback, submitted_on)
-                    VALUES (?, ?, ?)
-                """
-                now = datetime.datetime.now()
-                cursor.execute(query, (
-                    st.session_state.feedback_name,
-                    st.session_state.feedback_text,
-                    now
-                ))
-                conn.commit()
-                conn.close()
+                save_feedback(st.session_state.feedback_name, st.session_state.feedback_text)
                 st.success("Thank you for your feedback!")
-
                 reset_feedback_form()
 
+if __name__ == "__main__":
+    st.title("VetSmart 🧑‍⚕️")
+    menu = ["Dashboard", "Disease Diagnosis", "Health Tips", "Feedback"]
+    choice = st.sidebar.selectbox("Menu", menu)
+
+    if choice == "Dashboard":
+        display_dashboard()
+    elif choice == "Disease Diagnosis":
+        display_diagnosis()
+    elif choice == "Health Tips":
+        display_health_tips()
+    elif choice == "Feedback":
+        display_feedback()
+        
 # ========== Sidebar ==========
 with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
