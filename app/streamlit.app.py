@@ -167,8 +167,8 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.setFont("Helvetica", 10)
 
     # Animal Information Table
-
-    data = [
+    
+    data = [
 
         ['Animal Tag', animal_data['Name']],
 
