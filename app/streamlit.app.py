@@ -2,7 +2,6 @@ import streamlit as st
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="VetSmart", layout="wide")
-st.title("VetSmart")
 
 import pandas as pd
 import datetime
@@ -25,6 +24,7 @@ from PIL import Image
 try:
     logo = Image.open("logoo.png")
     st.image(logo, width=150)
+    st.title("VetSmart")
 except Exception as e:
     st.warning(f"Logo could not be loaded: {e}")
 
