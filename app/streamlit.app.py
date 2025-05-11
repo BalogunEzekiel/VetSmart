@@ -102,23 +102,6 @@ def save_livestock_data(name, animal_type, age, weight, vaccination):
     conn.commit()
     conn.close()
 
-# ========== Custom CSS ==========
-st.markdown("""
-<style>
-.stApp {
-    background-image: url('https://images.unsplash.com/photo-1601749111324-82e873f9f9d4');
-    background-size: cover;
-    background-attachment: fixed;
-}
-.title {
-    font-size: 48px;
-    font-weight: bold;
-    color: #2E8B57;
-    text-shadow: 1px 1px #ffffff;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
@@ -144,7 +127,7 @@ from PIL import Image
 from reportlab.lib.units import inch
 import datetime
 
-def generate_professional_diagnosis_report(animal_data, disease, recommendation):
+def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
@@ -412,31 +395,35 @@ with tab6:
 with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
     st.markdown("## 🐄Livestock Focus:")
-    st.markdown("""
-    
-    ***Cattle***
-    
-    ***Goat***
-    
-    ***Sheep***
-    """)    
-    st.markdown("## About VetSmart")
-    st.markdown("""
-    **VetSmart** is an AI-powered livestock health monitoring, disease prevention and diagnosis app. It is designed to help farmers and veterinary experts monitor animal health, predict diseases, treatment recommendations and improve the health status of their animals in real-time.
-    
-    With features like livestock registration, disease prediction based on symptoms, vaccination records and downloadable diagnosis reports, VetSmart enhances the efficiency and accuracy of animal healthcare decisions.
 
-    **Contributors:**
-    - **Ezekiel BALOGUN**
-    *Data Scientist/Lead*  
-    - **Oluwakemi Adesanwo**
-    *Data Analyst*  
-    - **Damilare Abayomi**
-    *Software Developer*  
-    - **Boluwatife Adeagbo**
-    *Veterinary Doctor*
+# ========== Sidebar ==========
+with st.sidebar:
+    st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
+    st.markdown("## Livestock Focus")
+    st.markdown("""
+    - **Cattle**
+    - **Goat**
+    - **Sheep**
     """)
 
+    st.markdown("## About VetSmart")
+    st.markdown("""
+    **VetSmart** is an AI-powered livestock health monitoring, disease prevention, and diagnosis app designed to support farmers and veterinary experts.
+
+    **Key Features:**
+    - Livestock registration  
+    - Disease prediction based on symptoms  
+    - Vaccination records  
+    - Downloadable diagnosis reports  
+
+    These features enhance the efficiency and accuracy of animal healthcare decisions.
+
+    **👥 Contributors**
+    - **Ezekiel BALOGUN** — *Data Scientist / Lead*  
+    - **Oluwakemi Adesanwo** — *Data Analyst*  
+    - **Damilare Abayomi** — *Software Developer*  
+    - **Boluwatife Adeagbo** — *Veterinary Doctor*
+    """)
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
 if st.sidebar.button("Download SQLite Data as CSV"):
