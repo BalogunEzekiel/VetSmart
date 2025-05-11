@@ -373,30 +373,41 @@ def register_vet():
 def request_vet_service():
     st.subheader("📞 Request Veterinary Services")
     conn = get_sqlite_connection()
+
     vets = pd.read_sql("SELECT * FROM veterinarians", conn)
+    animals = pd.read_sql("SELECT tag FROM livestock", conn)  # Assuming `tag` is the animal ID column
 
     if vets.empty:
         st.info("No registered veterinarians available at the moment.")
+        conn.close()
+        return
+
+    if animals.empty:
+        st.info("No animals are currently registered.")
+        conn.close()
         return
 
     vet_names = ["-- Select a Vet --"] + vets['name'].tolist()
+    animal_tags = ["-- Select an Animal --"] + animals['tag'].tolist()
 
     with st.form("vet_service_form", clear_on_submit=True):
         farmer_name = st.text_input("Your Name")
-        animal_tag = st.text_input("Animal Tag (e.g., from your livestock record)")
+        selected_animal = st.selectbox("Animal Tag (Select a pre-registered animal)", animal_tags)
         selected_vet = st.selectbox("Select a Vet", vet_names)
         request_reason = st.text_area("Reason for Request")
         submitted = st.form_submit_button("Submit Request")
 
         if submitted:
-            if selected_vet == "-- Select a Vet --":
-                st.warning("Please select a valid vet before submitting.")
+            if selected_animal == "-- Select an Animal --":
+                st.warning("Please select a valid animal.")
+            elif selected_vet == "-- Select a Vet --":
+                st.warning("Please select a valid vet.")
             else:
                 vet_id = vets[vets['name'] == selected_vet]['id'].values[0]
                 conn.execute("""
                     INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
                     VALUES (?, ?, ?, ?, ?)
-                """, (farmer_name, animal_tag, vet_id, request_reason, datetime.datetime.now()))
+                """, (farmer_name, selected_animal, vet_id, request_reason, datetime.datetime.now()))
                 conn.commit()
                 st.success("Vet service requested successfully!")
 
