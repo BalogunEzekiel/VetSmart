@@ -96,23 +96,6 @@ def save_livestock_data(name, animal_type, age, weight, vaccination):
     conn.commit()
     conn.close()
 
-# ========== Custom CSS ==========
-st.markdown("""
-<style>
-.stApp {
-    background-image: url('https://images.unsplash.com/photo-1601749111324-82e873f9f9d4');
-    background-size: cover;
-    background-attachment: fixed;
-}
-.title {
-    font-size: 48px;
-    font-weight: bold;
-    color: #2E8B57;
-    text-shadow: 1px 1px #ffffff;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
     diseases = ['Foot-and-Mouth', 'Anthrax', 'PPR', 'Mastitis', 'None']
