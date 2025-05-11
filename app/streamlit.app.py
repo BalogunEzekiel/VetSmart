@@ -21,7 +21,7 @@ from reportlab.lib import colors
 # Logo and title
 try:
     logo = Image.open("Logo.png")
-    st.image(logo, width=200)
+    st.image(logo, width=400)
 except Exception as e:
     st.warning(f"Logo could not be loaded: {e}")
 st.title("Welcome to VetSmart!")
