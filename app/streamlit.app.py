@@ -424,7 +424,7 @@ with st.sidebar:
 
     These features enhance the efficiency and accuracy of animal healthcare decisions.
 
-    **👥 Contributors**
+    ## 👥Contributors
     - **Ezekiel BALOGUN** — *Data Scientist / Lead*  
     - **Oluwakemi Adesanwo** — *Data Analyst*  
     - **Damilare Abayomi** — *Software Developer*  
