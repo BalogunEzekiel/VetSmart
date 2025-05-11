@@ -140,18 +140,18 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     # Header Customization (Logo + Title)
     try:
         logo = Image.open("logoo.png")
-        c.drawImage("logoo.png", inch, letter[1] - 50, width=150, height=50)  # Align logo to the left
+        c.drawImage("logoo.png", inch, letter[1] - 50, width=100, height=30)  # Align logo to the left
     except Exception as e:
         c.setFont("Helvetica", 12)
         c.drawString(inch, letter[1] - 50, "Logo could not be loaded")
     
     # Title with Calligraphic Font and Livestock Header Background
     c.setFillColor(colors.green)  # Set header background color
-    c.rect(0, letter[1] - 60, letter[0], 60, fill=True)  # Draw rectangle for header background
+    c.rect(0, letter[1] - 45, letter[0], 45, fill=True)  # Draw rectangle for header background
     
-    c.setFont("Times-Roman", 36)  # Calligraphic-like font style
+    c.setFont("Times-Roman", 30)  # Calligraphic-like font style
     c.setFillColor(colors.white)
-    c.drawString(200, letter[1] - 25, "VetSmart Diagnosis Report")  # Title text centralized
+    c.drawString(150, letter[1] - 20, "VetSmart Diagnosis Report")  # Title text centralized
 
     c.setFont("Helvetica", 10)
     c.setFillColor(colors.black)
@@ -159,7 +159,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     
     # Animal Information
     p = Paragraph("<b>Animal Information</b>", centered_title_style)
-    p.wrapOn(c, letter[0] - 2 * inch, letter[1])
+    p.wrapOn(c, letter[0] - 2 * inch, 💌 [1])
     p.drawOn(c, inch, letter[1] - 1.5 * inch)
     c.line(inch, letter[1] - 1.6 * inch, letter[0] - inch, letter[1] - 1.6 * inch)
     c.setFont("Helvetica-Bold", 12)
@@ -171,7 +171,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         ['Animal Tag', animal_data['Name']],
         ['Type', animal_data['Type']],
         ['Age (years)', animal_data['Age']],
-        ['Weight (kg)', animal_data['Weight']],
+        ['Weight (kg)', animal_data['Weight]]', to 
     ]
     table = Table(data, colWidths=[letter[0] / 3.0, (2 * letter[0]) / 3.0])
     table.setStyle(TableStyle([
