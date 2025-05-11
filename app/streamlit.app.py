@@ -305,6 +305,17 @@ def handle_feedback_submission():
                 conn.close()
                 st.success("Thank you for your feedback!")
 
+# ========== Main ==========
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback"])
+with tab1:
+    display_dashboard()
+with tab2:
+    display_diagnosis()
+with tab3:
+    display_health_tips()
+with tab4:
+    handle_feedback_submission()
+
 # ========== Sidebar ==========
 with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
