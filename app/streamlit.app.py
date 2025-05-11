@@ -370,7 +370,7 @@ def request_vet_service():
     conn.close()
 
 # ========================= Main =====================================
-tab1, tab2, tab3, tab4, tab5, tab4 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback", "Vet Doc", "Request Service"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Dashboard", "🩺 Diagnosis", "💡 Health Tips", "📝 Feedback", "Vet Doc", "Request Service"])
 with tab1:
     display_dashboard()
 with tab2:
