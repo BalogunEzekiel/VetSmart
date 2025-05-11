@@ -16,6 +16,27 @@ from reportlab.graphics.barcode import code128
 from io import BytesIO
 from reportlab.lib import colors
 
+# ========== Centered Logo ==========
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="Logo.png" width="150" alt="VetSmart Logo">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# ========== Title & Subtitle ==========
+st.markdown(
+    """
+    <div style="text-align: center; margin-top: 10px;">
+        <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 0;">🐮 VetSmart</h1>
+        <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # ========== Database Configuration ==========
 SQLITE_DB = 'livestock_data.db'
 
@@ -366,27 +387,6 @@ with st.sidebar:
     - **Boluwatife Adeagbo**
     *Veterinary Doctor*
     """)
-
-# ========== Centered Logo ==========
-st.markdown(
-    """
-    <div style="text-align: center;">
-        <img src="Logo.png" width="150" alt="VetSmart Logo">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# ========== Title & Subtitle ==========
-st.markdown(
-    """
-    <div style="text-align: center; margin-top: 10px;">
-        <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 0;">🐮 VetSmart</h1>
-        <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 # ========== SQLite Database Download ==========
 st.sidebar.markdown("## Download Data")
