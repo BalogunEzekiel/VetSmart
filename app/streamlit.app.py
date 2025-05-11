@@ -23,16 +23,21 @@ from PIL import Image
 # Logo and title
 try:
     logo = Image.open("logoo.png")
-    st.image(logo, width=150)
+    col1, col2, col3 = st.columns([1, 6, 1])  # Create columns to structure the layout
+    
+    with col1:
+        st.image(logo, width=150)  # Align logo to the left
+        
+    with col2:
+        st.markdown("<h1 style='text-align: center;'>VetSmart</h1>", unsafe_allow_html=True)  # Centralized title
+    
 except Exception as e:
     st.warning(f"Logo could not be loaded: {e}")
-st.title("VetSmart!")
-
+    
 # ========== Title & Subtitle ==========
 st.markdown(
     """
     <div style="text-align: center; margin-top: 10px;">
-        <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 0;">🐮 </h1>
         <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
     </div>
     """,
