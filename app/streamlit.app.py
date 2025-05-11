@@ -326,21 +326,7 @@ def display_feedback():
                 save_feedback(st.session_state.feedback_name, st.session_state.feedback_text)
                 st.success("Thank you for your feedback!")
                 reset_feedback_form()
-
-if __name__ == "__main__":
-    st.title("VetSmart 🧑‍⚕️")
-    menu = ["Dashboard", "Disease Diagnosis", "Health Tips", "Feedback"]
-    choice = st.sidebar.selectbox("Menu", menu)
-
-    if choice == "Dashboard":
-        display_dashboard()
-    elif choice == "Disease Diagnosis":
-        display_diagnosis()
-    elif choice == "Health Tips":
-        display_health_tips()
-    elif choice == "Feedback":
-        display_feedback()
-        
+       
 # ========== Sidebar ==========
 with st.sidebar:
     st.sidebar.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
