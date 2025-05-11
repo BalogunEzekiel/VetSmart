@@ -701,4 +701,3 @@ if event and event.get("type") == "chatMessage":
         # Trigger JS to update the chat window dynamically
         chat_update = "".join([f"<div><b>{s}:</b> {m}</div>" for s, m in reversed(st.session_state.chat_history)])
         st.components.v1.html(f"<script>window.parent.postMessage({{type: 'updateChat', html: `{chat_update}`}}, '*');</script>", height=0)
-
