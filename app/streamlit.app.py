@@ -95,8 +95,8 @@ def initialize_database():
         FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
     )
 """)
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
 
 initialize_database()
 
