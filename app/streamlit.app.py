@@ -84,7 +84,7 @@ def initialize_database():
         registered_on DATETIME
     )
 """)
-cursor.execute("""
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS vet_requests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         farmer_name TEXT NOT NULL,
