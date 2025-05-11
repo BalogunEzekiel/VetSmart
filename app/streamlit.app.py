@@ -167,7 +167,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     # Header - Logo + Title Bar
     try:
         logo_path = "logoo.png"
-        c.drawImage(logo_path, inch, height - 60, width=100, height=30)
+        c.drawImage(logo_path, inch, height - 60, width=100, height=50)
     except Exception:
         c.setFont("Helvetica", 12)
         c.drawString(inch, height - 50, "Logo could not be loaded")
@@ -191,7 +191,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         ["Weight (kg):", animal_data["Weight"]]
     ]
 
-    animal_table = Table(animal_table_data, colWidths=[2 * inch, 2.5 * inch], hAlign='CENTER')
+    animal_table = Table(animal_table_data, colWidths=[2 * inch, 3.5 * inch], hAlign='CENTER')
     animal_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
