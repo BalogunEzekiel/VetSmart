@@ -225,8 +225,8 @@ c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftim
 c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
 c.save()
-  buffer.seek(0)
-  return buffer
+buffer.seek(0)
+return buffer
     
 # ========== Page Functions ==========
 def display_dashboard():
