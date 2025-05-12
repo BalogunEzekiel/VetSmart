@@ -339,7 +339,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
 #        st.info("No livestock data available yet.")
 #
 
-def display_diagnosis():
+def display_visualization():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     df = load_data()
