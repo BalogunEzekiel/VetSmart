@@ -114,7 +114,7 @@ def load_data():
     return df
 
 def save_livestock_data(name, animal_type, age, weight, vaccination):
-    conn = sqlite3.connect("livestock_data.db")
+    conn = get_sqlite_connection()
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO livestock (name, animal_type, age, weight, vaccination)
