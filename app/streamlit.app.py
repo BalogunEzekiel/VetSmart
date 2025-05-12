@@ -391,42 +391,6 @@ def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     df = load_data()
-
-    if df.empty:
-        st.warning("No livestock registered yet. Please add animals to the dashboard first.")
-    else:
-        animal_options = ["-- Select an Animal --"] + df["Name"].tolist()
-        selected_animal = st.selectbox("Select Registered Animal", animal_options)
-
-        if selected_animal == "-- Select an Animal --":
-            st.info("Please select a valid animal to proceed.")
-            return
-
-        animal_data = df[df["Name"] == selected_animal].iloc[0]
-        symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
-
-        if st.button("🧠 Predict Disease"):
-            if not symptoms:
-                st.warning("Please select at least one symptom.")
-                return
-
-            disease, recommendation = predict_disease(symptoms)
-            st.write(f"**Predicted Disease:** 🐾 {disease}")
-            st.write(f"**Recommendation:** 💊 {recommendation}")
-
-            pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
-
-            st.download_button(
-                label="Download Diagnosis Report",
-                data=pdf_buffer,
-                file_name=f"{selected_animal}_diagnosis_report.pdf",
-                mime="application/pdf"
-            )
-    
-def display_diagnosis():
-    """Displays the symptom-based disease diagnosis section."""
-    st.subheader("🩺 Symptom-based Disease Diagnosis")
-    df = load_data()
     if df.empty:
         st.warning("No livestock registered yet. Please add animals to the dashboard first.")
     else:
@@ -476,6 +440,37 @@ def register_vet():
                 conn.commit()
                 conn.close()
                 st.success("Veterinarian registered successfully!")
+
+def display_health_tips():
+    """Displays general health tips for selected livestock."""
+    st.subheader("🌿 General Health Tips for Livestock")
+    animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
+    tips = {
+        "Cattle": [
+            "✅ Provide clean water daily.",
+            "💉 Schedule regular vaccinations and deworming.",
+            "🧼 Maintain proper hygiene in sheds.",
+            "🌱 Ensure access to quality feed and pasture.",
+            "📋 Monitor body condition and behavior regularly."
+        ],
+        "Goat": [
+            "🚫 Avoid overcrowding in pens.",
+            "🥗 Feed balanced diet with minerals and vitamins.",
+            "🧽 Clean water containers daily.",
+            "📆 Conduct routine hoof trimming.",
+            "💉 Deworm and vaccinate periodically."
+        ],
+        "Sheep": [
+            "🧴 Shear regularly to prevent overheating.",
+            "💊 Monitor for signs of parasites.",
+            "🌾 Provide nutritious forage.",
+            "👀 Check for eye infections and foot rot.",
+            "🛏️ Keep bedding dry and clean."
+        ]
+    }
+
+    for tip in tips[animal]:
+        st.markdown(f"- {tip}")
 
 def request_vet_service():
     st.subheader("📞 Request Veterinary Services")
