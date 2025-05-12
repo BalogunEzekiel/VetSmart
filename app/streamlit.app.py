@@ -113,29 +113,78 @@ def load_data():
     conn.close()
     return df
 
-def save_livestock_data(name, animal_type, age, weight, vaccination):
+def save_livestock(name, animal_type, age, weight, vaccination):
     try:
         conn = get_sqlite_connection()
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO livestock (name, animal_type, age, weight, vaccination, added_on)
             VALUES (?, ?, ?, ?, ?, ?)
-        """, (name, animal_type, age, weight, vaccination, datetime.now()))
+        """, (name, animal_type, age, weight, vaccination, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         conn.commit()
     except Exception as e:
         print(f"Error saving data: {e}")
     finally:
         conn.close()
 
-#def save_livestock_data(name, animal_type, age, weight, vaccination):
-#    conn = get_sqlite_connection()
-#    query = """
-#    INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
-#    VALUES (?, ?, ?, ?, ?, ?)
-#    """
-#    conn.execute(query, (name, animal_type, age, weight, vaccination, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-#    conn.commit()
-#    conn.close()
+def load_feedback():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM feedback", conn)
+    conn.close()
+    return df
+def save_feedback(name, feedback_text):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO feedback (name, feedback, submitted_on)
+            VALUES (?, ?, ?)
+        """, (name, feedback_text, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving feedback: {e}")
+    finally:
+        conn.close()
+
+def load_veterinarians():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM veterinarians", conn)
+    conn.close()
+    return df
+
+def save_veterinarian(name, specialization, phone, email):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
+            VALUES (?, ?, ?, ?, ?)
+        """, (name, specialization, phone, email, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving veterinarian: {e}")
+    finally:
+        conn.close()
+
+def load_vet_requests():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM vet_requests", conn)
+    conn.close()
+    return df
+
+def save_vet_request(farmer_name, animal_tag, vet_id, request_reason):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
+            VALUES (?, ?, ?, ?, ?)
+        """, (farmer_name, animal_tag, vet_id, request_reason, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving vet request: {e}")
+    finally:
+        conn.close()
 
 # ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
