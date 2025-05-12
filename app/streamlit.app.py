@@ -375,6 +375,31 @@ def display_visualization():
                 mime="application/pdf"
             )
     
+def display_diagnosis():
+    """Displays the symptom-based disease diagnosis section."""
+    st.subheader("🩺 Symptom-based Disease Diagnosis")
+    df = load_data()
+    if df.empty:
+        st.warning("No livestock registered yet. Please add animals to the dashboard first.")
+    else:
+        animal_name = st.selectbox("Select Registered Animal", df["Name"])
+        animal_data = df[df["Name"] == animal_name].iloc[0]
+        symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
+
+        if st.button("🧠 Predict Disease"):
+            disease, recommendation = predict_disease(symptoms)
+            st.write(f"**Predicted Disease:** 🐾 {disease}")
+            st.write(f"**Recommendation:** 💊 {recommendation}")
+
+            pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
+
+            st.download_button(
+                label="Download Diagnosis Report",
+                data=pdf_buffer,
+                file_name=f"{animal_name}_diagnosis_report.pdf",
+                mime="application/pdf"
+            )
+
 def display_health_tips():
     """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Daily Health Tips for Livestock")
