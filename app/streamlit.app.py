@@ -158,7 +158,7 @@ from PIL import Image
 from reportlab.lib.units import inch
 import datetime
 
-def generate_diagnosis_report(animal_data, disease, recommendation):
+def display_diagnosis(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
