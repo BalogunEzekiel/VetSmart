@@ -63,7 +63,7 @@ def initialize_database():
         CREATE TABLE IF NOT EXISTS livestock (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            type TEXT NOT NULL,
+            animal_type TEXT NOT NULL,
             age REAL NOT NULL,
             weight REAL NOT NULL,
             vaccination TEXT,
@@ -118,9 +118,9 @@ def save_livestock_data(name, animal_type, age, weight, vaccination):
         conn = get_sqlite_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO livestock (name, animal_type, age, weight, vaccination)
-            VALUES (?, ?, ?, ?, ?)
-        """, (name, animal_type, age, weight, vaccination))
+            INSERT INTO livestock (name, animal_type, age, weight, vaccination, added_on)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (name, animal_type, age, weight, vaccination, datetime.now()))
         conn.commit()
     except Exception as e:
         print(f"Error saving data: {e}")
