@@ -503,6 +503,31 @@ def request_vet_service():
                 st.success("Vet service requested successfully!")
 
     conn.close()
+
+def handle_feedback_submission():
+    """Handles the feedback submission process."""
+    st.subheader("We Value Your Feedback 📝")
+    with st.form("feedback_form"):
+        name = st.text_input("Your Name")
+        feedback_text = st.text_area("Please provide your feedback here:")
+        submitted = st.form_submit_button("Submit Feedback")
+
+        if submitted:
+            if name.strip() == "" or feedback_text.strip() == "":
+                st.warning("Name and Feedback cannot be empty.")
+            else:
+                conn = get_sqlite_connection()
+                cursor = conn.cursor()
+                query = """
+                INSERT INTO feedback (name, feedback, submitted_on)
+                VALUES (?, ?, ?)
+                """
+                now = datetime.datetime.now()
+                cursor.execute(query, (name, feedback_text, now))
+                conn.commit()
+                conn.close()
+                st.success("Thank you for your feedback!")
+
     
 # ========== Main ==========
 tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊🩺 Diagnosis", "💡 Health Tips", "👨‍⚕️ Vet Doc", "📞 Request Service", "Visualization", "📝 Feedback"])
