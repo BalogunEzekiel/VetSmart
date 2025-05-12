@@ -588,24 +588,24 @@ if st.sidebar.button("Download SQLite Data as CSV"):
         mime="text/csv"
     )
 
-#Custom CSS for background image in the sidebar
+# Custom CSS for background image in the sidebar
 sidebar_style = """
-  <style>
-    [data-testid="stSidebar"]{
-      background-image: url("https://www.google.com/imgres?q=grass%20or%20flowers%20png%20images&imgurl=https%3A%2F%2Fwww.clipartmax.com%2Fpng%2Fmiddle%2F238-2383752_new-textures-billboard-grass-flower-game-texture.png&imgrefurl=https%3A%2F%2Fwww.clipartmax.com%2Fmiddle%2Fm2H7K9i8A0N4d3b1_new-textures-billboard-grass-flower-game-texture%2F&docid=xlJgXBBNYEnXCM&tbnid=0gYCdSH4DOn8YM&vet=12ahUKEwi6797-8ZyNAxXiTDABHXOxK6A4HhAzegQINRAA..i&w=840&h=1088&hcb=2&ved=2ahUKEwi6797-8ZyNAxXiTDABHXOxK6A4HhAzegQINRAA");
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: centre;
-      }
-      </style>
-      """
+    <style>
+        [data-testid="stSidebar"] {
+            background-image: url("https://drive.google.com/file/d/1yK4B_D25ZRxJu3FyBUpfDRplQNkdnRas/view?usp=sharing.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
+"""
+
 # Apply the CSS
 st.markdown(sidebar_style, unsafe_allow_html=True)
 
 # Main content
 st.title("Main Area")
-st.write("This is the main content area.")
-
+st.write("This is the ma")
 # ================VetChat==================
 import streamlit as st
 
