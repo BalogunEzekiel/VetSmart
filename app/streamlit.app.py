@@ -340,6 +340,54 @@ def display_diagnosis(animal_data, disease, recommendation):
 #
 
 def display_visualization():
+    """Displays the livestock dashboard and add animal form."""
+    st.subheader("📋 Add and Monitor Your Livestock")
+
+    # Form for adding livestock
+    with st.form("livestock_form", clear_on_submit=True):
+        name = st.text_input("Animal Tag")
+        animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
+        animal_type = st.selectbox("Type", animal_types)
+        age = st.number_input("Age (years)", 0.0, 20.0)
+        weight = st.number_input("Weight (kg)", 0.0, 1000.0)
+        vaccination = st.text_input("Vaccination Details")
+        submitted = st.form_submit_button("Add Livestock")
+
+        if submitted:
+            if animal_type == "-- Select Type --" or not name:
+                st.warning("Please fill in all required fields.")
+            else:
+                save_livestock_data(name, animal_type, age, weight, vaccination)
+                st.success(f"{name} has been added successfully.")
+
+    # Load data for visualization
+    df = load_data()
+    
+    if not df.empty:
+        st.markdown("### 📊 Livestock Data Overview")
+
+        # Show the raw data table
+        st.dataframe(df[['name', 'type', 'age', 'weight', 'vaccination', 'added_on']])
+
+        # Bar chart - Count by animal type
+        type_counts = df['type'].value_counts().reset_index()
+        type_counts.columns = ['Type', 'Count']
+        fig_type = px.bar(type_counts, x='Type', y='Count', title='Livestock Count by Type', color='Type')
+        st.plotly_chart(fig_type, use_container_width=True)
+
+        # Pie chart - Distribution by type
+        fig_pie = px.pie(type_counts, names='Type', values='Count', title='Livestock Distribution by Type')
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+        # Scatter plot - Age vs Weight
+        fig_scatter = px.scatter(df, x='age', y='weight', color='type', size='weight',
+                                 hover_data=['name'], title='Age vs Weight of Livestock')
+        st.plotly_chart(fig_scatter, use_container_width=True)
+
+    else:
+        st.info("No livestock records found. Please add livestock data to see insights.")
+
+def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
     df = load_data()
@@ -399,67 +447,6 @@ def display_diagnosis():
                 file_name=f"{animal_name}_diagnosis_report.pdf",
                 mime="application/pdf"
             )
-
-def display_health_tips():
-    """Displays general health tips for selected livestock."""
-    st.subheader("🌿 General Daily Health Tips for Livestock")
-
-    animal_options = ["-- Select Animal Type --", "Cattle", "Goat", "Sheep"]
-    selected_animal = st.selectbox("Select Animal Type", animal_options)
-
-    tips = {
-        "Cattle": [
-            "✅ Provide clean water daily.",
-            "💉 Schedule regular vaccinations and deworming.",
-            "🧼 Maintain proper hygiene in sheds.",
-            "🌱 Ensure access to quality feed and pasture.",
-            "📋 Monitor body condition and behavior regularly."
-        ],
-        "Goat": [
-            "🚫 Avoid overcrowding in pens.",
-            "🥗 Feed balanced diet with minerals and vitamins.",
-            "🧽 Clean water containers daily.",
-            "📆 Conduct routine hoof trimming.",
-            "💉 Deworm and vaccinate periodically."
-        ],
-        "Sheep": [
-            "🧴 Shear regularly to prevent overheating.",
-            "💊 Monitor for signs of parasites.",
-            "🌾 Provide nutritious forage.",
-            "👀 Check for eye infections and foot rot.",
-            "🛏️ Keep bedding dry and clean."
-        ]
-    }
-
-    if selected_animal == "-- Select Animal Type --":
-        st.info("Please select a valid animal type to view health tips.")
-    else:
-        for tip in tips[selected_animal]:
-            st.markdown(f"- {tip}")
-
-def handle_feedback_submission():
-    """Handles the feedback submission process."""
-    st.subheader("We Value Your Feedback 📝")
-    with st.form("feedback_form", clear_on_submit=True):
-        name = st.text_input("Your Name")
-        feedback_text = st.text_area("Please provide your feedback here:")
-        submitted = st.form_submit_button("Submit Feedback")
-
-        if submitted:
-            if name.strip() == "" or feedback_text.strip() == "":
-                st.warning("Name and Feedback cannot be empty.")
-            else:
-                conn = get_sqlite_connection()
-                cursor = conn.cursor()
-                query = """
-                INSERT INTO feedback (name, feedback, submitted_on)
-                VALUES (?, ?, ?)
-                """
-                now = datetime.datetime.now()
-                cursor.execute(query, (name, feedback_text, now))
-                conn.commit()
-                conn.close()
-                st.success("Thank you for your feedback!")
 
 def register_vet():
     st.subheader("👨‍⚕️ Register as a Veterinary Doctor")
