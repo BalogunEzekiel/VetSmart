@@ -120,6 +120,3 @@ def chatbot_widget():
 
         # Close the chatbot container
         st.markdown("</div>", unsafe_allow_html=True)
-
-# Run the chatbot widget
-chatbot_widget()
