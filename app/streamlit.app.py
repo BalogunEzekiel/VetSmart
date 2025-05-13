@@ -398,14 +398,6 @@ def display_dashboard():
         st.info("No livestock records found. Please add livestock data to see insights.")
         return
 
-    # --- Filters and Sorting ---
-    with st.expander("🔍 Filter and Sort Data"):
-        
-        search_tag = st.text_input("Search by Animal Tag")
-
-        sort_column = st.selectbox("Sort By", ["None", "age", "weight"])
-        sort_order = st.radio("Sort Order", ["Ascending", "Descending"], horizontal=True)
-
     # --- Apply Filters ---
     filtered_df = df.copy()
 
