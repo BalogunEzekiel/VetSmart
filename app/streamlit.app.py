@@ -652,7 +652,7 @@ with st.sidebar:
 
 # ================VetChat==================
 # ========== Simple Rule-Based Chatbot ==========
-def chatbot_widget
+def chatbot_widget(
 
     def chatbot_response(user_input):
         responses = {
@@ -758,6 +758,7 @@ def chatbot_widget
                     st.session_state.chat_history.append(("VetChat", response))
     
             st.markdown("</div>", unsafe_allow_html=True)
+)
     
     # Run the chatbot
 
