@@ -386,7 +386,7 @@ def display_view_livestock():
             file_name="filtered_livestock_records.csv",
             mime="text/csv"
         )
-   
+
 def display_dashboard(selected_type, search_tag, sort_column, sort_order):
     st.subheader("📊 Monitor Your Livestock Insights")
 
@@ -615,7 +615,10 @@ with tab5:
 with tab6:
     request_vet_service()
 with tab7:
+    try:
     display_dashboard()
+except Exception as e:
+    st.error(f"An error occurred: {e}")
 with tab8:
     handle_feedback_submission()
 
