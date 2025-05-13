@@ -531,7 +531,7 @@ def handle_feedback_submission():
                 st.success("Thank you for your feedback!")
     
 # =================================================== Main =======================================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab7 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Visualization", "📝 Feedback"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Visualization", "📝 Feedback"])
 
 with tab1:
     display_add_livestock()
@@ -539,7 +539,7 @@ with tab2:
     display_view_livestock()
 with tab3:
     display_diagnosis()
-with tab4
+with tab4:
     display_health_tips()
 with tab5:
     register_vet()
