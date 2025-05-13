@@ -320,7 +320,7 @@ def display_diagnosis(animal_data, disease, recommendation):
 # ========== Page Functions ==========
 def display_add_livestock():
     """Displays the livestock dashboard and add animal form."""
-    st.subheader("📋 Add and Monitor Your Livestock")
+    st.subheader("📋 Register Your Livestock")
 
     # Form for adding livestock
     with st.form("livestock_form", clear_on_submit=True):
@@ -340,31 +340,98 @@ def display_add_livestock():
                 st.success(f"{animal_type} '{name}' saved successfully!")
 
 def display_view_livestock():
-    """Displays all registered livestock."""
-    st.subheader("🐐 View All Your Livestock")
+    """Displays all registered livestock with filters, sorting, and export."""
+    st.subheader("🐐🐑🐄 View All Your Livestock")
 
-# Load livestock data
-def load_data():
-    if os.path.exists(DATA_FILE):
-        return pd.read_csv(DATA_FILE)
+    df = load_data()
+
+    if df.empty:
+        st.info("No livestock records found.")
+        return
+
+    # --- Filter section ---
+    with st.expander("🔍 Filter Records"):
+        animal_types = ["All"] + sorted(df["Type"].dropna().unique())
+        selected_type = st.selectbox("Filter by Animal Type", animal_types)
+
+        search_tag = st.text_input("Search by Animal Tag")
+
+        # Sorting options
+        sort_column = st.selectbox("Sort By", ["None", "Age", "Weight"])
+        sort_order = st.radio("Sort Order", ["Ascending", "Descending"], horizontal=True)
+
+    # --- Apply filters ---
+    filtered_df = df.copy()
+
+    if selected_type != "All":
+        filtered_df = filtered_df[filtered_df["Type"] == selected_type]
+
+    if search_tag:
+        filtered_df = filtered_df[filtered_df["Name"].str.contains(search_tag, case=False)]
+
+    # --- Apply sorting ---
+    if sort_column != "None":
+        ascending = sort_order == "Ascending"
+        filtered_df = filtered_df.sort_values(by=sort_column, ascending=ascending)
+
+    # --- Display results ---
+    if filtered_df.empty:
+        st.warning("No matching records found.")
     else:
-        return pd.DataFrame(columns=["Name", "Type", "Age", "Weight", "Vaccination"])
+        st.dataframe(filtered_df)
+
+        # --- Export button ---
+        csv = filtered_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Filtered Data as CSV",
+            data=csv,
+            file_name="filtered_livestock_records.csv",
+            mime="text/csv"
+        )
    
 def display_dashboard():
     """Displays the livestock dashboard for insights."""
     st.subheader("📊 Monitor Your Livestock Insights")
 
-    # Load data for visualization
+    # Load data
     df = load_data()
-    
-    if not df.empty:
-        st.markdown("### 📊 Livestock Data Overview")
 
-        # Show the raw data table
-        st.dataframe(df[['name', 'type', 'age', 'weight', 'vaccination', 'added_on']])
+    if df.empty:
+        st.info("No livestock records found. Please add livestock data to see insights.")
+        return
+
+    # --- Filters and Sorting ---
+    with st.expander("🔍 Filter and Sort Data"):
+        animal_types = ["All"] + sorted(df["type"].dropna().unique())
+        selected_type = st.selectbox("Filter by Animal Type", animal_types)
+
+        search_tag = st.text_input("Search by Animal Tag")
+
+        sort_column = st.selectbox("Sort By", ["None", "age", "weight"])
+        sort_order = st.radio("Sort Order", ["Ascending", "Descending"], horizontal=True)
+
+    # --- Apply Filters ---
+    filtered_df = df.copy()
+
+    if selected_type != "All":
+        filtered_df = filtered_df[filtered_df["type"] == selected_type]
+
+    if search_tag:
+        filtered_df = filtered_df[filtered_df["name"].str.contains(search_tag, case=False)]
+
+    if sort_column != "None":
+        ascending = sort_order == "Ascending"
+        filtered_df = filtered_df.sort_values(by=sort_column, ascending=ascending)
+
+    # --- Display Data and Charts ---
+    if filtered_df.empty:
+        st.warning("No matching records found.")
+    else:
+        st.markdown("### 📋 Filtered Livestock Records")
+        st.dataframe(filtered_df[['name', 'type', 'age', 'weight', 'vaccination', 'added_on']])
 
         # Bar chart - Count by animal type
-        type_counts = df['type'].value_counts().reset_index()
+        type_counts = filtered_df['type'].value_counts().reset_index()
         type_counts.columns = ['Type', 'Count']
         fig_type = px.bar(type_counts, x='Type', y='Count', title='Livestock Count by Type', color='Type')
         st.plotly_chart(fig_type, use_container_width=True)
@@ -374,12 +441,20 @@ def display_dashboard():
         st.plotly_chart(fig_pie, use_container_width=True)
 
         # Scatter plot - Age vs Weight
-        fig_scatter = px.scatter(df, x='age', y='weight', color='type', size='weight',
+        fig_scatter = px.scatter(filtered_df, x='age', y='weight', color='type', size='weight',
                                  hover_data=['name'], title='Age vs Weight of Livestock')
         st.plotly_chart(fig_scatter, use_container_width=True)
 
-    else:
-        st.info("No livestock records found. Please add livestock data to see insights.")
+        # --- Summary Statistics ---
+        st.markdown("### 📈 Summary Statistics")
+        avg_age = filtered_df['age'].mean()
+        avg_weight = filtered_df['weight'].mean()
+        total_livestock = filtered_df.shape[0]
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("📦 Total Livestock", total_livestock)
+        col2.metric("📊 Average Age (yrs)", f"{avg_age:.2f}")
+        col3.metric("⚖️ Average Weight (kg)", f"{avg_weight:.2f}")
 
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
