@@ -400,7 +400,7 @@ def display_dashboard():
 
     # --- Filters and Sorting ---
     with st.expander("🔍 Filter and Sort Data"):
-        animal_types = ["All"] + sorted(df["Type"].dropna().unique())
+        animal_types = ["All"] + sorted(df["type"].dropna().unique())
         selected_type = st.selectbox("Filter by Animal Type", animal_types)
 
         search_tag = st.text_input("Search by Animal Tag")
@@ -651,31 +651,13 @@ if st.sidebar.button("Download SQLite Data as CSV"):
     conn.close()
 
     csv = df.to_csv(index=False)
-    st.sidebar.download_button(
+/    st.sidebar.download_button(
         label="📥 Download livestock_data.csv",
         data=csv,
         file_name="livestock_data.csv",
         mime="text/csv"
     )
 
-# Custom CSS for background image in the sidebar
-sidebar_style = """
-    <style>
-        [data-testid="stSidebar"] {
-            background-image: url("https://drive.google.com/file/d/1yK4B_D25ZRxJu3FyBUpfDRplQNkdnRas/view?usp=sharing.jpg");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-    </style>
-"""
-
-# Apply the CSS
-st.markdown(sidebar_style, unsafe_allow_html=True)
-
-# Main content
-st.title("Main Area")
-st.write("This is the ma")
 # ================VetChat==================
 import streamlit as st
 
