@@ -318,81 +318,7 @@ def display_diagnosis(animal_data, disease, recommendation):
     return buffer
 
 # ========== Page Functions ==========
-# def display_dashboard():
-#    """Displays the livestock dashboard and add animal form."""
-#   st.subheader("📋 Add and Monitor Your Livestock")
-#
-#   with st.form("livestock_form", clear_on_submit=True):
-#       name = st.text_input("Animal Tag")
-#       animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
-#       animal_type = st.selectbox("Type", animal_types)
-#       age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
-#       weight = st.number_input("Weight (kg)", 0.0, 500.0, step=1.0)
-#       vaccination = st.text_area("Vaccination History")
-#       submit = st.form_submit_button("💾 Save")
-#
-#   if submit:
-#       if name.strip() == "":
-#           st.warning("Animal Tag cannot be empty.")
-#       elif animal_type == "-- Select Type --":
-#           st.warning("Please select a valid animal type.")
-#       else:
-#           save_livestock_data(name, animal_type, age, weight, vaccination)
-#           st.success(f"{animal_type} '{name}' saved successfully!")
-
-#def display_visualization():
-#   """Displays the livestock dashboard and add animal form."""
-#   st.subheader("📋 Add and Monitor Your Livestock")
-#
-#    # Form for adding livestock
-#    with st.form("livestock_form", clear_on_submit=True):
-#        name = st.text_input("Animal Tag")
-#        animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
-#        animal_type = st.selectbox("Type", animal_types)
-#        age = st.number_input("Age (years)", 0.0, 20.0, step=0.1)
-#        weight = st.number_input("Weight (kg)", 0.0, 1000.0, step=1.0)
-#        vaccination = st.text_input("Vaccination Details")
-#        submitted = st.form_submit_button("Add Animal")
-#
-#        if submitted and name and animal_type != "-- Select Type --":
-#            save_livestock_data(name, animal_type, age, weight, vaccination)
-#            st.success(f"{name} added successfully!")
-#
-#    # Load data
-#    df = load_data()
-#
-#    if not df.empty:
-#        st.markdown("### 📊 Livestock Overview")
-#
-#        # KPIs
-#        total_animals = df.shape[0]
-#        avg_weight = df['weight'].mean()
-#        avg_age = df['age'].mean()
-#
-#        kpi1, kpi2, kpi3 = st.columns(3)
-#        kpi1.metric("Total Animals", total_animals)
-#        kpi2.metric("Average Weight (kg)", f"{avg_weight:.1f}")
-#        kpi3.metric("Average Age (yrs)", f"{avg_age:.1f}")
-#
-#        # Visualizations
-#        chart1, chart2 = st.columns(2)
-#
-#        with chart1:
-#            fig1 = px.histogram(df, x="type", title="Distribution by Animal Type", color="type")
-#            st.plotly_chart(fig1, use_container_width=True)
-#
-#        with chart2:
-#            fig2 = px.scatter(df, x="age", y="weight", color="type", 
-#                              title="Age vs Weight by Animal Type", size_max=60)
-#            st.plotly_chart(fig2, use_container_width=True)
-#
-#        st.markdown("### 🧾 Detailed Livestock Records")
-#        st.dataframe(df)
-#    else:
-#        st.info("No livestock data available yet.")
-#
-
-def display_visualization():
+def display_add_livestock():
     """Displays the livestock dashboard and add animal form."""
     st.subheader("📋 Add and Monitor Your Livestock")
 
@@ -410,8 +336,31 @@ def display_visualization():
             if animal_type == "-- Select Type --" or not name:
                 st.warning("Please fill in all required fields.")
             else:
-                save_livestock_data(name, animal_type, age, weight, vaccination)
-                st.success(f"{name} has been added successfully.")
+                save_livestock(name, animal_type, age, weight, vaccination)
+                st.success(f"{animal_type} '{name}' saved successfully!")
+
+def display_view_livestock():
+    """Displays all registered livestock."""
+    st.subheader("🐐 View All Your Livestock")
+
+# Load livestock data
+def load_data():
+    if os.path.exists(DATA_FILE):
+        return pd.read_csv(DATA_FILE)
+    else:
+        return pd.DataFrame(columns=["Name", "Type", "Age", "Weight", "Vaccination"])
+
+# Save livestock data
+def save_livestock(name, animal_type, age, weight, vaccination):
+    df = load_data()
+    new_entry = pd.DataFrame([[name, animal_type, age, weight, vaccination]],
+                             columns=["Name", "Type", "Age", "Weight", "Vaccination"])
+    df = pd.concat([df, new_entry], ignore_index=True)
+    df.to_csv(DATA_FILE, index=False)
+    
+def display_dashboard():
+    """Displays the livestock dashboard for insights."""
+    st.subheader("📊 Monitor Your Livestock Insights")
 
     # Load data for visualization
     df = load_data()
@@ -580,22 +529,25 @@ def handle_feedback_submission():
                 conn.commit()
                 conn.close()
                 st.success("Thank you for your feedback!")
-
     
-# ========== Main ==========
-tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊🩺 Diagnosis", "💡 Health Tips", "👨‍⚕️ Vet Doc", "📞 Request Service", "Visualization", "📝 Feedback"])
+# =================================================== Main =======================================================
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab7 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Visualization", "📝 Feedback"])
 
+with tab1:
+    display_add_livestock()
 with tab2:
-    display_diagnosis()
+    display_view_livestock()
 with tab3:
+    display_diagnosis()
+with tab4
     display_health_tips()
-with tab4:
-    register_vet()
 with tab5:
-    request_vet_service()
+    register_vet()
 with tab6:
-    display_visualization()
+    request_vet_service()
 with tab7:
+    display_visualization()
+with tab8:
     handle_feedback_submission()
 
 # ========== Sidebar ==========
