@@ -619,6 +619,8 @@ with tab6:
 with tab8:
     handle_feedback_submission()
 
+chatbot_widget()
+
 # ========== Sidebar ==========
 with st.sidebar:
     st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
@@ -649,8 +651,6 @@ with st.sidebar:
     """)
 
 # ================VetChat==================
-import streamlit as st
-
 # ========== Simple Rule-Based Chatbot ==========
 def chatbot_response(user_input):
     responses = {
@@ -685,37 +685,79 @@ def chatbot_response(user_input):
         "how do i treat foot rot in sheep": "Trim the hoof, clean the wound, and soak the foot in a zinc sulfate solution. Isolate affected animals.",
         "why is my sheep limping": "Likely causes: foot rot, injuries, or joint infections. Check the hoof for wounds or swelling.",
     }
-
-    for key in responses:
-        if key in user_input.lower():
-            return responses[key]
-    return "Sorry, I didn't understand that. Please try asking something else."
-
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+    return responses.get(user_input.lower(), "I'm not sure how to help with that. Try asking about animal health, feeding, or vaccinations.")
 
 def chatbot_widget():
-    with st.sidebar.expander("💬 VetChat", expanded=True):
-        st.markdown("*Ask me anything about livestock care!*")
+    st.markdown("""
+        <style>
+        #vetchat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2c6d37;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            z-index: 1001;
+        }
 
-        # Display chat history
+        #vetchat-container {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background-color: #f0f2f6;
+            border: 1px solid #ccc;
+            padding: 15px;
+            width: 300px;
+            height: 350px;
+            overflow-y: auto;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    if "vetchat_open" not in st.session_state:
+        st.session_state.vetchat_open = False
+
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
+    toggle = st.button("💬 VetChat", key="vetchat-toggle")
+
+    if toggle:
+        st.session_state.vetchat_open = not st.session_state.vetchat_open
+
+    if st.session_state.vetchat_open:
+        st.markdown('<div id="vetchat-container">', unsafe_allow_html=True)
+        st.markdown("**🗨️ Ask me anything about livestock care!**")
+
         for sender, message in st.session_state.chat_history:
             if sender == "You":
                 st.markdown(f"**You:** {message}")
             else:
                 st.markdown(f"🤖 **VetChat:** {message}")
 
-        # Input form to avoid st.experimental_rerun() bug
         with st.form("chat_form", clear_on_submit=True):
-            user_input = st.text_input("Ask VetChat:", key="chat_input")
+            user_input = st.text_input("Ask VetChat:", key="chat_input", label_visibility="collapsed")
             submitted = st.form_submit_button("Send")
             if submitted and user_input:
-                response = chatbot_response(user_input)
                 st.session_state.chat_history.append(("You", user_input))
+
+                placeholder = st.empty()
+                placeholder.markdown("🤖 **VetChat:** _typing..._")
+                time.sleep(1.5)
+
+                response = chatbot_response(user_input)
+                placeholder.markdown(f"🤖 **VetChat:** {response}")
                 st.session_state.chat_history.append(("VetChat", response))
 
-chatbot_widget()
+        st.markdown("</div>", unsafe_allow_html=True)
 
+# Run the chatbot
 
 # ======================RasaVetChat=============================
 import streamlit as st
