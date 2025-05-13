@@ -387,8 +387,7 @@ def display_view_livestock():
             mime="text/csv"
         )
    
-def display_dashboard():
-    """Displays the livestock dashboard for insights."""
+def display_dashboard(selected_type, search_tag, sort_column, sort_order):
     st.subheader("📊 Monitor Your Livestock Insights")
 
     # Load data
@@ -401,48 +400,63 @@ def display_dashboard():
     # --- Apply Filters ---
     filtered_df = df.copy()
 
-    if selected_type != "All":
+    if selected_type != "All" and "type" in filtered_df.columns:
         filtered_df = filtered_df[filtered_df["type"] == selected_type]
 
-    if search_tag:
-        filtered_df = filtered_df[filtered_df["name"].str.contains(search_tag, case=False)]
+    if search_tag and "name" in filtered_df.columns:
+        filtered_df = filtered_df[filtered_df["name"].str.contains(search_tag, case=False, na=False)]
 
-    if sort_column != "None":
+    if sort_column != "None" and sort_column in filtered_df.columns:
         ascending = sort_order == "Ascending"
         filtered_df = filtered_df.sort_values(by=sort_column, ascending=ascending)
 
-    # --- Display Data and Charts ---
+    # --- Handle No Matching Records ---
     if filtered_df.empty:
         st.warning("No matching records found.")
-    else:
-        st.markdown("### 📋 Filtered Livestock Records")
-        st.dataframe(filtered_df[['name', 'type', 'age', 'weight', 'vaccination', 'added_on']])
+        return
 
-        # Bar chart - Count by animal type
+    # --- Display Filtered Data ---
+    st.markdown("### 📋 Filtered Livestock Records")
+    display_columns = ['name', 'type', 'age', 'weight', 'vaccination', 'added_on']
+    available_columns = [col for col in display_columns if col in filtered_df.columns]
+    st.dataframe(filtered_df[available_columns])
+
+    # --- Charts Section ---
+    if "type" in filtered_df.columns:
         type_counts = filtered_df['type'].value_counts().reset_index()
         type_counts.columns = ['Type', 'Count']
-        fig_type = px.bar(type_counts, x='Type', y='Count', title='Livestock Count by Type', color='Type')
+
+        # Bar chart
+        fig_type = px.bar(
+            type_counts, x='Type', y='Count', title='Livestock Count by Type', color='Type',
+            labels={'Type': 'Animal Type', 'Count': 'Number of Animals'}
+        )
         st.plotly_chart(fig_type, use_container_width=True)
 
-        # Pie chart - Distribution by type
-        fig_pie = px.pie(type_counts, names='Type', values='Count', title='Livestock Distribution by Type')
+        # Pie chart
+        fig_pie = px.pie(
+            type_counts, names='Type', values='Count', title='Livestock Distribution by Type'
+        )
         st.plotly_chart(fig_pie, use_container_width=True)
 
-        # Scatter plot - Age vs Weight
-        fig_scatter = px.scatter(filtered_df, x='age', y='weight', color='type', size='weight',
-                                 hover_data=['name'], title='Age vs Weight of Livestock')
+    # Scatter plot - Age vs Weight
+    if {'age', 'weight', 'type'}.issubset(filtered_df.columns):
+        fig_scatter = px.scatter(
+            filtered_df, x='age', y='weight', color='type', size='weight',
+            hover_data=['name'], title='Age vs Weight of Livestock'
+        )
         st.plotly_chart(fig_scatter, use_container_width=True)
 
-        # --- Summary Statistics ---
-        st.markdown("### 📈 Summary Statistics")
-        avg_age = filtered_df['age'].mean()
-        avg_weight = filtered_df['weight'].mean()
-        total_livestock = filtered_df.shape[0]
+    # --- Summary Statistics ---
+    st.markdown("### 📈 Summary Statistics")
+    avg_age = filtered_df['age'].dropna().mean() if 'age' in filtered_df.columns else None
+    avg_weight = filtered_df['weight'].dropna().mean() if 'weight' in filtered_df.columns else None
+    total_livestock = filtered_df.shape[0]
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("📦 Total Livestock", total_livestock)
-        col2.metric("📊 Average Age (yrs)", f"{avg_age:.2f}")
-        col3.metric("⚖️ Average Weight (kg)", f"{avg_weight:.2f}")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("📦 Total Livestock", total_livestock)
+    col2.metric("📊 Average Age (yrs)", f"{avg_age:.2f}" if avg_age is not None else "N/A")
+    col3.metric("⚖️ Average Weight (kg)", f"{avg_weight:.2f}" if avg_weight is not None else "N/A")
 
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
@@ -633,20 +647,6 @@ with st.sidebar:
     - **Damilare Abayomi** — *Software Developer*  
     - **Boluwatife Adeagbo** — *Veterinary Doctor*
     """)
-# ========== SQLite Database Download ==========
-st.sidebar.markdown("## Download Data")
-if st.sidebar.button("Download SQLite Data as CSV"):
-    conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM livestock", conn)
-    conn.close()
-
-    csv = df.to_csv(index=False)
-    st.sidebar.download_button(
-        label="📥 Download livestock_data.csv",
-        data=csv,
-        file_name="livestock_data.csv",
-        mime="text/csv"
-    )
 
 # ================VetChat==================
 import streamlit as st
