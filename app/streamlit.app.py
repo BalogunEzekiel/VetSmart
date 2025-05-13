@@ -113,7 +113,7 @@ def load_data():
     conn.close()
     return df
 
-def save_livestock(name, animal_type, age, weight, vaccination):
+def save_livestock_data(name, animal_type, age, weight, vaccination):
     try:
         conn = get_sqlite_connection()
         cursor = conn.cursor()
@@ -253,8 +253,9 @@ def display_diagnosis(animal_data, disease, recommendation):
 
     # Animal Information Heading beside Logo
     p = Paragraph("<b>Animal Information</b>", table_heading_style)
-    p.wrapOn(c, width - 3 * inch, height)
-    p.drawOn(c, width / 2 - 1.25 * inch, height - 90)
+    text_width, text_height = p.wrap(width - 3 * inch, height)
+    x = (width - text_width) / 2
+    p.drawOn(c, x, height - 90)
 
     # Animal Information Table
     animal_table_data = [
@@ -264,7 +265,7 @@ def display_diagnosis(animal_data, disease, recommendation):
         ["Weight (kg):", animal_data["Weight"]]
     ]
 
-    animal_table = Table(animal_table_data, colWidths=[2 * inch, 3.5 * inch], hAlign='CENTER')
+    animal_table = Table(animal_table_data, colWidths=[2 * inch, 3.5 * inch], Align='CENTER')
     animal_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
@@ -276,9 +277,10 @@ def display_diagnosis(animal_data, disease, recommendation):
     animal_table.drawOn(c, width / 2 - 2.25 * inch, height - 250)
 
     # Diagnosis Heading
-    p2 = Paragraph("<b>Diagnosis</b>", table_heading_style)
-    p2.wrapOn(c, width - 2 * inch, height)
-    p2.drawOn(c, width / 2 - inch, height - 290)
+p2 = Paragraph("<b>Diagnosis</b>", table_heading_style)
+text_width, text_height = p2.wrap(width - 2 * inch, height)
+x = (width - text_width) / 2
+p2.drawOn(c, x, height - 290)
 
     # Diagnosis Table
     diagnosis_table_data = [
@@ -286,7 +288,7 @@ def display_diagnosis(animal_data, disease, recommendation):
         ["Recommendation:", recommendation]
     ]
 
-    diagnosis_table = Table(diagnosis_table_data, colWidths=[2 * inch, 3.5 * inch], hAlign='CENTER')
+    diagnosis_table = Table(diagnosis_table_data, colWidths=[2 * inch, 3.5 * inch], Align='CENTER')
     diagnosis_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
@@ -336,7 +338,7 @@ def display_add_livestock():
             if animal_type == "-- Select Type --" or not name:
                 st.warning("Please fill in all required fields.")
             else:
-                save_livestock(name, animal_type, age, weight, vaccination)
+                save_livestock_data(name, animal_type, age, weight, vaccination)
                 st.success(f"{animal_type} '{name}' saved successfully!")
 
 def display_view_livestock():
