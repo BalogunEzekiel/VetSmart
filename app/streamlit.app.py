@@ -204,9 +204,9 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.graphics.barcode import code128
-from PIL import Image
-from reportlab.lib.units import inch
 import datetime
+from reportlab.lib.units import inch
+
 
 def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
@@ -306,11 +306,16 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
     c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
 
-    # --- Footer ---
-    c.setFont("Helvetica", 8)
-    c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
+    # --- Footer (Permanent across pages) ---
+    def draw_footer():
+        c.setFont("Helvetica", 8)
+        c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
+    # Draw footer
+    draw_footer()
+
+    # Save and return PDF
     c.save()
     buffer.seek(0)
     return buffer
