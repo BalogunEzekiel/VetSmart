@@ -609,7 +609,7 @@ with tab3:
 with tab4:
     display_daily_health_tips()
 with tab5:
-    register_vet()
+    display_register_vet()
 with tab6:
     request_vet_service()
 with tab7:
