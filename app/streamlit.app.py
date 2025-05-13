@@ -400,7 +400,6 @@ def display_dashboard():
 
     # --- Filters and Sorting ---
     with st.expander("🔍 Filter and Sort Data"):
-        animal_types = ["All"] + sorted(df["animal_types"].dropna().unique())
         selected_type = st.selectbox("Filter by Animal Type", animal_types)
 
         search_tag = st.text_input("Search by Animal Tag")
