@@ -599,6 +599,9 @@ def handle_feedback_submission():
                 conn.close()
                 st.success("Thank you for your feedback!")
 
+def chatbot_widget():
+    st.write("chatbot.py")
+
 # =================================================== Main =======================================================
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Dashboard", "📝 Feedback"])
 
