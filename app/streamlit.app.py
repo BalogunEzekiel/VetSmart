@@ -282,11 +282,11 @@ text_width, text_height = p2.wrap(width - 2 * inch, height)
 x = (width - text_width) / 2
 p2.drawOn(c, x, height - 290)
 
-    # Diagnosis Table
-    diagnosis_table_data = [
-        ["Predicted Diagnosis:", disease],
-        ["Recommendation:", recommendation]
-    ]
+# Diagnosis Table
+diagnosis_table_data = [
+    ["Predicted Diagnosis:", disease],
+    ["Recommendation:", recommendation]
+]
 
     diagnosis_table = Table(diagnosis_table_data, colWidths=[2 * inch, 3.5 * inch], Align='CENTER')
     diagnosis_table.setStyle(TableStyle([
