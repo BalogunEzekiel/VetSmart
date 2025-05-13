@@ -598,64 +598,11 @@ def handle_feedback_submission():
                 conn.commit()
                 conn.close()
                 st.success("Thank you for your feedback!")
-    
-# =================================================== Main =======================================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Dashboard", "📝 Feedback"])
 
-with tab1:
-    display_add_livestock()
-with tab2:
-    display_view_livestock()
-with tab3:
-    display_diagnosis()
-with tab4:
-    display_daily_health_tips()
-with tab5:
-    display_register_vet()
-with tab6:
-    request_vet_service()
-# with tab7:
-#    display_dashboard()
-with tab8:
-    handle_feedback_submission()
-
-chatbot_widget()
-
-# ========== Sidebar ==========
-with st.sidebar:
-    st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
-    st.markdown("## Livestock Focus")
-    st.markdown("""
-    - **Cattle**
-    - **Goat**
-    - **Sheep**
-    """)
-
-    st.markdown("## About VetSmart")
-    st.markdown("""
-    **VetSmart** is an AI-powered livestock health monitoring, disease prevention, and diagnosis app designed to support farmers and veterinary experts.
-
-    **Key Features:**
-    - Livestock registration  
-    - Disease prediction based on symptoms  
-    - Vaccination records  
-    - Downloadable diagnosis reports  
-
-    These features enhance the efficiency and accuracy of animal healthcare decisions.
-
-    ## 👥Contributors
-    - **Ezekiel BALOGUN** — *Data Scientist / Lead*  
-    - **Oluwakemi Adesanwo** — *Data Analyst*  
-    - **Damilare Abayomi** — *Software Developer*  
-    - **Boluwatife Adeagbo** — *Veterinary Doctor*
-    """)
-
-# ================VetChat==================
-# ========== Simple Rule-Based Chatbot ==========
 import time
 import streamlit as st
 
-# Response logic
+# Define the chatbot response logic
 def chatbot_response(user_input):
     responses = {
         "hello": "Hi there! How can I assist you with your livestock today?",
@@ -691,8 +638,9 @@ def chatbot_response(user_input):
     }
     return responses.get(user_input.lower(), "I'm not sure how to help with that. Try asking about animal health, feeding, or vaccinations.")
 
-# Chatbot UI logic
+# Define the chatbot widget for Streamlit
 def chatbot_widget():
+    # Styling for the chatbot window
     st.markdown("""
         <style>
         #vetchat-toggle {
@@ -725,45 +673,108 @@ def chatbot_widget():
         </style>
     """, unsafe_allow_html=True)
 
+    # Initialize session states for chatbot
     if "vetchat_open" not in st.session_state:
         st.session_state.vetchat_open = False
 
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
 
+    # Button to toggle the chatbot window
     toggle = st.button("💬 VetChat", key="vetchat-toggle")
 
     if toggle:
         st.session_state.vetchat_open = not st.session_state.vetchat_open
 
     if st.session_state.vetchat_open:
+        # Show the chatbot container
         st.markdown('<div id="vetchat-container">', unsafe_allow_html=True)
         st.markdown("**🗨️ Ask me anything about livestock care!**")
 
+        # Display the chat history
         for sender, message in st.session_state.chat_history:
             if sender == "You":
                 st.markdown(f"**You:** {message}")
             else:
                 st.markdown(f"🤖 **VetChat:** {message}")
 
+        # Text input form for user to ask a question
         with st.form("chat_form", clear_on_submit=True):
             user_input = st.text_input("Ask VetChat:", key="chat_input", label_visibility="collapsed")
             submitted = st.form_submit_button("Send")
+
             if submitted and user_input:
+                # Store the user's question in chat history
                 st.session_state.chat_history.append(("You", user_input))
 
+                # Simulate typing delay
                 placeholder = st.empty()
                 placeholder.markdown("🤖 **VetChat:** _typing..._")
                 time.sleep(1.5)
 
+                # Get the chatbot's response
                 response = chatbot_response(user_input)
+
+                # Show the chatbot's response
                 placeholder.markdown(f"🤖 **VetChat:** {response}")
                 st.session_state.chat_history.append(("VetChat", response))
 
+        # Close the chatbot container
         st.markdown("</div>", unsafe_allow_html=True)
 
-# Run the chatbot
+# =================================================== Main =======================================================
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Dashboard", "📝 Feedback"])
+
+with tab1:
+    display_add_livestock()
+with tab2:
+    display_view_livestock()
+with tab3:
+    display_diagnosis()
+with tab4:
+    display_daily_health_tips()
+with tab5:
+    display_register_vet()
+with tab6:
+    request_vet_service()
+# with tab7:
+#    display_dashboard()
+with tab8:
+    handle_feedback_submission()
+# Run the chatbot widget
 chatbot_widget()
+
+# ========== Sidebar ==========
+with st.sidebar:
+    st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
+    st.markdown("## Livestock Focus")
+    st.markdown("""
+    - **Cattle**
+    - **Goat**
+    - **Sheep**
+    """)
+
+    st.markdown("## About VetSmart")
+    st.markdown("""
+    **VetSmart** is an AI-powered livestock health monitoring, disease prevention, and diagnosis app designed to support farmers and veterinary experts.
+
+    **Key Features:**
+    - Livestock registration  
+    - Disease prediction based on symptoms  
+    - Vaccination records  
+    - Downloadable diagnosis reports  
+
+    These features enhance the efficiency and accuracy of animal healthcare decisions.
+
+    ## 👥Contributors
+    - **Ezekiel BALOGUN** — *Data Scientist / Lead*  
+    - **Oluwakemi Adesanwo** — *Data Analyst*  
+    - **Damilare Abayomi** — *Software Developer*  
+    - **Boluwatife Adeagbo** — *Veterinary Doctor*
+    """)
+
+# ================VetChat==================
+# ========== Simple Ru]le-Based Chatbot ==========
 
 # ======================RasaVetChat=============================
 import streamlit as st
