@@ -217,7 +217,7 @@ def display_diagnosis(animal_data, disease, recommendation):
     width, height = letter
     styles = getSampleStyleSheet()
 
-    # Custom styles
+    # --- Custom Styles ---
     centered_title_style = ParagraphStyle(
         name='CenteredTitle',
         parent=styles['Heading2'],
@@ -227,6 +227,7 @@ def display_diagnosis(animal_data, disease, recommendation):
         textColor=colors.green,
         leading=24
     )
+
     table_heading_style = ParagraphStyle(
         name='TableHeading',
         parent=styles['Heading3'],
@@ -237,7 +238,7 @@ def display_diagnosis(animal_data, disease, recommendation):
         leading=24
     )
 
-    # Header - Logo + Title Bar
+    # --- Header with Logo and Title ---
     try:
         logo_path = "logoo.png"
         c.drawImage(logo_path, inch, height - 60, width=100, height=50)
@@ -251,13 +252,12 @@ def display_diagnosis(animal_data, disease, recommendation):
     c.setFont("Times-Roman", 18)
     c.drawCentredString(width / 2, height - 30, "VetSmart Diagnosis Report")
 
-    # Animal Information Heading beside Logo
+    # --- Animal Information Section ---
     p = Paragraph("<b>Animal Information</b>", table_heading_style)
     text_width, text_height = p.wrap(width - 3 * inch, height)
     x = (width - text_width) / 2
     p.drawOn(c, x, height - 90)
 
-    # Animal Information Table
     animal_table_data = [
         ["Animal Tag:", animal_data["Name"]],
         ["Type:", animal_data["Type"]],
@@ -265,7 +265,7 @@ def display_diagnosis(animal_data, disease, recommendation):
         ["Weight (kg):", animal_data["Weight"]]
     ]
 
-    animal_table = Table(animal_table_data, colWidths=[2 * inch, 3.5 * inch], Align='CENTER')
+    animal_table = Table(animal_table_data, colWidths=[2 * inch, 3.5 * inch], hAlign='CENTER')
     animal_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
@@ -276,19 +276,18 @@ def display_diagnosis(animal_data, disease, recommendation):
     animal_table.wrapOn(c, width, height)
     animal_table.drawOn(c, width / 2 - 2.25 * inch, height - 250)
 
-    # Diagnosis Heading
-p2 = Paragraph("<b>Diagnosis</b>", table_heading_style)
-text_width, text_height = p2.wrap(width - 2 * inch, height)
-x = (width - text_width) / 2
-p2.drawOn(c, x, height - 290)
+    # --- Diagnosis Section ---
+    p2 = Paragraph("<b>Diagnosis</b>", table_heading_style)
+    text_width, text_height = p2.wrap(width - 2 * inch, height)
+    x = (width - text_width) / 2
+    p2.drawOn(c, x, height - 290)
 
-# Diagnosis Table
-diagnosis_table_data = [
-    ["Predicted Diagnosis:", disease],
-    ["Recommendation:", recommendation]
-]
+    diagnosis_table_data = [
+        ["Predicted Diagnosis:", disease],
+        ["Recommendation:", recommendation]
+    ]
 
-    diagnosis_table = Table(diagnosis_table_data, colWidths=[2 * inch, 3.5 * inch], Align='CENTER')
+    diagnosis_table = Table(diagnosis_table_data, colWidths=[2 * inch, 3.5 * inch], hAlign='CENTER')
     diagnosis_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
@@ -299,7 +298,7 @@ diagnosis_table_data = [
     diagnosis_table.wrapOn(c, width, height)
     diagnosis_table.drawOn(c, width / 2 - 2.75 * inch, height - 380)
 
-    # Barcode
+    # --- Barcode Section ---
     barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
     barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
     barcode_width = barcode.wrap(0, 0)[0]
@@ -310,7 +309,7 @@ diagnosis_table_data = [
     c.drawString(x_position, y_position - 0.2 * inch, "VetSmart Authenticated")
     c.drawString(x_position, y_position - 0.4 * inch, barcode_value)
 
-    # Footer
+    # --- Footer ---
     c.setFont("Helvetica", 8)
     c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
