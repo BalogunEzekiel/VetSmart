@@ -652,7 +652,7 @@ with st.sidebar:
 
 # ================VetChat==================
 # ========== Simple Rule-Based Chatbot ==========
-def chatbot_widget()
+def chatbot_widget
 
     def chatbot_response(user_input):
         responses = {
