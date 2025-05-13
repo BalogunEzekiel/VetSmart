@@ -114,18 +114,15 @@ def load_data():
     return df
 
 def save_livestock_data(name, animal_type, age, weight, vaccination):
-    try:
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO livestock (name, animal_type, age, weight, vaccination, added_on)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (name, animal_type, age, weight, vaccination, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        conn.commit()
-    except Exception as e:
-        print(f"Error saving data: {e}")
-    finally:
-        conn.close()
+    conn = get_sqlite_connection()
+    query = """
+    INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """
+    conn.execute(query, (name, animal_type, age, weight, vaccination, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    conn.commit()
+    conn.close()
+
 
 def load_feedback():
     conn = get_sqlite_connection()
