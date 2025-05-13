@@ -345,7 +345,7 @@ def display_add_livestock():
 
 def display_view_livestock():
     """Displays all registered livestock with filters, sorting, and export."""
-    st.subheader("🐐🐑🐄 View All Your Livestock")
+    st.subheader("🐐🐑🐄 View Your Livestock")
 
     df = load_data()
 
@@ -584,7 +584,7 @@ def request_vet_service():
 def handle_feedback_submission():
     """Handles the feedback submission process."""
     st.subheader("We Value Your Feedback 📝")
-    with st.form("feedback_form"):
+    with st.form("feedback_form", clear_on_submit=True):
         name = st.text_input("Your Name")
         feedback_text = st.text_area("Please provide your feedback here:")
         submitted = st.form_submit_button("Submit Feedback")
