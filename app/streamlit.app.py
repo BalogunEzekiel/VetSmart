@@ -613,7 +613,7 @@ with tab5:
 with tab6:
     request_vet_service()
 with tab7:
-    display_visualization()
+    display_dashboard()
 with tab8:
     handle_feedback_submission()
 
