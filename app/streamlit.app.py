@@ -474,7 +474,7 @@ def display_diagnosis():
             st.write(f"**Predicted Disease:** 🐾 {disease}")
             st.write(f"**Recommendation:** 💊 {recommendation}")
 
-            pdf_buffer = display_diagnosis(animal_data, disease, recommendation)
+            pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
 
             st.download_button(
                 label="Download Diagnosis Report",
@@ -610,7 +610,7 @@ with tab1:
 with tab2:
     display_view_livestock()
 with tab3:
-    display_diagnosis()
+    generate_diagnosis_report()
 with tab4:
     display_daily_health_tips()
 with tab5:
