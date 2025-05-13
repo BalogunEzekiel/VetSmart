@@ -349,15 +349,7 @@ def load_data():
         return pd.read_csv(DATA_FILE)
     else:
         return pd.DataFrame(columns=["Name", "Type", "Age", "Weight", "Vaccination"])
-
-# Save livestock data
-def save_livestock(name, animal_type, age, weight, vaccination):
-    df = load_data()
-    new_entry = pd.DataFrame([[name, animal_type, age, weight, vaccination]],
-                             columns=["Name", "Type", "Age", "Weight", "Vaccination"])
-    df = pd.concat([df, new_entry], ignore_index=True)
-    df.to_csv(DATA_FILE, index=False)
-    
+   
 def display_dashboard():
     """Displays the livestock dashboard for insights."""
     st.subheader("📊 Monitor Your Livestock Insights")
@@ -414,7 +406,7 @@ def display_diagnosis():
                 mime="application/pdf"
             )
 
-def register_vet():
+def display_register_vet():
     st.subheader("👨‍⚕️ Register as a Veterinary Doctor")
     with st.form("vet_registration", clear_on_submit=True):
         name = st.text_input("Full Name")
@@ -443,7 +435,7 @@ def register_vet():
                 conn.close()
                 st.success("Veterinarian registered successfully!")
 
-def display_health_tips():
+def display_daily_health_tips():
     """Displays general health tips for selected livestock."""
     st.subheader("🌿 General Health Tips for Livestock")
     animal = st.selectbox("Select Animal Type", ["Cattle", "Goat", "Sheep"])
@@ -540,7 +532,7 @@ with tab2:
 with tab3:
     display_diagnosis()
 with tab4:
-    display_health_tips()
+    display_daily_health_tips()
 with tab5:
     register_vet()
 with tab6:
