@@ -208,7 +208,7 @@ from PIL import Image
 from reportlab.lib.units import inch
 import datetime
 
-def display_diagnosis(animal_data, disease, recommendation):
+def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
@@ -610,7 +610,7 @@ with tab1:
 with tab2:
     display_view_livestock()
 with tab3:
-    generate_diagnosis_report(animal_data, disease, recommendation)
+    display_diagnosis()
 with tab4:
     display_daily_health_tips()
 with tab5:
