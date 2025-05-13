@@ -196,7 +196,7 @@ def predict_disease(symptoms):
     }
     return prediction, treatments[prediction]
 
-# ========== PDF Generation Function ==========
+# ========================PDF Report ===========================
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -235,14 +235,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         leading=24
     )
 
-    # --- Header with Logo and Title ---
-    try:
-        logo_path = "logoo.png"
-        c.drawImage(logo_path, inch, height - 60, width=100, height=50)
-    except Exception:
-        c.setFont("Helvetica", 12)
-        c.drawString(inch, height - 50, "Logo could not be loaded")
-
+    # --- Header with Title Only (Logo removed) ---
     c.setFillColor(colors.green)
     c.rect(0, height - 45, width, 45, fill=True)
     c.setFillColor(colors.white)
@@ -268,7 +261,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
         ('INNERGRID', (0, 0), (-1, -1), 1, colors.black),
         ('LEADING', (0, 0), (-1, -1), 20),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT')
+        ('ALIGN', (0, 0), (-1, -1), 'CENTRE')
     ]))
     animal_table.wrapOn(c, width, height)
     animal_table.drawOn(c, width / 2 - 2.25 * inch, height - 250)
@@ -290,10 +283,18 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
         ('INNERGRID', (0, 0), (-1, -1), 1, colors.black),
         ('LEADING', (0, 0), (-1, -1), 20),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT')
+        ('ALIGN', (0, 0), (-1, -1), 'CENTRE')
     ]))
     diagnosis_table.wrapOn(c, width, height)
     diagnosis_table.drawOn(c, width / 2 - 2.75 * inch, height - 380)
+
+    # --- Place Logo on Top-Right Corner ---
+    try:
+        logo_path = "logoo.png"
+        c.drawImage(logo_path, width - inch - 100, height - 60, width=100, height=50)
+    except Exception:
+        c.setFont("Helvetica", 12)
+        c.drawString(width - inch - 100, height - 50, "Logo could not be loaded")
 
     # --- Barcode Section ---
     barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
@@ -604,7 +605,7 @@ def handle_feedback_submission():
                 conn.close()
                 st.success("Thank you for your feedback!")
 
-def chatbot_widget():
+chatbot_widget()
     st.write("chatbot.py")
 
 # =================================================== Main =======================================================
