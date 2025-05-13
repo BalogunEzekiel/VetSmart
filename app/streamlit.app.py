@@ -400,8 +400,7 @@ def display_dashboard():
 
     # --- Filters and Sorting ---
     with st.expander("🔍 Filter and Sort Data"):
-        selected_type = st.selectbox("Filter by Animal Type", animal_types)
-
+        
         search_tag = st.text_input("Search by Animal Tag")
 
         sort_column = st.selectbox("Sort By", ["None", "age", "weight"])
