@@ -615,11 +615,7 @@ with tab5:
 with tab6:
     request_vet_service()
 with tab7:
-try:
     display_dashboard()
-except Exception as e:
-    st.error(f"An error occurred: {e}")
-    st.write("Full error details:", e)
 with tab8:
     handle_feedback_submission()
 
