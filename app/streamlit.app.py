@@ -651,7 +651,7 @@ if st.sidebar.button("Download SQLite Data as CSV"):
     conn.close()
 
     csv = df.to_csv(index=False)
-/    st.sidebar.download_button(
+    st.sidebar.download_button(
         label="📥 Download livestock_data.csv",
         data=csv,
         file_name="livestock_data.csv",
