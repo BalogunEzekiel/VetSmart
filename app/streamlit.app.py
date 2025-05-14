@@ -393,76 +393,54 @@ def display_view_livestock():
             mime="text/csv"
         )
 
-def display_dashboard(selected_type, search_tag, sort_column, sort_order):
-    st.subheader("📊 Monitor Your Livestock Insights")
+def display_dashboard():
+    st.subheader("📊 Livestock Dashboard")
 
-    # Load data
+    # Load livestock data
     df = load_data()
 
     if df.empty:
-        st.info("No livestock records found. Please add livestock data to see insights.")
+        st.info("No livestock data available.")
         return
 
-    # --- Apply Filters ---
-    filtered_df = df.copy()
+    # Rename columns if necessary
+    df.rename(columns={
+        "name": "Name",
+        "animal_type": "Type",
+        "age": "Age",
+        "weight": "Weight",
+        "vaccination": "Vaccination",
+        "added_on": "Added On"
+    }, inplace=True)
 
-    if selected_type != "All" and "type" in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df["type"] == selected_type]
-
-    if search_tag and "name" in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df["name"].str.contains(search_tag, case=False, na=False)]
-
-    if sort_column != "None" and sort_column in filtered_df.columns:
-        ascending = sort_order == "Ascending"
-        filtered_df = filtered_df.sort_values(by=sort_column, ascending=ascending)
-
-    # --- Handle No Matching Records ---
-    if filtered_df.empty:
-        st.warning("No matching records found.")
-        return
-
-    # --- Display Filtered Data ---
-    st.markdown("### 📋 Filtered Livestock Records")
-    display_columns = ['name', 'type', 'age', 'weight', 'vaccination', 'added_on']
-    available_columns = [col for col in display_columns if col in filtered_df.columns]
-    st.dataframe(filtered_df[available_columns])
-
-    # --- Charts Section ---
-    if "type" in filtered_df.columns:
-        type_counts = filtered_df['type'].value_counts().reset_index()
-        type_counts.columns = ['Type', 'Count']
-
-        # Bar chart
-        fig_type = px.bar(
-            type_counts, x='Type', y='Count', title='Livestock Count by Type', color='Type',
-            labels={'Type': 'Animal Type', 'Count': 'Number of Animals'}
-        )
-        st.plotly_chart(fig_type, use_container_width=True)
-
-        # Pie chart
-        fig_pie = px.pie(
-            type_counts, names='Type', values='Count', title='Livestock Distribution by Type'
-        )
-        st.plotly_chart(fig_pie, use_container_width=True)
-
-    # Scatter plot - Age vs Weight
-    if {'age', 'weight', 'type'}.issubset(filtered_df.columns):
-        fig_scatter = px.scatter(
-            filtered_df, x='age', y='weight', color='type', size='weight',
-            hover_data=['name'], title='Age vs Weight of Livestock'
-        )
-        st.plotly_chart(fig_scatter, use_container_width=True)
-
-    # --- Summary Statistics ---
-    st.markdown("### 📈 Summary Statistics")
-    avg_age = filtered_df['age'].dropna().mean() if 'age' in filtered_df.columns else None
-    avg_weight = filtered_df['weight'].dropna().mean() if 'weight' in filtered_df.columns else None
-    total_livestock = filtered_df.shape[0]
+    # KPIs
+    total_animals = df.shape[0]
+    avg_weight = round(df["Weight"].mean(), 2)
+    avg_age = round(df["Age"].mean(), 2)
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("📦 Total Livestock", total_livestock)
-    col2.metric("📊 Average Age (yrs)", f"{avg_age:.2f}" if avg_age is not None else "N/A")
-    col3.metric("⚖️ Average Weight (kg)", f"{avg_weight:.2f}" if avg_weight is not None else "N/A")
+    col1.metric("Total Livestock", total_animals)
+    col2.metric("Average Weight (kg)", avg_weight)
+    col3.metric("Average Age (yrs)", avg_age)
+
+    # Show data table
+    with st.expander("📋 View Livestock Records"):
+        st.dataframe(df, use_container_width=True)
+
+    # Pie chart of animal types
+    fig1 = px.pie(df, names="Type", title="Distribution of Animal Types")
+    st.plotly_chart(fig1, use_container_width=True)
+
+    # Bar chart for average weight by type
+    weight_by_type = df.groupby("Type")["Weight"].mean().reset_index()
+    fig2 = px.bar(weight_by_type, x="Type", y="Weight", color="Type", title="Average Weight by Animal Type")
+    st.plotly_chart(fig2, use_container_width=True)
+
+    # Line chart for livestock added over time
+    df["Added On"] = pd.to_datetime(df["Added On"])
+    added_over_time = df.groupby(df["Added On"].dt.date).size().reset_index(name='Count')
+    fig3 = px.line(added_over_time, x="Added On", y="Count", title="Livestock Added Over Time")
+    st.plotly_chart(fig3, use_container_width=True)
 
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
