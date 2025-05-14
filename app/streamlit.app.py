@@ -592,8 +592,8 @@ with tab5:
     display_register_vet()
 with tab6:
     request_vet_service()
-# with tab7:
-#    display_dashboard()
+with tab7:
+    display_dashboard()
 with tab8:
     handle_feedback_submission()
 # Run the chatbot widget
