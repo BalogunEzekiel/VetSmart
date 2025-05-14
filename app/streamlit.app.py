@@ -434,6 +434,13 @@ def display_dashboard():
     vaccinated = df[df["Vaccination"].notnull()]
     fig3 = px.histogram(vaccinated, x="Vaccination", color="Type", title="Vaccination Count by Type", barmode="group")
     st.plotly_chart(fig3, use_container_width=True)
+
+# Line chart for livestock added over time
+    df["Added On"] = pd.to_datetime(df["Added On"])
+    added_over_time = df.groupby(df["Added On"].dt.date).size().reset_index(name='Count')
+    fig3 = px.line(added_over_time, x="Added On", y="Count", title="Livestock Added Over Time")
+    st.plotly_chart(fig3, use_container_width=True)
+    
 def display_register_vet():
     st.subheader("👨‍⚕️ Register as a Veterinary Doctor")
     with st.form("vet_registration", clear_on_submit=True):
