@@ -396,77 +396,44 @@ def display_view_livestock():
 def display_dashboard():
     st.subheader("📊 Livestock Dashboard")
 
-    # Load livestock data
     df = load_data()
 
     if df.empty:
-        st.info("No livestock data available.")
+        st.info("No livestock records found. Please add livestock data.")
         return
 
-    # Rename columns if necessary
-    df.rename(columns={
-        "name": "Name",
-        "animal_type": "Type",
-        "age": "Age",
-        "weight": "Weight",
-        "vaccination": "Vaccination",
-        "added_on": "Added On"
-    }, inplace=True)
+    # Rename columns if needed
+    df.rename(columns={"animal_type": "Type", "age": "Age", "weight": "Weight", "vaccination": "Vaccination", "name": "Name", "added_on": "Date Added"}, inplace=True)
 
-    # KPIs
-    total_animals = df.shape[0]
-    avg_weight = round(df["Weight"].mean(), 2)
-    avg_age = round(df["Age"].mean(), 2)
+    # Show raw data
+    with st.expander("View Raw Data"):
+        st.dataframe(df)
 
+    # Summary statistics
+    st.markdown("### Summary Statistics")
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total Livestock", total_animals)
-    col2.metric("Average Weight (kg)", avg_weight)
-    col3.metric("Average Age (yrs)", avg_age)
+    with col1:
+        st.metric("Total Animals", len(df))
+    with col2:
+        st.metric("Average Age", round(df["Age"].mean(), 1))
+    with col3:
+        st.metric("Average Weight (kg)", round(df["Weight"].mean(), 1))
 
-    # Show data table
-    with st.expander("📋 View Livestock Records"):
-        st.dataframe(df, use_container_width=True)
-
-    # Pie chart of animal types
-    fig1 = px.pie(df, names="Type", title="Distribution of Animal Types")
+    # Animal Type Distribution
+    st.markdown("### Animal Type Distribution")
+    fig1 = px.pie(df, names="Type", title="Distribution by Animal Type")
     st.plotly_chart(fig1, use_container_width=True)
 
-    # Bar chart for average weight by type
-    weight_by_type = df.groupby("Type")["Weight"].mean().reset_index()
-    fig2 = px.bar(weight_by_type, x="Type", y="Weight", color="Type", title="Average Weight by Animal Type")
+    # Age vs Weight Scatter Plot
+    st.markdown("### Age vs. Weight")
+    fig2 = px.scatter(df, x="Age", y="Weight", color="Type", hover_data=["Name", "Vaccination"])
     st.plotly_chart(fig2, use_container_width=True)
 
-    # Line chart for livestock added over time
-    df["Added On"] = pd.to_datetime(df["Added On"])
-    added_over_time = df.groupby(df["Added On"].dt.date).size().reset_index(name='Count')
-    fig3 = px.line(added_over_time, x="Added On", y="Count", title="Livestock Added Over Time")
+    # Vaccination Count
+    st.markdown("### Vaccination Overview")
+    vaccinated = df[df["Vaccination"].notnull()]
+    fig3 = px.histogram(vaccinated, x="Vaccination", color="Type", title="Vaccination Count by Type", barmode="group")
     st.plotly_chart(fig3, use_container_width=True)
-
-def display_diagnosis():
-    """Displays the symptom-based disease diagnosis section."""
-    st.subheader("🩺 Symptom-based Disease Diagnosis")
-    df = load_data()
-    if df.empty:
-        st.warning("No livestock registered yet. Please add animals to the dashboard first.")
-    else:
-        animal_name = st.selectbox("Select Registered Animal", df["Name"])
-        animal_data = df[df["Name"] == animal_name].iloc[0]
-        symptoms = st.multiselect("Select observed symptoms:", ["Fever", "Coughing", "Diarrhea", "Loss of appetite", "Lameness", "Swelling"])
-
-        if st.button("🧠 Predict Disease"):
-            disease, recommendation = predict_disease(symptoms)
-            st.write(f"**Predicted Disease:** 🐾 {disease}")
-            st.write(f"**Recommendation:** 💊 {recommendation}")
-
-            pdf_buffer = generate_diagnosis_report(animal_data, disease, recommendation)
-
-            st.download_button(
-                label="Download Diagnosis Report",
-                data=pdf_buffer,
-                file_name=f"{animal_name}_diagnosis_report.pdf",
-                mime="application/pdf"
-            )
-
 def display_register_vet():
     st.subheader("👨‍⚕️ Register as a Veterinary Doctor")
     with st.form("vet_registration", clear_on_submit=True):
