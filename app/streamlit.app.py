@@ -21,7 +21,7 @@ import plotly.express as px
 
 # ================================== Landing / Login Page ======================================================
 # Background image
-def set_background(cow_background.jpg):
+def set_background(assets/cow_background.jpg):
     st.markdown(
         f"""
         <style>
