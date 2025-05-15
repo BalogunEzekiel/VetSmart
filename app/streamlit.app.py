@@ -19,6 +19,168 @@ import nltk
 from PIL import Image
 import plotly.express as px
 
+# ================================== Landing / Login Page ======================================================
+# Background image
+def set_background(image_path):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("{image_path}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+set_background("assets/background.jpg")
+
+# Session State Init
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "user_role" not in st.session_state:
+    st.session_state.user_role = None
+
+# Header
+col1, col2 = st.columns([1, 6])
+with col1:
+    st.image("assets/vetsmart_logo.png", width=100)
+with col2:
+    st.markdown("<h1 style='color:white;'>Welcome to VetSmart</h1>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:white;'>...revolutionizing the livestock sector with AI.</h4>", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# --- NOT LOGGED IN ---
+if not st.session_state.logged_in:
+    # About Section
+    st.markdown("## About VetSmart")
+    st.markdown("""
+        VetSmart is an AI-driven platform that connects farmers with veterinarians, enabling predictive health monitoring,
+        data-driven livestock management, and seamless veterinary services.
+    """)
+
+    # Contributors
+    st.markdown("## Contributors")
+    contributors = {
+        "Balogun Ezekiel": "Data Scientist",
+        "Jane Doe": "Frontend Developer",
+        "John Smith": "Backend Developer",
+        "Mary Johnson": "Project Manager",
+        "Samuel Ade": "AI/ML Engineer"
+    }
+    for name, role in contributors.items():
+        st.markdown(f"- **{name}** — *{role}*")
+
+    # Supporters
+    st.markdown("## Supporters & Partners")
+    cols = st.columns(5)
+    logos = [
+        "assets/partner_fmcide.png",
+        "assets/partner_3mtt.png",
+        "assets/partner_nitda.png",
+        "assets/partner_dsn.png",
+        "assets/partner_google.png"
+    ]
+    for col, logo in zip(cols, logos):
+        col.image(logo, use_column_width=True)
+
+    st.markdown("---")
+
+    # Signup/Login
+    st.markdown("## Access VetSmart")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Sign Up")
+        new_role = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
+        new_user = st.text_input("Create Username")
+        new_pass = st.text_input("Create Password", type="password")
+        if st.button("Register"):
+            st.success(f"User created for {new_role}: {new_user}")
+            st.session_state.logged_in = True
+            st.session_state.user_role = new_role
+
+    with col2:
+        st.subheader("Login")
+        login_user = st.text_input("Username", key="login_user")
+        login_pass = st.text_input("Password", type="password", key="login_pass")
+        login_role = st.selectbox("Login As", ["Farmer", "Veterinarian", "Admin"])
+        if st.button("Login"):
+            st.success(f"Welcome back, {login_user}")
+            st.session_state.logged_in = True
+            st.session_state.user_role = login_role
+
+# --- LOGGED IN VIEW ---
+else:
+    role = st.session_state.user_role
+    st.sidebar.success(f"Logged in as: {role}")
+    if st.sidebar.button("Logout"):
+        st.session_state.logged_in = False
+        st.session_state.user_role = None
+        st.rerun()
+
+    st.markdown("## VetSmart Dashboard")
+
+    # Role-based Tabs
+    tabs_by_role = {
+        "Farmer": ["Add Livestock", "View Livestock", "Diagnosis", "Daily Health Tips", "Request Service", "Dashboard", "Feedback"],
+        "Veterinarian": ["Diagnosis", "Daily Health Tips", "Vet Doc", "Feedback"],
+        "Admin": ["Add Livestock", "View Livestock", "Diagnosis", "Daily Health Tips", "Vet Doc", "Request Service", "Dashboard", "Feedback"]
+    }
+
+    available_tabs = tabs_by_role.get(role, [])
+    selected_tab = st.tabs(available_tabs)
+
+    for i, tab in enumerate(available_tabs):
+        with selected_tab[i]:
+            if tab == "Add Livestock":
+                st.subheader("🐄 Add Livestock")
+                st.text_input("Enter Animal ID")
+                st.selectbox("Species", ["Cattle", "Goat", "Sheep", "Chicken"])
+                st.date_input("Date of Birth")
+                st.text_area("Health Notes")
+                st.button("Save")
+
+            elif tab == "View Livestock":
+                st.subheader("📋 Livestock Records")
+                st.write("Display livestock table here...")
+
+            elif tab == "Diagnosis":
+                st.subheader("🧪 Livestock Diagnosis")
+                st.write("Run AI-powered diagnosis or input symptoms...")
+
+            elif tab == "Daily Health Tips":
+                st.subheader("💡 Daily Health Tips")
+                st.success("Ensure animals have clean water and shade daily.")
+
+            elif tab == "Request Service":
+                st.subheader("📞 Request Veterinary Service")
+                st.text_input("Enter Service Description")
+                st.button("Send Request")
+
+            elif tab == "Dashboard":
+                st.subheader("📊 Overview Dashboard")
+                st.write("Show analytics and metrics here.")
+
+            elif tab == "Feedback":
+                st.subheader("📝 Feedback")
+                st.text_area("Your suggestions...")
+                st.button("Submit")
+
+            elif tab == "Vet Doc":
+                st.subheader("📁 Veterinary Documents")
+                st.file_uploader("Upload Vet Document")
+                st.write("List of previously uploaded docs...")
+
+# Footer
+st.markdown(
+    "<footer style='text-align:center; color: white;'>© 2025 VetSmart. All rights reserved.</footer>",
+    unsafe_allow_html=True
+)
 
 # ========== Centered Logo ==========
 
