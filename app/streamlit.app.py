@@ -26,7 +26,7 @@ def set_background(cow_background):
         f"""
         <style>
         .stApp {{
-            background-image: url("{https://drive.google.com/file/d/1fSBcwWet6mdtwMvMcEH4pmSdFzqhpM7t/view?usp=drive_link}");
+            background-image: url("https://img.freepik.com/premium-vector/painting-farm-with-farmer-cows_1095437-5301.jpg");
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
