@@ -36,7 +36,7 @@ def set_background(cow_background):
         unsafe_allow_html=True
     )
 
-set_background("cow_background.jpg")
+set_background("cow_background")
 
 # Session State Init
 if "logged_in" not in st.session_state:
