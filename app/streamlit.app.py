@@ -21,7 +21,7 @@ import plotly.express as px
 
 # ================================== Landing / Login Page ======================================================
 # Background image
-def set_background(assets/cow_background.jpg):
+def set_background(cow_background.jpg):
     st.markdown(
         f"""
         <style>
@@ -36,7 +36,7 @@ def set_background(assets/cow_background.jpg):
         unsafe_allow_html=True
     )
 
-set_background("assets/cow_background.jpg")
+set_background("cow_background.jpg")
 
 # Session State Init
 if "logged_in" not in st.session_state:
