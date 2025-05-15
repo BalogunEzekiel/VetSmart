@@ -21,7 +21,7 @@ import plotly.express as px
 
 # ================================== Landing / Login Page ======================================================
 # Background image
-def set_background(image_path):
+def set_background(cow_background.jpg):
     st.markdown(
         f"""
         <style>
@@ -36,7 +36,7 @@ def set_background(image_path):
         unsafe_allow_html=True
     )
 
-set_background("assets/background.jpg")
+set_background("assets/cow_background.jpg")
 
 # Session State Init
 if "logged_in" not in st.session_state:
@@ -79,11 +79,13 @@ if not st.session_state.logged_in:
     st.markdown("## Supporters & Partners")
     cols = st.columns(5)
     logos = [
-        "assets/partner_fmcide.png",
-        "assets/partner_3mtt.png",
-        "assets/partner_nitda.png",
-        "assets/partner_dsn.png",
-        "assets/partner_google.png"
+        "assets/Partner_FMCIDE.png",
+        "assets/Partner_DSN.png",
+        "assets/Partner_Google.png",
+        "assets/Partner_AWS.png",
+        "assets/Partner_Azure.png",
+        "assets/Partner_Amason.png",
+        "assets/Partner_Microsoft.png"
     ]
     for col, logo in zip(cols, logos):
         col.image(logo, use_column_width=True)
