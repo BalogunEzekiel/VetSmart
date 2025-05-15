@@ -436,6 +436,17 @@ def display_dashboard():
     fig3 = px.histogram(vaccinated, x="Vaccination", color="Type", title="Vaccination Count by Type", barmode="group")
     st.plotly_chart(fig3, use_container_width=True)
 
+    # Bar chart for average weight by type
+    weight_by_type = df.groupby("Type")["Weight"].mean().reset_index()
+    fig2 = px.bar(weight_by_type, x="Type", y="Weight", color="Type", title="Average Weight by Animal Type")
+    st.plotly_chart(fig2, use_container_width=True)
+
+    # Line chart for livestock added over time
+    df["Added On"] = pd.to_datetime(df["Added On"])
+    added_over_time = df.groupby(df["Added On"].dt.date).size().reset_index(name='Count')
+    fig3 = px.line(added_over_time, x="Added On", y="Count", title="Livestock Added Over Time")
+    st.plotly_chart(fig3, use_container_width=True)
+
 def display_diagnosis():
     """Displays the symptom-based disease diagnosis section."""
     st.subheader("🩺 Symptom-based Disease Diagnosis")
