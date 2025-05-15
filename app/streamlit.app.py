@@ -88,7 +88,7 @@ if not st.session_state.logged_in:
         "assets/Partner_Microsoft.png"
     ]
     for col, logo in zip(cols, logos):
-    col.image(logo, use_container_width=True)
+        col.image(logo, use_container_width=True)
    
     st.markdown("---")
 
