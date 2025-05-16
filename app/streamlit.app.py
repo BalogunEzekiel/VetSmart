@@ -63,12 +63,19 @@ if not st.session_state['logged_in']:
     col_login, col_signup = st.columns(2)
     with col_login:
         st.subheader("Login")
-        login_user = st.text_input("Username", key="login_user")
+        login_user = st.text_input("Ema]il", key="login_user")
         login_pwd  = st.text_input("Password", type="password", key="login_pwd")
         if st.button("Login", key="login_btn"):
-            # Attempt to fetch user and check password
-            c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Username = ?", (login_user,))
-            row = c.fetchone()
+            def get_sqlite_connection():
+                return sqlite3.connect("livestock_data.db")
+                # Get database connection and cursor
+            
+            if st.button("Login", key="login_btn"):
+                conn = get_sqlite_connection()
+                c = conn.cursor()
+                # Attempt to fetch user and check password
+                c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+                row = c.fetchone()
             if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
                 # Successful login: set session state
                 st.session_state['logged_in'] = True
@@ -90,10 +97,9 @@ if not st.session_state['logged_in']:
                 role      = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
                 firstname = st.text_input("First Name")
                 lastname  = st.text_input("Last Name")
-                username  = st.text_input("Create Username")
+                username  = st.text_input("Email")
                 password  = st.text_input("Password", type="password")
                 confirm   = st.text_input("Confirm Password", type="password")
-                email     = st.text_input("Email")
                 telephone = st.text_input("Telephone")
                 farm_name    = st.text_input("Farm Name")
                 farm_address = st.text_input("Farm Address")
@@ -102,24 +108,24 @@ if not st.session_state['logged_in']:
 
                 if submitted:
                     # -- Validation: all fields required, password match --
-                    if not (firstname and lastname and username and password and confirm and email and telephone and farm_name and farm_address and farm_role):
+                    if not (firstname and lastname and username and password and confirm and telephone and farm_name and farm_address and farm_role):
                         st.error("Error: All fields are required.")
                     elif password != confirm:
                         st.error("Error: Passwords do not match.")
                     else:
                         # Check if username already exists
-                        c.execute("SELECT * FROM users WHERE Username = ?", (username,))
+                        c.execute("SELECT * FROM users WHERE Email = ?", (username,))
                         if c.fetchone():
-                            st.error("Error: Username already taken.")
+                            st.error("Error: Email already used.")
                         else:
                             # Hash the password and insert the new user
                             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                             c.execute('''
                                 INSERT INTO users 
-                                (role, firstname, lastname, username, password, email, telephone, farmname, farmaddress, farmrole, registered_on)
+                                (role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole, registered_on)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             ''', (role, firstname, lastname, username, hashed.decode('utf-8'),
-                                  email, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                                  telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                             conn.commit()
                             st.success(f"User '{username}' registered successfully!")
                             # Hide the form after successful registration
@@ -281,7 +287,6 @@ def initialize_database():
             lastname TEXT, 
             username TEXT UNIQUE,
             password TEXT NOT NULL, 
-            email TEXT,
             telephone TEXT,
             farmname TEXT,
             farmaddress TEXT,
@@ -328,7 +333,7 @@ def initialize_database():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS vet_requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            farmer_name TEXT NOT NULL,
+            fa]rmer_name TEXT NOT NULL,
             animal_tag TEXT NOT NULL,
             vet_id INTEGER,
             request_reason TEXT,
@@ -344,23 +349,23 @@ def initialize_database():
 initialize_database()
 
 # ========== Load & Save Data Functions ==========
-def load_user():
+def load_users():
     conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM user", conn)
+    df = pd.read_sql("SELECT * FROM users", conn)
     conn.close()
     return df
 
-def save_user(role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole):
+def save_users(role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole):
     try:
         conn = get_sqlite_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO feedback (role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole registered_on)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            INSERT INTO users (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, registered_on)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         conn.commit()
     except Exception as e:
-        print(f"Error saving feedback: {e}")
+        print(f"Error saving users: {e}")
     finally:
         conn.close()
 
@@ -379,7 +384,6 @@ def save_livestock_data(name, animal_type, age, weight, vaccination):
     conn.execute(query, (name, animal_type, age, weight, vaccination, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
     conn.commit()
     conn.close()
-
 
 def load_feedback():
     conn = get_sqlite_connection()
