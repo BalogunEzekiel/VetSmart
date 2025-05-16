@@ -263,83 +263,85 @@ st.markdown(
 # ========== Database Configuration ==========
 SQLITE_DB = 'livestock_data.db'
 
-# ========== Database Connection Functions ==========
+# ========== Database Connection Function ==========
 def get_sqlite_connection():
-    return sqlite3.connect(SQLITE_DB)
-
-# Connect to the SQLite database (creates it if it doesn't exist)
-# conn = sqlite3.connect('livestock_data.db')  # replace with your actual database name
-conn = sqlite3.connect("livestock_data.db", check_same_thread=False)
-cursor = conn.cursor()
-
+    return sqlite3.connect(SQLITE_DB, check_same_thread=False)
 
 # ========== Initialize Database and Tables ==========
 def initialize_database():
-    conn = get_sqlite_connection()
+    with get_sqlite_connection() as conn: 
     cursor = conn.cursor()
 
-# Create a table for users if it doesn't exist.
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        role TEXT,
-        firstname TEXT,
-        lastname TEXT,
-        username TEXT UNIQUE,
-        password TEXT,
-        confirmpassword TEXT,
-        email TEXT,
-        telephone TEXT,
-        farmname TEXT,
-        farmaddress TEXT,
-        farmrole TEXT
-    );
-""")
-conn.commit()
+    # Create users table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            role TEXT,
+            firstname TEXT,
+            lastname ]TEXT, 
+            username TEXT UNIQUE,
+            password TEXT NOT NULL, 
+            email TEXT,
+            telephone TEXT,
+            farmname TEXT,
+            farmaddress TEXT,
+            farmrole TEXT
+        );
+    """)
+ 
+    # Create livestock table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS livestock (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            animal_type TEXT NOT NULL,
+            age REAL NOT NULL,
+            weight REAL NOT NULL,
+            vaccination TEXT,
+            added_on DATETIME
+        )
+    """)
 
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS livestock (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        animal_type TEXT NOT NULL,
-        age REAL NOT NULL,
-        weight REAL NOT NULL,
-        vaccination TEXT,
-        added_on DATETIME
-    )
-""")
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS feedback (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        feedback TEXT NOT NULL,
-        submitted_on DATETIME
-    )
-""")
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS veterinarians (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        specialization TEXT NOT NULL,
-        phone TEXT,
-        email TEXT,
-        registered_on DATETIME
-    )
-""")
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS vet_requests (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        farmer_name TEXT NOT NULL,
-        animal_tag TEXT NOT NULL,
-        vet_id INTEGER,
-        request_reason TEXT,
-        requested_on DATETIME,
-        FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
-    )
-""")
+    # Create feedback table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            feedback TEXT NOT NULL,
+            submitted_on DATETIME
+        )
+    """)
 
-conn.commit()
-conn.close()
+    # Create veterinarians table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS veterinarians (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            specialization TEXT NOT NULL,
+            phone TEXT,
+            email TEXT,
+            registered_on DATETIME
+        )
+    """)
+
+    # Create vet_requests table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS vet_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            farmer_name TEXT NOT NULL,
+            animal_tag TEXT NOT NULL,
+            vet_id INTEGER,
+            request_reason TEXT,
+            requested_on DATETIME,
+            FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+# Call the function to initialize the database
+initialize_database()
 
 # Initialize the database and tables
 # initialize_database()
