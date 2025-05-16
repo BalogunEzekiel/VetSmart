@@ -135,48 +135,6 @@ else:
     }
 
     available_tabs = tabs_by_role.get(role, [])
-    selected_tab = st.tabs(available_tabs)
-
-# for i, tab in enumerate(available_tabs):
-#     with selected_tab[i]:
-#         if tab == "Add Livestock":
-#             st.subheader("🐄 Add Livestock")
-#             st.text_input("Enter Animal ID")
-#             st.selectbox("Species", ["Cattle", "Goat", "Sheep", "Chicken"])
-#             st.date_input("Date of Birth")
-#             st.text_area("Health Notes")
-#             st.button("Save")
-#
-#         elif tab == "View Livestock":
-#             st.subheader("📋 Livestock Records")
-#             st.write("Display livestock table here...")
-#
-#         elif tab == "Diagnosis":
-#             st.subheader("🧪 Livestock Diagnosis")
-#             st.write("Run AI-powered diagnosis or input symptoms...")
-#
-#         elif tab == "Daily Health Tips":
-#             st.subheader("💡 Daily Health Tips")
-#             st.success("Ensure animals have clean water and shade daily.")
-#
-#         elif tab == "Request Service":
-#             st.subheader("📞 Request Veterinary Service")
-#             st.text_input("Enter Service Description")
-#             st.button("Send Request")
-#
-#         elif tab == "Dashboard":
-#             st.subheader("📊 Overview Dashboard")
-#             st.write("Show analytics and metrics here.")
-#
-#         elif tab == "Feedback":
-#             st.subheader("📝 Feedback")
-#             st.text_area("Your suggestions...")
-#             st.button("Submit")
-#
-#         elif tab == "Vet Doc":
-#             st.subheader("📁 Veterinary Documents")
-#             st.file_uploader("Upload Vet Document")
-#             st.write("List of previously uploaded docs...")
 
 # ========== Centered Logo ==========
 
