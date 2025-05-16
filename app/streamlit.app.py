@@ -294,7 +294,7 @@ c.execute("""
         farmrole TEXT
     )
 """)
-conn.commit()
+c.commit()
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS livestock (
