@@ -274,7 +274,7 @@ def initialize_database():
     cursor = conn.cursor()
 
         # Create a table for users if it doesn't exist.
-    c.execute('''
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             role TEXT,
@@ -289,7 +289,7 @@ def initialize_database():
             farmaddress TEXT,
             farmrole TEXT
         );
-    ''')
+    """)
     conn.commit()
 
     cursor.execute("""
