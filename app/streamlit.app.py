@@ -41,10 +41,90 @@ def set_background(cow_background):
 set_background("cow_background")
 
 # Session State Init
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "user_role" not in st.session_state:
-    st.session_state.user_role = None
+# if "logged_in" not in st.session_state:
+#    st.session_state.logged_in = False
+# if "user_role" not in st.session_state:
+#    st.session_state.user_role = None
+
+# -- Session State Defaults ---------------------------------------------------
+# Initialize session state variables for login status and whether to show signup.
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+if 'show_signup' not in st.session_state:
+    st.session_state['show_signup'] = False
+
+# -- Home Page Content --------------------------------------------------------
+if not st.session_state['logged_in']:
+    st.title("Welcome to the Livestock Management App")
+    st.write("This app allows farmers, veterinarians, and admins to manage livestock data securely.")
+    st.write("**About:** A brief overview of the system and its features.")
+    st.write("**Contributors:** Alice, Bob, Carol.")
+    st.write("**Partners:** (Logos or names of partner organizations)")
+
+    col_login, col_signup = st.columns(2)
+    with col_login:
+        st.subheader("Login")
+        login_user = st.text_input("Username", key="login_user")
+        login_pwd  = st.text_input("Password", type="password", key="login_pwd")
+        if st.button("Login", key="login_btn"):
+            # Attempt to fetch user and check password
+            c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Username = ?", (login_user,))
+            row = c.fetchone()
+            if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
+                # Successful login: set session state
+                st.session_state['logged_in'] = True
+                st.session_state['user_role'] = row[1]
+                st.session_state['user_name'] = f"{row[2]} {row[3]}"
+                st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
+            else:
+                st.error("Login failed: invalid username or password.")
+
+    with col_signup:
+        st.subheader("New User? Register Here")
+        # Show the sign-up form when button is clicked
+        if st.button("Sign Up"):
+            st.session_state['show_signup'] = True
+
+        if st.session_state['show_signup']:
+            with st.form("signup_form"):
+                st.write("Please fill in all fields:")
+                role      = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
+                firstname = st.text_input("First Name")
+                lastname  = st.text_input("Last Name")
+                username  = st.text_input("Create Username")
+                password  = st.text_input("Password", type="password")
+                confirm   = st.text_input("Confirm Password", type="password")
+                email     = st.text_input("Email")
+                telephone = st.text_input("Telephone")
+                farm_name    = st.text_input("Farm Name")
+                farm_address = st.text_input("Farm Address")
+                farm_role    = st.text_input("Farm Role (e.g., owner, worker)")
+                submitted = st.form_submit_button("Register")
+
+                if submitted:
+                    # -- Validation: all fields required, password match --
+                    if not (firstname and lastname and username and password and confirm and email and telephone and farm_name and farm_address and farm_role):
+                        st.error("Error: All fields are required.")
+                    elif password != confirm:
+                        st.error("Error: Passwords do not match.")
+                    else:
+                        # Check if username already exists
+                        c.execute("SELECT * FROM users WHERE Username = ?", (username,))
+                        if c.fetchone():
+                            st.error("Error: Username already taken.")
+                        else:
+                            # Hash the password and insert the new user
+                            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+                            c.execute('''
+                                INSERT INTO users 
+                                (role, firstname, lastname, username, password, email, telephone, farmname, farmaddress, farmrole, registered_on)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ''', (role, firstname, lastname, username, hashed.decode('utf-8'),
+                                  email, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                            conn.commit()
+                            st.success(f"User '{username}' registered successfully!")
+                            # Hide the form after successful registration
+                            st.session_state['show_signup'] = False
 
 # Header
 col1, col2 = st.columns([1, 6])
@@ -69,10 +149,7 @@ if not st.session_state.logged_in:
     st.markdown("## Contributors")
     contributors = {
         "Balogun Ezekiel": "Data Scientist",
-        "Jane Doe": "Frontend Deeloper",
-        "John Smith": "Backend Developer",
-        "Mary Johnson": "Project Manager",
-        "Samuel Ade": "AI/ML Engineer"
+        "Adesanwo Oluwakemi": "Data Analyst"
     }
     for name, role in contributors.items():
         st.markdown(f"- **{name}** — *{role}*")
@@ -94,50 +171,69 @@ if not st.session_state.logged_in:
    
     st.markdown("---")
 
-    # Signup/Login
-    st.markdown("## Access VetSmart")
-    col1, col2 = st.columns(2)
+# # Signup/Login
+# st.markdown("## Access VetSmart")
+# col1, col2 = st.columns(2)
 
-    with col1:
-        st.subheader("Sign Up")
-        new_role = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
-        new_user = st.text_input("Create Username")
-        new_pass = st.text_input("Create Password", type="password")
-        if st.button("Register"):
-            st.success(f"User created for {new_role}: {new_user}")
-            st.session_state.logged_in = True
-            st.session_state.user_role = new_role
+# with col1:
+#     st.subheader("Sign Up")
+#     new_role = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
+#     new_user = st.text_input("Create Username")
+#     new_pass = st.text_input("Create Password", type="password")
+#     if st.button("Register"):
+#         st.success(f"User created for {new_role}: {new_user}")
+#         st.session_state.logged_in = True
+#         st.session_state.user_role = new_role
 
-    with col2:
-        st.subheader("Login")
-        login_user = st.text_input("Username", key="login_user")
-        login_pass = st.text_input("Password", type="password", key="login_pass")
-        login_role = st.selectbox("Login As", ["Farmer", "Veterinarian", "Admin"])
-        if st.button("Login"):
-            st.success(f"Welcome back, {login_user}")
-            st.session_state.logged_in = True
-            st.session_state.user_role = login_role
+# with col2:
+#     st.subheader("Login")
+#     login_user = st.text_input("Username", key="login_user")
+#     login_pass = st.text_input("Password", type="password", key="login_pass")
+#     login_role = st.selectbox("Login As", ["Farmer", "Veterinarian", "Admin"])
+#     if st.button("Login"):
+#         st.success(f"Welcome back, {login_user}")
+#         st.session_state.logged_in = True
+#         st.session_state.user_role = login_role
 
-# --- LOGGED IN VIEW ---
-else:
-    role = st.session_state.user_role
-    st.sidebar.success(f"Logged in as: {role}")
-    if st.sidebar.button("Logout"):
-        st.session_state.logged_in = False
-        st.session_state.user_role = None
-        st.rerun()
+# # --- LOGGED IN VIEW ---
+# else:
+#     role = st.session_state.user_role
+#     st.sidebar.success(f"Logged in as: {role}")
+#     if st.sidebar.button("Logout"):
+#         st.session_state.logged_in = False
+#         st.session_state.user_role = None
+#         st.rerun()
 
-    st.markdown("## VetSmart Dashboard")
+#     st.markdown("## VetSmart Dashboard")
 
-    # Role-based Tabs
+#     # Role-based Tabs
+#     tabs_by_role = {
+#         "Farmer": ["dislplay_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display_register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"],
+#         "Veterinarian": ["display_diagnosis", "display_daily_health_tips", "display_register_vet", "handle_feedback_submission"],
+#         "Admin": ["dislplay_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display__register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"]
+#     }
+
+#     available_tabs = tabs_by_role.get(role, [])
+
+# -- Main App (after login) ---------------------------------------------------
+if st.session_state['logged_in']:
+    st.sidebar.title("Navigation")
+    role = st.session_state['user_role']
+    st.sidebar.write(f"Logged in as **{st.session_state['user_name']}** ({role})")
+    # Define pages per role
     tabs_by_role = {
-        "Farmer": ["dislplay_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display_register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"],
+        "Farmer": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "request_vet_service", "display_dashboard", "handle_feedback_submission"],
         "Veterinarian": ["display_diagnosis", "display_daily_health_tips", "display_register_vet", "handle_feedback_submission"],
-        "Admin": ["dislplay_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display__register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"]
+        "Admin": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display_register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"]
     }
+    options = tabs_by_role.get(role, [])
+    page = st.sidebar.selectbox("Go to", options)
 
-    available_tabs = tabs_by_role.get(role, [])
-
+    # Optional logout button
+    if st.sidebar.button("Logout"):
+        st.session_state['logged_in'] = False
+        st.experimental_rerun()
+        
 # ========== Centered Logo ==========
 
 # Logo and title
@@ -176,6 +272,25 @@ def get_sqlite_connection():
 def initialize_database():
     conn = get_sqlite_connection()
     cursor = conn.cursor()
+
+        # Create a table for users if it doesn't exist.
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            role TEXT,
+            firstname TEXT,
+            lastname TEXT,
+            username TEXT PRIMARY KEY,
+            password TEXT,
+            confirmpassword TEXT,
+            email TEXT,
+            telephone TEXT,
+            farmname TEXT,
+            farmaddress TEXT,
+            farmrole TEXT
+        );
+    ''')
+    conn.commit()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS livestock (
@@ -225,6 +340,26 @@ def initialize_database():
 initialize_database()
 
 # ========== Load & Save Data Functions ==========
+def load_user():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM user", conn)
+    conn.close()
+    return df
+
+def save_user(role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO feedback (role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole registered_on)
+            VALUES (?, ?, ?)
+        """, (role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving feedback: {e}")
+    finally:
+        conn.close()
+
 def load_data():
     conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM livestock", conn)
