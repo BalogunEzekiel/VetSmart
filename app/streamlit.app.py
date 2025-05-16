@@ -269,7 +269,6 @@ def get_sqlite_connection():
 
 # Connect to the SQLite database (creates it if it doesn't exist)
 c = sqlite3.connect('livestock.db')  # replace with your actual database name
-c = conn.cursor()
 # conn = sqlite3.connect("livestock.db", check_same_thread=False)
 
 
