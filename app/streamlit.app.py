@@ -20,7 +20,6 @@ from PIL import Image
 import plotly.express as px
 import bcrypt
 
-
 # ================================== Landing / Login Page ======================================================
 # Background image
 def set_background(cow_background):
@@ -450,16 +449,6 @@ def predict_disease(symptoms):
     return prediction, treatments[prediction]
 
 # ========================PDF Report ===========================
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.graphics.barcode import code128
-import datetime
-from reportlab.lib.units import inch
-
 
 def generate_diagnosis_report(animal_data, disease, recommendation):
     buffer = BytesIO()
