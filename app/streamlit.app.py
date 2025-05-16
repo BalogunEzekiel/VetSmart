@@ -18,6 +18,8 @@ from reportlab.lib import colors
 import nltk
 from PIL import Image
 import plotly.express as px
+import bcrypt
+
 
 # ================================== Landing / Login Page ======================================================
 # Background image
