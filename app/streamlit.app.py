@@ -273,10 +273,10 @@ conn = sqlite3.connect('livestock_data.db')  # replace with your actual database
 # ========== Initialize Database and Tables ==========
 def initialize_database():
     conn = get_sqlite_connection()
-    cursor = conn.cursor()
+    c = conn.cursor()
 
 # Create a table for users if it doesn't exist.
-cursor.execute("""
+c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         role TEXT,
