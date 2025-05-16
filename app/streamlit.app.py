@@ -278,7 +278,7 @@ def initialize_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             role TEXT,
             firstname TEXT,
-            lastname ]TEXT, 
+            lastname TEXT, 
             username TEXT UNIQUE,
             password TEXT NOT NULL, 
             email TEXT,
