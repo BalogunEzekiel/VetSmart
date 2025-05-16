@@ -343,9 +343,6 @@ def initialize_database():
 # Call the function to initialize the database
 initialize_database()
 
-# Initialize the database and tables
-# initialize_database()
-
 # ========== Load & Save Data Functions ==========
 def load_user():
     conn = get_sqlite_connection()
