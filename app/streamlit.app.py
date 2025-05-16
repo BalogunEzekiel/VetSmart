@@ -279,7 +279,7 @@ cursor.execute("""
         role TEXT,
         firstname TEXT,
         lastname TEXT,
-        username TEXT PRIMARY KEY,
+        username TEXT UNIQUE,
         password TEXT,
         confirmpassword TEXT,
         email TEXT,
