@@ -351,7 +351,7 @@ def save_user(role, firstname, lastname, username, password, confirmpassword, em
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO feedback (role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole registered_on)
-            VALUES (?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (role, firstname, lastname, username, password, confirmpassword, email, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         conn.commit()
     except Exception as e:
