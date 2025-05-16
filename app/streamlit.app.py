@@ -270,7 +270,7 @@ def get_sqlite_connection():
 # ========== Initialize Database and Tables ==========
 def initialize_database():
     with get_sqlite_connection() as conn: 
-    cursor = conn.cursor()
+        cursor = conn.cursor()
 
     # Create users table
     cursor.execute("""
