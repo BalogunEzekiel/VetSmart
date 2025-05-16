@@ -274,23 +274,23 @@ def initialize_database():
     cursor = conn.cursor()
 
         # Create a table for users if it doesn't exist.
-# cursor.execute("""
-#     CREATE TABLE IF NOT EXISTS users (
-#         id INTEGER PRIMARY KEY AUTOINCREMENT,
-#         role TEXT,
-#         firstname TEXT,
-#         lastname TEXT,
-#         username TEXT PRIMARY KEY,
-#         password TEXT,
-#         confirmpassword TEXT,
-#         email TEXT,
-#         telephone TEXT,
-#         farmname TEXT,
-#         farmaddress TEXT,
-#         farmrole TEXT
-#     );
-# """)
-# conn.commit()
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        role TEXT,
+        firstname TEXT,
+        lastname TEXT,
+        username TEXT PRIMARY KEY,
+        password TEXT,
+        confirmpassword TEXT,
+        email TEXT,
+        telephone TEXT,
+        farmname TEXT,
+        farmaddress TEXT,
+        farmrole TEXT
+    );
+""")
+conn.commit()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS livestock (
