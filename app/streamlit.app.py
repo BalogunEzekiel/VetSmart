@@ -272,7 +272,7 @@ def initialize_database():
     conn = get_sqlite_connection()
     cursor = conn.cursor()
 
-        # Create a table for users if it doesn't exist.
+# Create a table for users if it doesn't exist.
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -287,53 +287,53 @@ cursor.execute("""
         farmname TEXT,
         farmaddress TEXT,
         farmrole TEXT
-    );
+    )
 """)
 conn.commit()
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS livestock (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            animal_type TEXT NOT NULL,
-            age REAL NOT NULL,
-            weight REAL NOT NULL,
-            vaccination TEXT,
-            added_on DATETIME
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS feedback (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            feedback TEXT NOT NULL,
-            submitted_on DATETIME
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS veterinarians (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            specialization TEXT NOT NULL,
-            phone TEXT,
-            email TEXT,
-            registered_on DATETIME
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS vet_requests (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            farmer_name TEXT NOT NULL,
-            animal_tag TEXT NOT NULL,
-            vet_id INTEGER,
-            request_reason TEXT,
-            requested_on DATETIME,
-            FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
-        )
-    """)
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS livestock (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        animal_type TEXT NOT NULL,
+        age REAL NOT NULL,
+        weight REAL NOT NULL,
+        vaccination TEXT,
+        added_on DATETIME
+    )
+""")
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS feedback (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        feedback TEXT NOT NULL,
+        submitted_on DATETIME
+    )
+""")
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS veterinarians (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        specialization TEXT NOT NULL,
+        phone TEXT,
+        email TEXT,
+        registered_on DATETIME
+    )
+""")
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS vet_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        farmer_name TEXT NOT NULL,
+        animal_tag TEXT NOT NULL,
+        vet_id INTEGER,
+        request_reason TEXT,
+        requested_on DATETIME,
+        FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
+    )
+""")
 
-    conn.commit()
-    conn.close()
+conn.commit()
+conn.close()
 
 # Initialize the database and tables
 # initialize_database()
