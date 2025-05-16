@@ -20,3 +20,4 @@ streamlit_js_eval
 requests
 nltk
 plotly.express
+bcrypt
