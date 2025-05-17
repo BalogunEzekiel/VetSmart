@@ -346,7 +346,7 @@ def initialize_database():
     conn.close()
 
 # Call the function to initialize the database
-# initialize_database()
+initialize_database()
 
 # ========== Load & Save Data Functions ==========
 def load_users():
