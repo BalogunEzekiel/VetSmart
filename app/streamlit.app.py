@@ -333,7 +333,7 @@ def initialize_database():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS vet_requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fa]rmer_name TEXT NOT NULL,
+            farmer_name TEXT NOT NULL,
             animal_tag TEXT NOT NULL,
             vet_id INTEGER,
             request_reason TEXT,
