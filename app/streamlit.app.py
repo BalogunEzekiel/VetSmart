@@ -114,6 +114,8 @@ if not st.session_state['logged_in']:
                         st.error("Error: Passwords do not match.")
                     else:
                         # Check if username already exists
+                        conn = get_sqlite_connection()
+                        c = conn.cursor()
                         c.execute("SELECT * FROM users WHERE Email = ?", (username,))
                         if c.fetchone():
                             st.error("Error: Email already used.")
