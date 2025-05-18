@@ -240,7 +240,7 @@ set_background("cow_background")
 
 # -- Session State Defaults ---------------------------------------------------
 # Initialize session state variables for login status and whether to show signup.
-if 'logged_in' not i]n st.session_state:
+if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
 if 'show_signup' not in st.session_state:
     st.session_state['show_signup'] = False
