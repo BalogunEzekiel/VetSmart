@@ -4,7 +4,6 @@ import streamlit as st
 st.set_page_config(page_title="VetSmart", layout="wide")
 
 import pandas as pd
-# import datetime
 from datetime import datetime
 import random
 import sqlite3
@@ -280,35 +279,40 @@ def password_strength_message(score):
         return "Password is strong.", "green"
 
 with st.container():
-    col_login, col_signup = st.columns([1, 1])  # Equal moderate width
+    col_login, col_signup = st.columns(2)  # Equal moderate width
 
     # --- Login Container ---
-    with col_login:
-        st.subheader("🔐 Login")
-        login_user = st.text_input("Email", key="login_user")
-        login_pwd  = st.text_input("Password", type="password", key="login_pwd")
+   with col_login:
+    st.subheader("🔐 Login")
+    login_user = st.text_input("Email", key="login_user")
+    login_pwd  = st.text_input("Password", type="password", key="login_pwd")
 
-        if st.button("Login", key="login_btn"):
-            if not login_user or not login_pwd:
-                st.warning("Please enter both email and password.")
-            else:
-                try:
-                    conn = get_sqlite_connection()
-                    c = conn.cursor()
-                    c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
-                    row = c.fetchone()
+    if st.button("Login", key="login_btn"):
+        if not login_user or not login_pwd:
+            st.warning("Please enter both email and password.")
+        else:
+            try:
+                conn = get_sqlite_connection()
+                c = conn.cursor()
+                c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+                row = c.fetchone()
 
-                    if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
-                        st.session_state['logged_in'] = True
-                        st.session_state['user_role'] = row[1]
-                        st.session_state['user_name'] = f"{row[2]} {row[3]}"
-                        st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
-                    else:
-                        st.error("Login failed: Invalid email or password.")
-                except Exception as e:
-                    st.error(f"Database error: {e}")
-                finally:
-                    conn.close()
+                if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
+                    st.session_state['logged_in'] = True
+                    st.session_state['user_role'] = row[1]
+                    st.session_state['user_name'] = f"{row[2]} {row[3]}"
+                    st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
+
+                    # ✅ Clear the input fields after successful login
+                    st.session_state.login_user = ""
+                    st.session_state.login_pwd = ""
+
+                else:
+                    st.error("Login failed: Invalid email or password.")
+            except Exception as e:
+                st.error(f"Database error: {e}")
+            finally:
+                conn.close()
 
     # --- Signup Container ---
     with col_signup:
