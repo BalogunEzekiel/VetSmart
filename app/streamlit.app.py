@@ -310,7 +310,7 @@ with st.container():
         st.session_state['show_signup'] = True
 
     if st.session_state['show_signup']:
-        with st.form("signup_form"):
+        with st.form("signup_form", clear_on_submit=True):
             st.write("Please fill in all fields:")
             role      = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
             firstname = st.text_input("First Name")
