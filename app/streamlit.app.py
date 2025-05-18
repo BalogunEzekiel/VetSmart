@@ -300,7 +300,7 @@ with col_login:
                         # Check if username already exists
                         conn = get_sqlite_connection()
                         c = conn.cursor()
-                        c.execute("SELECT * FROM users WHERE Email = ?", (username,))
+                        c.execute("SELECT * FROM users WHERE username = ?", (username,))
                         if c.fetchone():
                             st.error("Error: Email already used.")
                         else:
