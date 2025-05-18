@@ -252,40 +252,40 @@ if not st.session_state['logged_in']:
     col_login, col_signup = st.columns(2)
 
 with col_login:
-st.subheader("Login")
-    login_user = st.text_input("Email", key="login_user")
-    login_pwd  = st.text_input("Password", type="password", key="login_pwd")
-
-    if st.button("Login", key="login_btn"):
-        if not login_user or not login_pwd:
-            st.warning("Please enter both email and password.")
-        else:
-            try:
-                # Connect to the SQLite database
-                conn = sqlite3.connect("livestock_data.db")
-                c = conn.cursor()
-
-                # Fetch user record
-                c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
-                row = c.fetchone()
-
-                # Check if user exists and password matches
-                if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
-                    st.session_state['logged_in'] = True
-                    st.session_state['user_role'] = row[1]
-                    st.session_state['user_name'] = f"{row[2]} {row[3]}"
-                    st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
-                else:
-                    st.error("Login failed: Invalid email or password.")
-
-            except Exception as e:
-                st.error(f"Database error: {e}")
-
-            finally:
+    st.subheader("Login")
+        login_user = st.text_input("Email", key="login_user")
+        login_pwd  = st.text_input("Password", type="password", key="login_pwd")
+    
+        if st.button("Login", key="login_btn"):
+            if not login_user or not login_pwd:
+                st.warning("Please enter both email and password.")
+            else:
                 try:
-                    conn.close()
-                except:
-                    pass
+                    # Connect to the SQLite database
+                    conn = sqlite3.connect("livestock_data.db")
+                    c = conn.cursor()
+    
+                    # Fetch user record
+                    c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+                    row = c.fetchone()
+    
+                    # Check if user exists and password matches
+                    if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
+                        st.session_state['logged_in'] = True
+                        st.session_state['user_role'] = row[1]
+                        st.session_state['user_name'] = f"{row[2]} {row[3]}"
+                        st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
+                    else:
+                        st.error("Login failed: Invalid email or password.")
+    
+                except Exception as e:
+                    st.error(f"Database error: {e}")
+    
+                finally:
+                    try:
+                        conn.close()
+                    except:
+                        pass
                     
 def password_strength(pw):
     length = len(pw)
