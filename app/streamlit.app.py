@@ -462,12 +462,37 @@ if not st.session_state.logged_in:
 #    role = st.session_state['user_role']
 #    st.sidebar.write(f"Logged in as **{st.session_state['user_name']}** ({role})")
 #    # Define pages per role
-#    tabs_by_role = {
-#        "Farmer": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "request_vet_service", "display_dashboard", "handle_feedback_submission"],
-#        "Veterinarian": ["display_diagnosis", "display_daily_health_tips", "display_register_vet", "handle_feedback_submission"],
-#        "Admin": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display_register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"]
-#    }
-    options = tabs_by_role.get(role, [])
+
+tabs_by_role = {
+    "Farmer": [
+        "display_add_livestock",
+        "display_view_livestock",
+        "display_diagnosis",
+        "display_daily_health_tips",
+        "request_vet_service",
+        "display_dashboard",
+        "handle_feedback_submission"
+    ],
+    "Veterinarian": [
+        "display_diagnosis",
+        "display_daily_health_tips",
+        "display_register_vet",
+        "handle_feedback_submission"
+    ],
+    "Admin": [
+        "display_add_livestock",
+        "display_view_livestock",
+        "display_diagnosis",
+        "display_daily_health_tips",
+        "display_register_vet",
+        "request_vet_service",
+        "display_dashboard",
+        "handle_feedback_submission"
+    ]
+}
+
+options = tabs_by_role.get(role, [])
+
 #    page = st.sidebar.selectbox("Go to", options)
 
     # Optional logout button
@@ -898,6 +923,34 @@ def handle_feedback_submission():
                 st.success("Thank you for your feedback!")
 
 # =================================================== Main =======================================================
+tabs_by_role = {
+    "Farmer": [
+        tab1,  # 🐐Add Livestock
+        tab2,  # 🐑🐐🐄View Livestock
+        tab3,  # 🩺Diagnosis
+        tab4,  # 💡Daily Health Tips
+        tab6,  # 📞Request Service
+        tab7,  # 📊Dashboard
+        tab8   # 📝 Feedback
+    ],
+    "Veterinarian": [
+        tab3,  # 🩺Diagnosis
+        tab4,  # 💡Daily Health Tips
+        tab5,  # 👨‍⚕️Vet Doc
+        tab8   # 📝 Feedback
+    ],
+    "Admin": [
+        tab1,  # 🐐Add Livestock
+        tab2,  # 🐑🐐🐄View Livestock
+        tab3,  # 🩺Diagnosis
+        tab4,  # 💡Daily Health Tips
+        tab5,  # 👨‍⚕️Vet Doc
+        tab6,  # 📞Request Service
+        tab7,  # 📊Dashboard
+        tab8   # 📝 Feedback
+    ]
+}
+
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Dashboard", "📝 Feedback"])
 
 with tab1:
