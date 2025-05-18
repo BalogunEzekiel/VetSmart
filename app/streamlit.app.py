@@ -250,9 +250,10 @@ if not st.session_state['logged_in']:
     st.write("**Partners:** (Logos or names of partner organizations)")
 
     col_login, col_signup = st.columns(2)
+
 with col_login:
     st.subheader("Login")
-    login_user = st.text_input("Email", key="login_user")  # Corrected label typo from "Ema]il"
+    login_user = st.text_input("Email", key="login_user")  # Corrected label typo from "Email"
     login_pwd  = st.text_input("Password", type="password", key="login_pwd")
     
     if st.button("Login", key="login_btn"):
@@ -261,8 +262,12 @@ with col_login:
         
         conn = get_sqlite_connection()
         c = conn.cursor()
+    try:
         c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
         row = c.fetchone()
+    except Exception as e:
+    st.error(f"Database error: {e}")
+    st.stop()
         
         if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
             st.session_state['logged_in'] = True
@@ -271,11 +276,6 @@ with col_login:
             st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
         else:
             st.error("Login failed: invalid email or password.")
-
-import re
-import streamlit as st
-from datetime import datetime
-import bcrypt
 
 def password_strength(pw):
     length = len(pw)
