@@ -70,20 +70,20 @@ if not st.session_state['logged_in']:
 #                return sqlite3.connect("livestock_data.db")
 #                # Get database connection and cursor
             
-            if st.button("Login", key="login_btn"):
-                conn = get_sqlite_connection()
-                c = conn.cursor()
-                # Attempt to fetch user and check password
-                c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
-                row = c.fetchone()
-            if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
-                # Successful login: set session state
-                st.session_state['logged_in'] = True
-                st.session_state['user_role'] = row[1]
-                st.session_state['user_name'] = f"{row[2]} {row[3]}"
-                st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
-            else:
-                st.error("Login failed: invalid username or password.")
+        if st.button("Login", key="login_btn"):
+            conn = get_sqlite_connection()
+            C = conn.cursor()
+            # Attempt to fetch user and check password
+            c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+            row = c.fetchone()
+        if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
+            # Successful login: set session state
+            st.session_state['logged_in'] = True
+            st.session_state['user_role'] = row[1]
+            st.session_state['user_name'] = f"{row[2]} {row[3]}"
+            st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
+        else:
+            st.error("Login failed: invalid username or password.")
 
     with col_signup:
         st.subheader("New User? Register Here")
