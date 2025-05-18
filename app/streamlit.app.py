@@ -23,14 +23,17 @@ import bcrypt
 import re
 
 
-# ========== Database Connection ==========
-def get_sqlite_connection(db_name='livestock.db'):
-    return sqlite3.connect(db_name)
+# ========== Database Configuration ==========
+SQLITE_DB = 'livestock_data.db'
+
+# ========== Database Connection Functions ==========
+def get_sqlite_connection():
+    return sqlite3.connect(SQLITE_DB)
 
 # ========== Initialize Database and Tables ==========
 def initialize_database():
-    with get_sqlite_connection() as conn: 
-        cursor = conn.cursor()
+    conn = get_sqlite_connection()
+    cursor = conn.cursor()
 
         # Create users table
         cursor.execute("""
