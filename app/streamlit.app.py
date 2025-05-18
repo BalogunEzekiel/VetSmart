@@ -925,29 +925,29 @@ def handle_feedback_submission():
 # =================================================== Main =======================================================
 tabs_by_role = {
     "Farmer": [
-        tab1, 🐐Add Livestock
-        tab2, 🐑🐐🐄View Livestock
-        tab3, 🩺Diagnosis
-        tab4, 💡Daily Health Tips
-        tab6, 📞Request Service
-        tab7, 📊Dashboard
-        tab8  📝 Feedback
+        tab1, Add Livestock
+        tab2, View Livestock
+        tab3, Diagnosis
+        tab4, Daily Health Tips
+        tab6, Request Service
+        tab7, Dashboard
+        tab8  Feedback
     ],
     "Veterinarian": [
-        tab3, 🩺Diagnosis
-        tab4, 💡Daily Health Tips
-        tab5, 👨‍⚕️Vet Doc
-        tab8 📝 Feedback
+        tab3, Diagnosis
+        tab4, Daily Health Tips
+        tab5, Vet Doc
+        tab8 Feedback
     ],
     "Admin": [
-        tab1, 🐐Add Livestock
-        tab2, 🐑🐐🐄View Livestock
-        tab3, 🩺Diagnosis
-        tab4, 💡Daily Health Tips
-        tab5, 👨‍⚕️Vet Doc
-        tab6, 📞Request Service
-        tab7, 📊Dashboard
-        tab8 📝 Feedback
+        tab1, Add Livestock
+        tab2, View Livestock
+        tab3, Diagnosis
+        tab4, Daily Health Tips
+        tab5, Vet Doc
+        tab6, Request Service
+        tab7, Dashboard
+        tab8 Feedback
     ]
 }
 
