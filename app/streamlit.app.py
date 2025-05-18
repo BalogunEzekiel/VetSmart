@@ -61,23 +61,21 @@ if not st.session_state['logged_in']:
     st.write("**Partners:** (Logos or names of partner organizations)")
 
     col_login, col_signup = st.columns(2)
-    with col_login:
-        st.subheader("Login")
-        login_user = st.text_input("Ema]il", key="login_user")
-        login_pwd  = st.text_input("Password", type="password", key="login_pwd")
-        if st.button("Login", key="login_btn"):
-            def get_sqlite_connection():
-                return sqlite3.connect("livestock_data.db")
-    # Get database connection and cursor
-            
-#        if st.button("Login", key="login_btn"):
-            conn = get_sqlite_connection()
-            c = conn.cursor()
-            # Attempt to fetch user and check password
-            c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
-            row = c.fetchone()
+with col_login:
+    st.subheader("Login")
+    login_user = st.text_input("Email", key="login_user")  # Corrected label typo from "Ema]il"
+    login_pwd  = st.text_input("Password", type="password", key="login_pwd")
+    
+    if st.button("Login", key="login_btn"):
+        def get_sqlite_connection():
+            return sqlite3.connect("livestock_data.db")
+        
+        conn = get_sqlite_connection()
+        c = conn.cursor()
+        c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+        row = c.fetchone()
+        
         if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
-            # Successful login: set session state
             st.session_state['logged_in'] = True
             st.session_state['user_role'] = row[1]
             st.session_state['user_name'] = f"{row[2]} {row[3]}"
