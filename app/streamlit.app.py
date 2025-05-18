@@ -232,17 +232,17 @@ def set_background(cow_background):
 set_background("cow_background")
 
 # Session State Init
-# if "logged_in" not in st.session_state:
-#    st.session_state.logged_in = False
-# if "user_role" not in st.session_state:
-#    st.session_state.user_role = None
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "user_role" not in st.session_state:
+    st.session_state.user_role = None
 
 # -- Session State Defaults ---------------------------------------------------
 # Initialize session state variables for login status and whether to show signup.
-if 'logged_in' not in st.session_state:
-    st.session_state['logged_in'] = False
-if 'show_signup' not in st.session_state:
-    st.session_state['show_signup'] = False
+# if 'logged_in' not in st.session_state:
+#    st.session_state['logged_in'] = False
+# if 'show_signup' not in st.session_state:
+#    st.session_state['show_signup'] = False
 
 # -- Database connection helper --
 def get_sqlite_connection():
@@ -279,13 +279,13 @@ def password_strength_message(score):
         return "Password is strong.", "green"
 
 with st.container():
-    col_login, col_signup = st.columns(2)  # Equal moderate width
+    col_login, col_signup = st.columns(2)
 
     # --- Login Container ---
-   with col_login:
-       st.subheader("🔐 Login")
-       login_user = st.text_input("Email", key="login_user")
-       login_pwd  = st.text_input("Password", type="password", key="login_pwd")
+with col_login:
+    st.subheader("🔐 Login")
+    login_user = st.text_input("Email", key="login_user")
+    login_pwd = st.text_input("Password", type="password", key="login_pwd")
 
     if st.button("Login", key="login_btn"):
         if not login_user or not login_pwd:
