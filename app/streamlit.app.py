@@ -20,9 +20,191 @@ from PIL import Image
 import plotly.express as px
 import bcrypt
 
-# 🔧 Move this here (GLOBAL SCOPE)
-def get_sqlite_connection():
-    return sqlite3.connect("livestock_data.db")
+# ========== Database Connection ==========
+def get_sqlite_connection(db_name='livestock.db'):
+    return sqlite3.connect(db_name)
+
+# ========== Initialize Database and Tables ==========
+def initialize_database():
+    with get_sqlite_connection() as conn: 
+        cursor = conn.cursor()
+
+        # Create users table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                role TEXT,
+                firstname TEXT,
+                lastname TEXT, 
+                username TEXT UNIQUE,
+                password TEXT NOT NULL, 
+                telephone TEXT,
+                farmname TEXT,
+                farmaddress TEXT,
+                farmrole TEXT,
+                registered_on DATETIME
+            );
+        """)
+
+        # Create livestock table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS livestock (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                animal_type TEXT NOT NULL,
+                age REAL NOT NULL,
+                weight REAL NOT NULL,
+                vaccination TEXT,
+                added_on DATETIME
+            )
+        """)
+
+        # Create feedback table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                feedback TEXT NOT NULL,
+                submitted_on DATETIME
+            )
+        """)
+
+        # Create veterinarians table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS veterinarians (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                specialization TEXT NOT NULL,
+                phone TEXT,
+                email TEXT,
+                registered_on DATETIME
+            )
+        """)
+
+        # Create vet_requests table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS vet_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                farmer_name TEXT NOT NULL,
+                animal_tag TEXT NOT NULL,
+                vet_id INTEGER,
+                request_reason TEXT,
+                requested_on DATETIME,
+                FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
+            )
+        """)
+
+        conn.commit()
+
+# Call the function to initialize the database
+initialize_database()
+
+# ========== Load & Save Data Functions ==========
+
+# Users
+def load_users():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM users", conn)
+    conn.close()
+    return df
+
+def save_users(role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO users (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, registered_on)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving users: {e}")
+    finally:
+        conn.close()
+
+# Livestock
+def load_data():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM livestock", conn)
+    conn.close()
+    return df
+
+def save_livestock_data(name, animal_type, age, weight, vaccination):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO livestock (name, animal_type, age, weight, vaccination, added_on)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (name, animal_type, age, weight, vaccination, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving livestock data: {e}")
+    finally:
+        conn.close()
+
+# Feedback
+def load_feedback():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM feedback", conn)
+    conn.close()
+    return df
+
+def save_feedback(name, feedback_text):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO feedback (name, feedback, submitted_on)
+            VALUES (?, ?, ?)
+        """, (name, feedback_text, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving feedback: {e}")
+    finally:
+        conn.close()
+
+# Veterinarians
+def load_veterinarians():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM veterinarians", conn)
+    conn.close()
+    return df
+
+def save_veterinarian(name, specialization, phone, email):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
+            VALUES (?, ?, ?, ?, ?)
+        """, (name, specialization, phone, email, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving veterinarian: {e}")
+    finally:
+        conn.close()
+
+# Vet Requests
+def load_vet_requests():
+    conn = get_sqlite_connection()
+    df = pd.read_sql("SELECT * FROM vet_requests", conn)
+    conn.close()
+    return df
+
+def save_vet_request(farmer_name, animal_tag, vet_id, request_reason):
+    try:
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
+            VALUES (?, ?, ?, ?, ?)
+        """, (farmer_name, animal_tag, vet_id, request_reason, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving vet request: {e}")
+    finally:
+        conn.close()
 
 # ================================== Landing / Login Page ======================================================
 # Background image
@@ -271,182 +453,183 @@ st.markdown(
 )
 
 # ========== Database Configuration ==========
-SQLITE_DB = 'livestock_data.db'
+# SQLITE_DB = 'livestock_data.db'
 
 # ========== Database Connection Function ==========
-def get_sqlite_connection():
-    return sqlite3.connect(SQLITE_DB, check_same_thread=False)
+# def get_sqlite_connection():
+#     return sqlite3.connect(SQLITE_DB, check_same_thread=False)
 
 # ========== Initialize Database and Tables ==========
-def initialize_database():
-    with get_sqlite_connection() as conn: 
-        cursor = conn.cursor()
+# def initialize_database():
+#     with get_sqlite_connection() as conn: 
+#         cursor = conn.cursor()
 
-    # Create users table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            role TEXT,
-            firstname TEXT,
-            lastname TEXT, 
-            username TEXT UNIQUE,
-            password TEXT NOT NULL, 
-            telephone TEXT,
-            farmname TEXT,
-            farmaddress TEXT,
-            farmrole TEXT
-        );
-    """)
+#     # Create users table
+#     cursor.execute("""
+#         CREATE TABLE IF NOT EXISTS users (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             role TEXT,
+#             firstname TEXT,
+#             lastname TEXT, 
+#             username TEXT UNIQUE,
+#             password TEXT NOT NULL, 
+#             telephone TEXT,
+#             farmname TEXT,
+#             farmaddress TEXT,
+#             farmrole TEXT
+#         );
+#     """)
  
-    # Create livestock table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS livestock (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            animal_type TEXT NOT NULL,
-            age REAL NOT NULL,
-            weight REAL NOT NULL,
-            vaccination TEXT,
-            added_on DATETIME
-        )
-    """)
+#     # Create livestock table
+#     cursor.execute("""
+#         CREATE TABLE IF NOT EXISTS livestock (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             name TEXT NOT NULL,
+#             animal_type TEXT NOT NULL,
+#             age REAL NOT NULL,
+#             weight REAL NOT NULL,
+#             vaccination TEXT,
+#             added_on DATETIME
+#         )
+#     """)
 
-    # Create feedback table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS feedback (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            feedback TEXT NOT NULL,
-            submitted_on DATETIME
-        )
-    """)
+#     # Create feedback table
+#     cursor.execute("""
+#         CREATE TABLE IF NOT EXISTS feedback (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             name TEXT,
+#             feedback TEXT NOT NULL,
+#             submitted_on DATETIME
+#         )
+#     """)
 
-    # Create veterinarians table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS veterinarians (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            specialization TEXT NOT NULL,
-            phone TEXT,
-            email TEXT,
-            registered_on DATETIME
-        )
-    """)
+#     # Create veterinarians table
+#     cursor.execute("""
+#         CREATE TABLE IF NOT EXISTS veterinarians (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             name TEXT NOT NULL,
+#             specialization TEXT NOT NULL,
+#             phone TEXT,
+#             email TEXT,
+#             registered_on DATETIME
+#         )
+#     """)
 
-    # Create vet_requests table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS vet_requests (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            farmer_name TEXT NOT NULL,
-            animal_tag TEXT NOT NULL,
-            vet_id INTEGER,
-            request_reason TEXT,
-            requested_on DATETIME,
-            FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
-        )
-    """)
+#     # Create vet_requests table
+#     cursor.execute("""
+#         CREATE TABLE IF NOT EXISTS vet_requests (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             farmer_name TEXT NOT NULL,
+#             animal_tag TEXT NOT NULL,
+#             vet_id INTEGER,
+#             request_reason TEXT,
+#             requested_on DATETIME,
+#             FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
+#         )
+#     """)
 
-    conn.commit()
-    conn.close()
+#     conn.commit()
+#     conn.close()
 
-# Call the function to initialize the database
-initialize_database()
+# # Call the function to initialize the database
+# initialize_database()
 
 # ========== Load & Save Data Functions ==========
-def load_users():
-    conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM users", conn)
-    conn.close()
-    return df
+# def load_users():
+#     conn = get_sqlite_connection()
+#     df = pd.read_sql("SELECT * FROM users", conn)
+#     conn.close()
+#     return df
 
-def save_users(role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole):
-    try:
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO users (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, registered_on)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        conn.commit()
-    except Exception as e:
-        print(f"Error saving users: {e}")
-    finally:
-        conn.close()
+# def save_users(role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole):
+#     try:
+#         conn = get_sqlite_connection()
+#         cursor = conn.cursor()
+#         cursor.execute("""
+#             INSERT INTO users (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, registered_on)
+#             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+#         """, (role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+#         conn.commit()
+#     except Exception as e:
+#         print(f"Error saving users: {e}")
+#     finally:
+#         conn.close()
 
-def load_data():
-    conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM livestock", conn)
-    conn.close()
-    return df
+# def load_data():
+#     conn = get_sqlite_connection()
+#     df = pd.read_sql("SELECT * FROM livestock", conn)
+#     conn.close()
+#     return df
 
-def save_livestock_data(name, animal_type, age, weight, vaccination):
-    conn = get_sqlite_connection()
-    query = """
-    INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """
-    conn.execute(query, (name, animal_type, age, weight, vaccination, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-    conn.commit()
-    conn.close()
+# def save_livestock_data(name, animal_type, age, weight, vaccination):
+#     conn = get_sqlite_connection()
+#     query = """
+#     INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
+#     VALUES (?, ?, ?, ?, ?, ?)
+#     """
+#     conn.execute(query, (name, animal_type, age, weight, vaccination, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+#     conn.commit()
+#     conn.close()
 
-def load_feedback():
-    conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM feedback", conn)
-    conn.close()
-    return df
-def save_feedback(name, feedback_text):
-    try:
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO feedback (name, feedback, submitted_on)
-            VALUES (?, ?, ?)
-        """, (name, feedback_text, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        conn.commit()
-    except Exception as e:
-        print(f"Error saving feedback: {e}")
-    finally:
-        conn.close()
+# def load_feedback():
+#     conn = get_sqlite_connection()
+#     df = pd.read_sql("SELECT * FROM feedback", conn)
+#     conn.close()
+#     return df
 
-def load_veterinarians():
-    conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM veterinarians", conn)
-    conn.close()
-    return df
+# def save_feedback(name, feedback_text):
+#     try:
+#         conn = get_sqlite_connection()
+#         cursor = conn.cursor()
+#         cursor.execute("""
+#             INSERT INTO feedback (name, feedback, submitted_on)
+#             VALUES (?, ?, ?)
+#         """, (name, feedback_text, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+#         conn.commit()
+#     except Exception as e:
+#         print(f"Error saving feedback: {e}")
+#     finally:
+#         conn.close()
 
-def save_veterinarian(name, specialization, phone, email):
-    try:
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
-            VALUES (?, ?, ?, ?, ?)
-        """, (name, specialization, phone, email, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        conn.commit()
-    except Exception as e:
-        print(f"Error saving veterinarian: {e}")
-    finally:
-        conn.close()
+# def load_veterinarians():
+#     conn = get_sqlite_connection()
+#     df = pd.read_sql("SELECT * FROM veterinarians", conn)
+#     conn.close()
+#     return df
 
-def load_vet_requests():
-    conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM vet_requests", conn)
-    conn.close()
-    return df
+# def save_veterinarian(name, specialization, phone, email):
+#     try:
+#         conn = get_sqlite_connection()
+#         cursor = conn.cursor()
+#         cursor.execute("""
+#             INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
+#             VALUES (?, ?, ?, ?, ?)
+#         """, (name, specialization, phone, email, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+#         conn.commit()
+#     except Exception as e:
+#         print(f"Error saving veterinarian: {e}")
+#     finally:
+#         conn.close()
 
-def save_vet_request(farmer_name, animal_tag, vet_id, request_reason):
-    try:
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
-            VALUES (?, ?, ?, ?, ?)
-        """, (farmer_name, animal_tag, vet_id, request_reason, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        conn.commit()
-    except Exception as e:
-        print(f"Error saving vet request: {e}")
-    finally:
-        conn.close()
+# def load_vet_requests():
+#     conn = get_sqlite_connection()
+#     df = pd.read_sql("SELECT * FROM vet_requests", conn)
+#     conn.close()
+#     return df
+
+# def save_vet_request(farmer_name, animal_tag, vet_id, request_reason):
+#     try:
+#         conn = get_sqlite_connection()
+#         cursor = conn.cursor()
+#         cursor.execute("""
+#             INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
+#             VALUES (?, ?, ?, ?, ?)
+#         """, (farmer_name, animal_tag, vet_id, request_reason, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+#         conn.commit()
+#     except Exception as e:
+#         print(f"Error saving vet request: {e}")
+#     finally:
+#         conn.close()
 
 # ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
