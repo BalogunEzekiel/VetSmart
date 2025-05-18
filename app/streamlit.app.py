@@ -20,6 +20,10 @@ from PIL import Image
 import plotly.express as px
 import bcrypt
 
+# 🔧 Move this here (GLOBAL SCOPE)
+def get_sqlite_connection():
+    return sqlite3.connect("livestock_data.db")
+
 # ================================== Landing / Login Page ======================================================
 # Background image
 def set_background(cow_background):
