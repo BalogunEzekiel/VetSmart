@@ -70,7 +70,7 @@ if not st.session_state['logged_in']:
                 return sqlite3.connect("livestock_data.db")
     # Get database connection and cursor
             
-        if st.button("Login", key="login_btn"):
+#        if st.button("Login", key="login_btn"):
             conn = get_sqlite_connection()
             C = conn.cursor()
             # Attempt to fetch user and check password
