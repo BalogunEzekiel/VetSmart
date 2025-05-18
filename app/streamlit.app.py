@@ -35,72 +35,73 @@ def initialize_database():
     conn = get_sqlite_connection()
     cursor = conn.cursor()
 
-        # Create users table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                role TEXT,
-                firstname TEXT,
-                lastname TEXT, 
-                email TEXT UNIQUE,
-                password TEXT NOT NULL, 
-                telephone TEXT,
-                farmname TEXT,
-                farmaddress TEXT,
-                farmrole TEXT,
-                registered_on DATETIME
-            );
-        """)
+    # Create users table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            role TEXT,
+            firstname TEXT,
+            lastname TEXT, 
+            email TEXT UNIQUE,
+            password TEXT NOT NULL, 
+            telephone TEXT,
+            farmname TEXT,
+            farmaddress TEXT,
+            farmrole TEXT,
+            registered_on DATETIME
+        );
+    """)
 
-        # Create livestock table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS livestock (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                animal_type TEXT NOT NULL,
-                age REAL NOT NULL,
-                weight REAL NOT NULL,
-                vaccination TEXT,
-                added_on DATETIME
-            )
-        """)
+    # Create livestock table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS livestock (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            animal_type TEXT NOT NULL,
+            age REAL NOT NULL,
+            weight REAL NOT NULL,
+            vaccination TEXT,
+            added_on DATETIME
+        )
+    """)
 
-        # Create feedback table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS feedback (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                feedback TEXT NOT NULL,
-                submitted_on DATETIME
-            )
-        """)
+    # Create feedback table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            feedback TEXT NOT NULL,
+            submitted_on DATETIME
+        )
+    """)
 
-        # Create veterinarians table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS veterinarians (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                specialization TEXT NOT NULL,
-                phone TEXT,
-                email TEXT,
-                registered_on DATETIME
-            )
-        """)
+    # Create veterinarians table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS veterinarians (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            specialization TEXT NOT NULL,
+            phone TEXT,
+            email TEXT,
+            registered_on DATETIME
+        )
+    """)
 
-        # Create vet_requests table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS vet_requests (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                farmer_name TEXT NOT NULL,
-                animal_tag TEXT NOT NULL,
-                vet_id INTEGER,
-                request_reason TEXT,
-                requested_on DATETIME,
-                FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
-            )
-        """)
+    # Create vet_requests table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS vet_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            farmer_name TEXT NOT NULL,
+            animal_tag TEXT NOT NULL,
+            vet_id INTEGER,
+            request_reason TEXT,
+            requested_on DATETIME,
+            FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
+        )
+    """)
 
-        conn.commit()
+    conn.commit()
+    conn.close()
 
 # Call the function to initialize the database
 initialize_database()
