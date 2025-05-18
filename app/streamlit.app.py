@@ -72,7 +72,7 @@ if not st.session_state['logged_in']:
             
 #        if st.button("Login", key="login_btn"):
             conn = get_sqlite_connection()
-            C = conn.cursor()
+            c = conn.cursor()
             # Attempt to fetch user and check password
             c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
             row = c.fetchone()
