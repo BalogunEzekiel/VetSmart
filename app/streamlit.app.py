@@ -245,14 +245,6 @@ if 'logged_in' not in st.session_state:
 if 'show_signup' not in st.session_state:
     st.session_state['show_signup'] = False
 
-# -- Home Page Content --------------------------------------------------------
-# if not st.session_state['logged_in']:
-#    st.title("Welcome to the Livestock Management App")
-#    st.write("This app allows farmers, veterinarians, and admins to manage livestock data securely.")
-#    st.write("**About:** A brief overview of the system and its features.")
-#    st.write("**Contributors:** Alice, Bob, Carol.")
-#    st.write("**Partners:** (Logos or names of partner organizations)")
-
 # -- Database connection helper --
 def get_sqlite_connection():
     return sqlite3.connect("livestock_data.db")
@@ -286,11 +278,6 @@ def password_strength_message(score):
         return "Password is moderate.", "yellow"
     else:
         return "Password is strong.", "green"
-
-# -- Landing Page Header Container (Login + Signup) --
-st.markdown("## 👋 Welcome to the Livestock Management App")
-st.markdown("Securely manage livestock records for Farmers, Vets, and Admins.")
-st.markdown("---")
 
 with st.container():
     col_login, col_signup = st.columns([1, 1])  # Equal moderate width
@@ -467,18 +454,17 @@ if not st.session_state.logged_in:
 #     available_tabs = tabs_by_role.get(role, [])
 
 # -- Main App (after login) ---------------------------------------------------
-if st.session_state['logged_in']:
-    st.sidebar.title("Navigation")
-    role = st.session_state['user_role']
-    st.sidebar.write(f"Logged in as **{st.session_state['user_name']}** ({role})")
-    # Define pages per role
-    tabs_by_role = {
-        "Farmer": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "request_vet_service", "display_dashboard", "handle_feedback_submission"],
-        "Veterinarian": ["display_diagnosis", "display_daily_health_tips", "display_register_vet", "handle_feedback_submission"],
-        "Admin": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display_register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"]
-    }
-    options = tabs_by_role.get(role, [])
-    page = st.sidebar.selectbox("Go to", options)
+# if st.session_state['logged_in']:
+#    role = st.session_state['user_role']
+#    st.sidebar.write(f"Logged in as **{st.session_state['user_name']}** ({role})")
+#    # Define pages per role
+#    tabs_by_role = {
+#        "Farmer": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "request_vet_service", "display_dashboard", "handle_feedback_submission"],
+#        "Veterinarian": ["display_diagnosis", "display_daily_health_tips", "display_register_vet", "handle_feedback_submission"],
+#        "Admin": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display_register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"]
+#    }
+#    options = tabs_by_role.get(role, [])
+#    page = st.sidebar.selectbox("Go to", options)
 
     # Optional logout button
     if st.sidebar.button("Logout"):
