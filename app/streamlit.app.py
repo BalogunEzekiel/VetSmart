@@ -283,9 +283,9 @@ with st.container():
 
     # --- Login Container ---
    with col_login:
-    st.subheader("🔐 Login")
-    login_user = st.text_input("Email", key="login_user")
-    login_pwd  = st.text_input("Password", type="password", key="login_pwd")
+        st.subheader("🔐 Login")
+        login_user = st.text_input("Email", key="login_user")
+        login_pwd  = st.text_input("Password", type="password", key="login_pwd")
 
     if st.button("Login", key="login_btn"):
         if not login_user or not login_pwd:
