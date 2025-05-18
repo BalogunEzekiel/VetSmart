@@ -923,34 +923,6 @@ def handle_feedback_submission():
                 st.success("Thank you for your feedback!")
 
 # =================================================== Main =======================================================
-tabs_by_role = {
-    "Farmer": [
-        tab1,  # Add Livestock
-        tab2,  # View Livestock
-        tab3,  # Diagnosis
-        tab4,  # Daily Health Tips
-        tab6,  # Request Service
-        tab7,  # Dashboard
-        tab8   # Feedback
-    ],
-    "Veterinarian": [
-        tab3,  # Diagnosis
-        tab4,  # Daily Health Tips
-        tab5,  # Vet Doc
-        tab8   # Feedback
-    ],
-    "Admin": [
-        tab1,  # Add Livestock
-        tab2,  # View Livestock
-        tab3,  # Diagnosis
-        tab4,  # Daily Health Tips
-        tab5,  # Vet Doc
-        tab6,  # Request Service
-        tab7,  # Dashboard
-        tab8   # Feedback
-    ]
-}
-
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Dashboard", "📝 Feedback"])
 
 with tab1:
@@ -972,6 +944,36 @@ with tab8:
 # Run the chatbot widget
 def chatbot_widget():
     chatbot_widget()
+
+tabs_by_role = {
+    "Farmer": [
+        tab1,  # 🐐Add Livestock
+        tab2,  # 🐑🐐🐄View Livestock
+        tab3,  # 🩺Diagnosis
+        tab4,  # 💡Daily Health Tips
+        tab5,  # 👨‍⚕️Vet Doc
+        tab6,  # 📞Request Service
+        tab7,  # 📊Dashboard
+        tab8   # 📝 Feedback
+    ],
+    "Veterinarian": [
+        tab3,  # 🩺Diagnosis
+        tab4,  # 💡Daily Health Tips
+        tab5,  # 👨‍⚕️Vet Doc
+        tab8   # 📝 Feedback
+    ],
+    "Admin": [
+        tab1,  # 🐐Add Livestock
+        tab2,  # 🐑🐐🐄View Livestock
+        tab3,  # 🩺Diagnosis
+        tab4,  # 💡Daily Health Tips
+        tab5,  # 👨‍⚕️Vet Doc
+        tab6,  # 📞Request Service
+        tab7,  # 📊Dashboard
+        tab8   # 📝 Feedback
+    ]
+}
+
 
 # ========== Sidebar ==========
 with st.sidebar:
