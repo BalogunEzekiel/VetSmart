@@ -20,6 +20,8 @@ import nltk
 from PIL import Image
 import plotly.express as px
 import bcrypt
+import re
+
 
 # ========== Database Connection ==========
 def get_sqlite_connection(db_name='livestock.db'):
@@ -37,7 +39,7 @@ def initialize_database():
                 role TEXT,
                 firstname TEXT,
                 lastname TEXT, 
-                username TEXT UNIQUE,
+                email TEXT UNIQUE,
                 password TEXT NOT NULL, 
                 telephone TEXT,
                 farmname TEXT,
@@ -109,14 +111,14 @@ def load_users():
     conn.close()
     return df
 
-def save_users(role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole):
+def save_users(role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole):
     try:
         conn = get_sqlite_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO users (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, registered_on)
+            INSERT INTO users (role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole, registered_on)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        """, (role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         conn.commit()
     except Exception as e:
         print(f"Error saving users: {e}")
@@ -268,55 +270,99 @@ with col_login:
             st.session_state['user_name'] = f"{row[2]} {row[3]}"
             st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
         else:
-            st.error("Login failed: invalid username or password.")
+            st.error("Login failed: invalid email or password.")
 
-    with col_signup:
-        st.subheader("New User? Register Here")
-        # Show the sign-up form when button is clicked
-        if st.button("Sign Up"):
-            st.session_state['show_signup'] = True
+import re
+import streamlit as st
+from datetime import datetime
+import bcrypt
 
-        if st.session_state['show_signup']:
-            with st.form("signup_form"):
-                st.write("Please fill in all fields:")
-                role      = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
-                firstname = st.text_input("First Name")
-                lastname  = st.text_input("Last Name")
-                username  = st.text_input("Email")
-                password  = st.text_input("Password", type="password")
-                confirm   = st.text_input("Confirm Password", type="password")
-                telephone = st.text_input("Telephone")
-                farm_name    = st.text_input("Farm Name")
-                farm_address = st.text_input("Farm Address")
-                farm_role    = st.text_input("Farm Role (e.g., owner, worker)")
-                submitted = st.form_submit_button("Register")
+def password_strength(pw):
+    length = len(pw)
+    has_upper = bool(re.search(r'[A-Z]', pw))
+    has_special = bool(re.search(r'[\W_]', pw))
+    score = 0
+    if length >= 6:
+        score += 1
+    if has_upper:
+        score += 1
+    if has_special:
+        score += 1
+    return score
 
-                if submitted:
-                    # -- Validation: all fields required, password match --
-                    if not (firstname and lastname and username and password and confirm and telephone and farm_name and farm_address and farm_role):
+def password_strength_message(score):
+    if score == 0:
+        return "Password is too weak.", "red"
+    elif score == 1:
+        return "Password is weak.", "orange"
+    elif score == 2:
+        return "Password is moderate.", "yellow"
+    else:
+        return "Password is strong.", "green"
+
+if 'show_signup' not in st.session_state: 
+    st.session_state['show_signup'] = False
+
+with st.container():
+    st.subheader("New User? Register Here")
+
+    if st.button("Sign Up"):
+        st.session_state['show_signup'] = True
+
+    if st.session_state['show_signup']:
+        with st.form("signup_form"):
+            st.write("Please fill in all fields:")
+            role      = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
+            firstname = st.text_input("First Name")
+            lastname  = st.text_input("Last Name")
+            email     = st.text_input("Email")
+            password  = st.text_input("Password", type="password", key="password_input")
+
+            if password:
+                try:
+                    score = password_strength(password)
+                    msg, color = password_strength_message(score)
+                    st.markdown(f"<span style='color:{color}; font-weight:bold'>{msg}</span>", unsafe_allow_html=True)
+                    # Show progress bar (score max 3, so normalize to 0-1)
+                    st.progress(score / 3)
+                except Exception as e:
+                    st.error(f"Error checking password strength: {e}")
+
+            confirm   = st.text_input("Confirm Password", type="password")
+            telephone = st.text_input("Telephone")
+            farm_name    = st.text_input("Farm Name")
+            farm_address = st.text_input("Farm Address")
+            farm_role    = st.text_input("Farm Role (e.g., owner, worker)")
+            submitted = st.form_submit_button("Register")
+
+            if submitted:
+                try:
+                    if not (firstname and lastname and email and password and confirm and telephone and farm_name and farm_address and farm_role):
                         st.error("Error: All fields are required.")
                     elif password != confirm:
                         st.error("Error: Passwords do not match.")
+                    elif password_strength(password) < 3:
+                        st.error("Password must be at least 6 characters long, include at least one uppercase letter, and one special character.")
                     else:
-                        # Check if username already exists
                         conn = get_sqlite_connection()
                         c = conn.cursor()
-                        c.execute("SELECT * FROM users WHERE username = ?", (username,))
+                        c.execute("SELECT * FROM users WHERE email = ?", (email,))
                         if c.fetchone():
                             st.error("Error: Email already used.")
                         else:
-                            # Hash the password and insert the new user
                             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                             c.execute('''
                                 INSERT INTO users 
                                 (role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole, registered_on)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            ''', (role, firstname, lastname, username, hashed.decode('utf-8'),
-                                  telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                            ''', (role, firstname, lastname, email, hashed.decode('utf-8'),
+                                  telephone, farm_name, farm_address, farm_role, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                             conn.commit()
-                            st.success(f"User '{username}' registered successfully!")
-                            # Hide the form after successful registration
+                            conn.close()
+                            st.success(f"User '{email}' registered successfully! You can now log in from the login section.")
                             st.session_state['show_signup'] = False
+                except Exception as e:
+                    st.error(f"Registration failed: {e}")
 
 # Header
 col1, col2 = st.columns([1, 6])
@@ -379,7 +425,7 @@ if not st.session_state.logged_in:
 
 # with col2:
 #     st.subheader("Login")
-#     login_user = st.text_input("Username", key="login_user")
+#     login_user = st.text_input("Email", key="login_user")
 #     login_pass = st.text_input("Password", type="password", key="login_pass")
 #     login_role = st.selectbox("Login As", ["Farmer", "Veterinarian", "Admin"])
 #     if st.button("Login"):
@@ -472,7 +518,7 @@ st.markdown(
 #             role TEXT,
 #             firstname TEXT,
 #             lastname TEXT, 
-#             username TEXT UNIQUE,
+#             email TEXT UNIQUE,
 #             password TEXT NOT NULL, 
 #             telephone TEXT,
 #             farmname TEXT,
@@ -542,14 +588,14 @@ st.markdown(
 #     conn.close()
 #     return df
 
-# def save_users(role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole):
+# def save_users(role, firstname, lastname, email, password, confirmpassword, telephone, farmname, farmaddress, farmrole):
 #     try:
 #         conn = get_sqlite_connection()
 #         cursor = conn.cursor()
 #         cursor.execute("""
-#             INSERT INTO users (role, firstname, lastname, username, password, telephone, farmname, farmaddress, farmrole, registered_on)
+#             INSERT INTO users (role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole, registered_on)
 #             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-#         """, (role, firstname, lastname, username, password, confirmpassword, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+#         """, (role, firstname, lastname, email, password, confirmpassword, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 #         conn.commit()
 #     except Exception as e:
 #         print(f"Error saving users: {e}")
