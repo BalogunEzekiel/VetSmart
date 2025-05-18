@@ -240,57 +240,30 @@ set_background("cow_background")
 
 # -- Session State Defaults ---------------------------------------------------
 # Initialize session state variables for login status and whether to show signup.
-if 'logged_in' not in st.session_state:
+if 'logged_in' not i]n st.session_state:
     st.session_state['logged_in'] = False
 if 'show_signup' not in st.session_state:
     st.session_state['show_signup'] = False
 
 # -- Home Page Content --------------------------------------------------------
-if not st.session_state['logged_in']:
-    st.title("Welcome to the Livestock Management App")
-    st.write("This app allows farmers, veterinarians, and admins to manage livestock data securely.")
-    st.write("**About:** A brief overview of the system and its features.")
-    st.write("**Contributors:** Alice, Bob, Carol.")
-    st.write("**Partners:** (Logos or names of partner organizations)")
+# if not st.session_state['logged_in']:
+#    st.title("Welcome to the Livestock Management App")
+#    st.write("This app allows farmers, veterinarians, and admins to manage livestock data securely.")
+#    st.write("**About:** A brief overview of the system and its features.")
+#    st.write("**Contributors:** Alice, Bob, Carol.")
+#    st.write("**Partners:** (Logos or names of partner organizations)")
 
-    col_login, col_signup = st.columns(2)
+# -- Database connection helper --
+def get_sqlite_connection():
+    return sqlite3.connect("livestock_data.db")
 
-with col_login:
-    st.subheader("Login")
-    login_user = st.text_input("Email", key="login_user")
-    login_pwd  = st.text_input("Password", type="password", key="login_pwd")
-    
-    if st.button("Login", key="login_btn"):
-        if not login_user or not login_pwd:
-            st.warning("Please enter both email and password.")
-        else:
-            try:
-                # Connect to the SQLite database
-                conn = sqlite3.connect("livestock_data.db")
-                c = conn.cursor()
+# -- Initialize session state --
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+if 'show_signup' not in st.session_state:
+    st.session_state['show_signup'] = False
 
-                # Fetch user record
-                c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
-                row = c.fetchone()
-
-                # Check if user exists and password matches
-                if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
-                    st.session_state['logged_in'] = True
-                    st.session_state['user_role'] = row[1]
-                    st.session_state['user_name'] = f"{row[2]} {row[3]}"
-                    st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
-                else:
-                    st.error("Login failed: Invalid email or password.")
-
-            except Exception as e:
-                st.error(f"Database error: {e}")
-
-            finally:
-                try:
-                    conn.close()
-                except:
-                    pass
-                    
+# -- Password strength checker --
 def password_strength(pw):
     length = len(pw)
     has_upper = bool(re.search(r'[A-Z]', pw))
@@ -314,33 +287,58 @@ def password_strength_message(score):
     else:
         return "Password is strong.", "green"
 
-if 'show_signup' not in st.session_state: 
-    st.session_state['show_signup'] = False
+# -- Landing Page Header Container (Login + Signup) --
+st.markdown("## 👋 Welcome to the Livestock Management App")
+st.markdown("Securely manage livestock records for Farmers, Vets, and Admins.")
+st.markdown("---")
 
 with st.container():
-    st.subheader("New User? Register Here")
+    col_login, col_signup = st.columns([1, 1])  # Equal moderate width
 
-    if st.button("Sign Up"):
-        st.session_state['show_signup'] = True
+    # --- Login Container ---
+    with col_login:
+        st.subheader("🔐 Login")
+        login_user = st.text_input("Email", key="login_user")
+        login_pwd  = st.text_input("Password", type="password", key="login_pwd")
 
-    if st.session_state['show_signup']:
+        if st.button("Login", key="login_btn"):
+            if not login_user or not login_pwd:
+                st.warning("Please enter both email and password.")
+            else:
+                try:
+                    conn = get_sqlite_connection()
+                    c = conn.cursor()
+                    c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+                    row = c.fetchone()
+
+                    if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
+                        st.session_state['logged_in'] = True
+                        st.session_state['user_role'] = row[1]
+                        st.session_state['user_name'] = f"{row[2]} {row[3]}"
+                        st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
+                    else:
+                        st.error("Login failed: Invalid email or password.")
+                except Exception as e:
+                    st.error(f"Database error: {e}")
+                finally:
+                    conn.close()
+
+    # --- Signup Container ---
+    with col_signup:
+        st.subheader("🆕 New User? Register")
+
         with st.form("signup_form", clear_on_submit=True):
-            st.write("Please fill in all fields:")
-            role      = st.selectbox("Choose Role", ["Farmer", "Veterinarian", "Admin"])
+            role      = st.selectbox("Role", ["Farmer", "Veterinarian", "Admin"])
             firstname = st.text_input("First Name")
             lastname  = st.text_input("Last Name")
             email     = st.text_input("Email")
             password  = st.text_input("Password", type="password", key="password_input")
 
             if password:
-                try:
-                    score = password_strength(password)
-                    msg, color = password_strength_message(score)
-                    st.markdown(f"<span style='color:{color}; font-weight:bold'>{msg}</span>", unsafe_allow_html=True)
-                    # Show progress bar (score max 3, so normalize to 0-1)
-                    st.progress(score / 3)
-                except Exception as e:
-                    st.error(f"Error checking password strength: {e}")
+                score = password_strength(password)
+                msg, color = password_strength_message(score)
+                st.markdown(f"<span style='color:{color}; font-weight:bold'>{msg}</span>", unsafe_allow_html=True)
+                st.progress(score / 3)
 
             confirm   = st.text_input("Confirm Password", type="password")
             telephone = st.text_input("Telephone")
@@ -351,18 +349,18 @@ with st.container():
 
             if submitted:
                 try:
-                    if not (firstname and lastname and email and password and confirm and telephone and farm_name and farm_address and farm_role):
-                        st.error("Error: All fields are required.")
+                    if not all([firstname, lastname, email, password, confirm, telephone, farm_name, farm_address, farm_role]):
+                        st.error("All fields are required.")
                     elif password != confirm:
-                        st.error("Error: Passwords do not match.")
+                        st.error("Passwords do not match.")
                     elif password_strength(password) < 3:
-                        st.error("Password must be at least 6 characters long, include at least one uppercase letter, and one special character.")
+                        st.error("Password must be at least 6 characters, with uppercase and special character.")
                     else:
                         conn = get_sqlite_connection()
                         c = conn.cursor()
                         c.execute("SELECT * FROM users WHERE email = ?", (email,))
                         if c.fetchone():
-                            st.error("Error: Email already used.")
+                            st.error("Email already used.")
                         else:
                             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                             c.execute('''
@@ -370,14 +368,15 @@ with st.container():
                                 (role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole, registered_on)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             ''', (role, firstname, lastname, email, hashed.decode('utf-8'),
-                                  telephone, farm_name, farm_address, farm_role, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                                  telephone, farm_name, farm_address, farm_role,
+                                  datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                             conn.commit()
                             conn.close()
-                            st.success(f"User '{email}' registered successfully! You can now log in from the login section.")
+                            st.success(f"User '{email}' registered successfully! You can now log in.")
                             st.session_state['show_signup'] = False
                 except Exception as e:
                     st.error(f"Registration failed: {e}")
-
+                    
 # Header
 col1, col2 = st.columns([1, 6])
 with col1:
@@ -512,185 +511,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-# ========== Database Configuration ==========
-# SQLITE_DB = 'livestock_data.db'
-
-# ========== Database Connection Function ==========
-# def get_sqlite_connection():
-#     return sqlite3.connect(SQLITE_DB, check_same_thread=False)
-
-# ========== Initialize Database and Tables ==========
-# def initialize_database():
-#     with get_sqlite_connection() as conn: 
-#         cursor = conn.cursor()
-
-#     # Create users table
-#     cursor.execute("""
-#         CREATE TABLE IF NOT EXISTS users (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             role TEXT,
-#             firstname TEXT,
-#             lastname TEXT, 
-#             email TEXT UNIQUE,
-#             password TEXT NOT NULL, 
-#             telephone TEXT,
-#             farmname TEXT,
-#             farmaddress TEXT,
-#             farmrole TEXT
-#         );
-#     """)
- 
-#     # Create livestock table
-#     cursor.execute("""
-#         CREATE TABLE IF NOT EXISTS livestock (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             name TEXT NOT NULL,
-#             animal_type TEXT NOT NULL,
-#             age REAL NOT NULL,
-#             weight REAL NOT NULL,
-#             vaccination TEXT,
-#             added_on DATETIME
-#         )
-#     """)
-
-#     # Create feedback table
-#     cursor.execute("""
-#         CREATE TABLE IF NOT EXISTS feedback (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             name TEXT,
-#             feedback TEXT NOT NULL,
-#             submitted_on DATETIME
-#         )
-#     """)
-
-#     # Create veterinarians table
-#     cursor.execute("""
-#         CREATE TABLE IF NOT EXISTS veterinarians (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             name TEXT NOT NULL,
-#             specialization TEXT NOT NULL,
-#             phone TEXT,
-#             email TEXT,
-#             registered_on DATETIME
-#         )
-#     """)
-
-#     # Create vet_requests table
-#     cursor.execute("""
-#         CREATE TABLE IF NOT EXISTS vet_requests (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             farmer_name TEXT NOT NULL,
-#             animal_tag TEXT NOT NULL,
-#             vet_id INTEGER,
-#             request_reason TEXT,
-#             requested_on DATETIME,
-#             FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
-#         )
-#     """)
-
-#     conn.commit()
-#     conn.close()
-
-# # Call the function to initialize the database
-# initialize_database()
-
-# ========== Load & Save Data Functions ==========
-# def load_users():
-#     conn = get_sqlite_connection()
-#     df = pd.read_sql("SELECT * FROM users", conn)
-#     conn.close()
-#     return df
-
-# def save_users(role, firstname, lastname, email, password, confirmpassword, telephone, farmname, farmaddress, farmrole):
-#     try:
-#         conn = get_sqlite_connection()
-#         cursor = conn.cursor()
-#         cursor.execute("""
-#             INSERT INTO users (role, firstname, lastname, email, password, telephone, farmname, farmaddress, farmrole, registered_on)
-#             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-#         """, (role, firstname, lastname, email, password, confirmpassword, telephone, farmname, farmaddress, farmrole, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-#         conn.commit()
-#     except Exception as e:
-#         print(f"Error saving users: {e}")
-#     finally:
-#         conn.close()
-
-# def load_data():
-#     conn = get_sqlite_connection()
-#     df = pd.read_sql("SELECT * FROM livestock", conn)
-#     conn.close()
-#     return df
-
-# def save_livestock_data(name, animal_type, age, weight, vaccination):
-#     conn = get_sqlite_connection()
-#     query = """
-#     INSERT INTO livestock (name, type, age, weight, vaccination, added_on)
-#     VALUES (?, ?, ?, ?, ?, ?)
-#     """
-#     conn.execute(query, (name, animal_type, age, weight, vaccination, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-#     conn.commit()
-#     conn.close()
-
-# def load_feedback():
-#     conn = get_sqlite_connection()
-#     df = pd.read_sql("SELECT * FROM feedback", conn)
-#     conn.close()
-#     return df
-
-# def save_feedback(name, feedback_text):
-#     try:
-#         conn = get_sqlite_connection()
-#         cursor = conn.cursor()
-#         cursor.execute("""
-#             INSERT INTO feedback (name, feedback, submitted_on)
-#             VALUES (?, ?, ?)
-#         """, (name, feedback_text, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-#         conn.commit()
-#     except Exception as e:
-#         print(f"Error saving feedback: {e}")
-#     finally:
-#         conn.close()
-
-# def load_veterinarians():
-#     conn = get_sqlite_connection()
-#     df = pd.read_sql("SELECT * FROM veterinarians", conn)
-#     conn.close()
-#     return df
-
-# def save_veterinarian(name, specialization, phone, email):
-#     try:
-#         conn = get_sqlite_connection()
-#         cursor = conn.cursor()
-#         cursor.execute("""
-#             INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
-#             VALUES (?, ?, ?, ?, ?)
-#         """, (name, specialization, phone, email, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-#         conn.commit()
-#     except Exception as e:
-#         print(f"Error saving veterinarian: {e}")
-#     finally:
-#         conn.close()
-
-# def load_vet_requests():
-#     conn = get_sqlite_connection()
-#     df = pd.read_sql("SELECT * FROM vet_requests", conn)
-#     conn.close()
-#     return df
-
-# def save_vet_request(farmer_name, animal_tag, vet_id, request_reason):
-#     try:
-#         conn = get_sqlite_connection()
-#         cursor = conn.cursor()
-#         cursor.execute("""
-#             INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
-#             VALUES (?, ?, ?, ?, ?)
-#         """, (farmer_name, animal_tag, vet_id, request_reason, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-#         conn.commit()
-#     except Exception as e:
-#         print(f"Error saving vet request: {e}")
-#     finally:
-#         conn.close()
 
 # ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
