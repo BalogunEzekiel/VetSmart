@@ -463,7 +463,7 @@ if not st.session_state.logged_in:
 #        "Veterinarian": ["display_diagnosis", "display_daily_health_tips", "display_register_vet", "handle_feedback_submission"],
 #        "Admin": ["display_add_livestock", "display_view_livestock", "display_diagnosis", "display_daily_health_tips", "display_register_vet", "request_vet_service", "display_dashboard", "handle_feedback_submission"]
 #    }
-#    options = tabs_by_role.get(role, [])
+    options = tabs_by_role.get(role, [])
 #    page = st.sidebar.selectbox("Go to", options)
 
     # Optional logout button
