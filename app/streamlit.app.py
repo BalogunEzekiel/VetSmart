@@ -66,9 +66,9 @@ if not st.session_state['logged_in']:
         login_user = st.text_input("Ema]il", key="login_user")
         login_pwd  = st.text_input("Password", type="password", key="login_pwd")
 #        if st.button("Login", key="login_btn"):
-#            def get_sqlite_connection():
-#                return sqlite3.connect("livestock_data.db")
-#                # Get database connection and cursor
+            def get_sqlite_connection():
+                return sqlite3.connect("livestock_data.db")
+                # Get database connection and cursor
             
         if st.button("Login", key="login_btn"):
             conn = get_sqlite_connection()
