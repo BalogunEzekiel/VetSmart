@@ -495,10 +495,10 @@ options = tabs_by_role.get(role, [])
 
 #    page = st.sidebar.selectbox("Go to", options)
 
-    # Optional logout button
-    if st.sidebar.button("Logout"):
-        st.session_state['logged_in'] = False
-        st.experimental_rerun()
+# Optional logout button
+if st.sidebar.button("Logout"):
+    st.session_state['logged_in'] = False
+    st.experimental_rerun()
         
 # ========== Centered Logo ==========
 
