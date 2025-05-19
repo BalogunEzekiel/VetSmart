@@ -750,7 +750,7 @@ def display_register_vet():
                 conn.execute("""
                     INSERT INTO veterinarians (name, specialization, phone, email, registered_on)
                     VALUES (?, ?, ?, ?, ?)
-                """, (name, specialization, phone, email, datetime.datetime.now()))
+                """, (name, specialization, phone, email, datetime.now()))
                 conn.commit()
                 conn.close()
                 st.success("Veterinarian registered successfully!")
