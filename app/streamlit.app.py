@@ -407,14 +407,23 @@ if not st.session_state.logged_in:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.text_input("**Our Vission** To be the leading force in transforming animal health through innovative, tech-driven veterinary solutions that empower farmers, veterinarians and communities globally.")
-    
+        st.markdown("### Our Vision")
+        st.markdown("""
+        To be the leading force in transforming animal health through innovative, tech-driven veterinary solutions that empower farmers, veterinarians, and communities globally.
+        """)
+
     with col2:
-        st.text_input("**Our Mission** We are revolutionizing livestock care by combining medical expertise, artificial intelligence and sustainable practices - delivering smart, accessible and impactful solutions that improve animal health, productivity and livelihoods.")
-    
+    st.markdown("### Our Mission")
+    st.markdown("""
+    We are revolutionizing livestock care by combining medical expertise, artificial intelligence and sustainable practices - delivering smart, accessible and impactful solutions that improve animal health, productivity and livelihoods.
+    """)
+
     with col3:
-        st.text_input("Join us on this quest as we take the world by storm!")
-    
+    st.markdown("### Call")
+    st.markdown("""
+    Join us on this quest as we take the world by storm!
+    """)
+        
     # Contributors
     st.markdown("## Contributors")
     
