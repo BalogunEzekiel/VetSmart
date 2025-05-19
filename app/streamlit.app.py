@@ -409,13 +409,13 @@ if not st.session_state.logged_in:
     with col1:
         st.markdown("##### Our Vision")
         st.markdown("""
-        To be the leading force in transforming animal health through innovative, tech-driven veterinary solutions that empower farmers, veterinarians, and communities globally.
+        To be the leading force in transforming animal health through innovative, tech-driven veterinary solutions that empower farmers, veterinarians and communities globally.
         """)
     
     with col2:
         st.markdown("##### Our Mission")
         st.markdown("""
-        We are revolutionizing livestock care by combining medical expertise, artificial intelligence, and sustainable practices – delivering smart, accessible, and impactful solutions that improve animal health, productivity, and livelihoods.
+        We are revolutionizing livestock care by combining medical expertise, artificial intelligence and sustainable practices – delivering smart, accessible, and impactful solutions that improve animal health, productivity, and livelihoods.
         """)
     
     with col3:
