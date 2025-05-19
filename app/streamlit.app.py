@@ -637,7 +637,6 @@ def display_view_livestock():
             mime="text/csv"
         )
 
-# ========== Dashboard Function ==========
 def display_dashboard():
     st.subheader("📊 Livestock Dashboard")
 
@@ -826,7 +825,7 @@ def handle_feedback_submission():
                 INSERT INTO feedback (name, feedback, submitted_on)
                 VALUES (?, ?, ?)
                 """
-                now = datetime.datetime.now()
+                now = datetime.now()
                 cursor.execute(query, (name, feedback_text, now))
                 conn.commit()
                 conn.close()
@@ -836,7 +835,7 @@ def handle_feedback_submission():
 import streamlit as st
 
 # Define your role (you can fetch this from login logic or session state)
-user_role = st.session_state.get("user_role", "Farmer")
+user_role = st.session_state.get("user_role", "")
 
 # Function mapping for each tab
 tab_functions = {
