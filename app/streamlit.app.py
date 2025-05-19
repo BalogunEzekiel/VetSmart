@@ -260,7 +260,6 @@ def password_strength(pw):
     if has_special:
         score += 1
     return score
-
 def password_strength_message(score):
     if score == 0:
         return "Password is too weak.", "red"
@@ -271,41 +270,42 @@ def password_strength_message(score):
     else:
         return "Password is strong.", "green"
 
-with st.container():
-    col_login, col_signup = st.columns(2)
+if not st.session_state['logged_in']:
+    with st.container():
+        col_login, col_signup = st.columns(2)
 
-    # --- Login Container ---
-with col_login:
-    st.subheader("🔐 Login")
-    login_user = st.text_input("Email", key="login_user")
-    login_pwd = st.text_input("Password", type="password", key="login_pwd")
+        # --- Login Container ---
+        with col_login:
+            st.subheader("🔐 Login")
+            login_user = st.text_input("Email", key="login_user")
+            login_pwd = st.text_input("Password", type="password", key="login_pwd")
 
-    if st.button("Login", key="login_btn"):
-        if not login_user or not login_pwd:
-            st.warning("Please enter both email and password.")
-        else:
-            try:
-                conn = get_sqlite_connection()
-                c = conn.cursor()
-                c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
-                row = c.fetchone()
-
-                if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
-                    st.session_state['logged_in'] = True
-                    st.session_state['user_role'] = row[1]
-                    st.session_state['user_name'] = f"{row[2]} {row[3]}"
-                    st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
-
-                    # ✅ Clear the input fields after successful login
-                    st.session_state.login_user = ""
-                    st.session_state.login_pwd = ""
-
+            if st.button("Login", key="login_btn"):
+                if not login_user or not login_pwd:
+                    st.warning("Please enter both email and password.")
                 else:
-                    st.error("Login failed: Invalid email or password.")
-            except Exception as e:
-                st.error(f"Database error: {e}")
-            finally:
-                conn.close()
+                    try:
+                        conn = get_sqlite_connection()
+                        c = conn.cursor()
+                        c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+                        row = c.fetchone()
+
+                        if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
+                            st.session_state['logged_in'] = True
+                            st.session_state['user_role'] = row[1]
+                            st.session_state['user_name'] = f"{row[2]} {row[3]}"
+                            st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
+
+                            # ✅ Clear the input fields after successful login
+                            st.session_state.login_user = ""
+                            st.session_state.login_pwd = ""
+
+                        else:
+                            st.error("Login failed: Invalid email or password.")
+                    except Exception as e:
+                        st.error(f"Database error: {e}")
+                    finally:
+                        conn.close()
 
     # --- Signup Container ---
     with col_signup:
@@ -407,9 +407,10 @@ if not st.session_state.logged_in:
     st.markdown("---")
 
 # Optional logout button
-if st.sidebar.button("Logout"):
-    st.session_state['logged_in'] = False
-    st.experimental_rerun()
+if st.session_state['logged_in']:
+    if st.button("Logout"):
+        st.session_state['logged_in'] = False
+        st.experimental_rerun()
         
 # ========== Centered Logo ==========
 
@@ -837,7 +838,7 @@ def handle_feedback_submission():
 import streamlit as st
 
 # Define your role (you can fetch this from login logic or session state)
-user_role = st.selectbox("Select your role:", ["Farmer", "Veterinarian", "Admin"])
+user_role = st.session_state.get("user_role", "Farmer")
 
 # Function mapping for each tab
 tab_functions = {
@@ -881,20 +882,22 @@ tabs_by_role = {
     ]
 }
 
-# Show only allowed tabs for the selected role
-allowed_tabs = tabs_by_role.get(user_role, [])
-tabs = st.tabs(allowed_tabs)
+# Show tabs only if user is logged in
+if st.session_state.get('logged_in'):
+    allowed_tabs = tabs_by_role.get(user_role, [])
+    tabs = st.tabs(allowed_tabs)
 
-for tab_name, tab in zip(allowed_tabs, tabs):
-    with tab:
-        tab_functions[tab_name]()  # Call the corresponding function
+    for tab_name, tab in zip(allowed_tabs, tabs):
+        with tab:
+            tab_functions[tab_name]()  # Call the corresponding function
 
-# Optional: chatbot widget (must avoid recursion)
-def chatbot_widget():
-    # Your chatbot implementation here
-    pass
+    # Optional: chatbot widget (must avoid recursion)
+    def chatbot_widget():
+        # Your chatbot implementation here
+        pass
 
-chatbot_widget()
+    # Show chatbot widget
+    chatbot_widget()
 
 # ========== Sidebar ==========
 with st.sidebar:
