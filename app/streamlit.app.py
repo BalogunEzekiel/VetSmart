@@ -412,41 +412,31 @@ if not st.session_state.logged_in:
    
     st.markdown("---")
 
-# Optional logout button
-# if st.session_state['logged_in']:
-#    st.markdown(f"### 👋 Hi, **{st.session_state.get('user_name', 'User')}**")
-#    if st.button("Logout"):
-#        st.session_state['logged_in'] = False
-#        st.session_state['user_role'] = None
-#        st.session_state['user_name'] = ""
-#        st.rerun()
-        
-# ========== Centered Logo ==========
+if st.session_state.get('logged_in'):
+    # ========== Centered Logo ==========
+    col1, col2, col3 = st.columns([1, 4, 1])  # Adjust ratios as needed
 
-# Logo and title
-# Layout: 3 columns
-col1, col2, col3 = st.columns([1, 4, 1])  # Adjust ratios as needed
+    with col1:
+        try:
+            logo = Image.open("logoo.png")
+            st.image(logo, width=120)
+        except Exception as e:
+            st.warning(f"Logo could not be loaded: {e}")
 
-with col1:
-    try:
-        logo = Image.open("logoo.png")
-        st.image(logo, width=120)
-    except Exception as e:
-        st.warning(f"Logo could not be loaded: {e}")
+    with col2:
+        st.markdown("<h1 style='text-align: center;'>VetSmart</h1>", unsafe_allow_html=True)
 
-with col2:
-    st.markdown("<h1 style='text-align: center;'>VetSmart</h1>", unsafe_allow_html=True)
+    # Optional: leave col3 empty or use it for spacing/content
 
-# Optional: leave col3 empty or use it for spacing/content
-# ========== Title & Subtitle ==========
-st.markdown(
-    """
-    <div style="text-align: center; margin-top: 10px;">
-        <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    # ========== Title & Subtitle ==========
+    st.markdown(
+        """
+        <div style="text-align: center; margin-top: 10px;">
+            <h3 style="font-weight: normal; font-size: 20px; color: #555;">Livestock Monitoring, Disease Prevention and Diagnosis</h3>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # ========== Disease Prediction Function ==========
 def predict_disease(symptoms):
@@ -908,41 +898,39 @@ if st.session_state.get('logged_in'):
     chatbot_widget()
 
 # ========== Sidebar ==========
-# with st.sidebar:
+if st.session_state.get('logged_in'):
+    with st.sidebar:
+        st.markdown(f"### 👋 Welcome, **{st.session_state.get('user_name', 'User')}**")
 
-# Optional logout button
-with st.sidebar:
-    if st.session_state.get('logged_in'):
-        st.markdown(f"### 👋 Hi, **{st.session_state.get('user_name', 'User')}**")
-        if st.button("Logout"):
+        if st.button("Logout", key="logout_button"):
             st.session_state['logged_in'] = False
             st.session_state['user_role'] = None
             st.session_state['user_name'] = ""
             st.rerun()
-        
-    st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
-    st.markdown("## Livestock Focus")
-    st.markdown("""
-    - **Cattle**
-    - **Goat**
-    - **Sheep**
-    """)
 
-    st.markdown("## About VetSmart")
-    st.markdown("""
-    **VetSmart** is an AI-powered livestock health monitoring, disease prevention, and diagnosis app designed to support farmers and veterinary experts.
+        st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
+        st.markdown("## Livestock Focus")
+        st.markdown("""
+        - **Cattle**
+        - **Goat**
+        - **Sheep**
+        """)
 
-    **Key Features:**
-    - Livestock registration  
-    - Disease prediction based on symptoms  
-    - Vaccination records  
-    - Downloadable diagnosis reports  
+        st.markdown("## About VetSmart")
+        st.markdown("""
+        **VetSmart** is an AI-powered livestock health monitoring, disease prevention, and diagnosis app designed to support farmers and veterinary experts.
 
-    These features enhance the efficiency and accuracy of animal healthcare decisions.
+        **Key Features:**
+        - Livestock registration  
+        - Disease prediction based on symptoms  
+        - Vaccination records  
+        - Downloadable diagnosis reports  
 
-    ## 👥Contributors
-    - **Ezekiel BALOGUN** — *Data Scientist / Lead*  
-    - **Oluwakemi Adesanwo** — *Data Analyst*  
-    - **Damilare Abayomi** — *Software Developer*  
-    - **Boluwatife Adeagbo** — *Veterinary Doctor*
-    """)
+        These features enhance the efficiency and accuracy of animal healthcare decisions.
+
+        ## 👥Contributors
+        - **Ezekiel BALOGUN** — *Data Scientist / Lead*  
+        - **Oluwakemi Adesanwo** — *Data Analyst*  
+        - **Damilare Abayomi** — *Software Developer*  
+        - **Boluwatife Adeagbo** — *Veterinary Doctor*
+        """)
