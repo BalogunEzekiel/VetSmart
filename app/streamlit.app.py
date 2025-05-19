@@ -388,11 +388,13 @@ if not st.session_state.logged_in:
 
     # Contributors
     st.markdown("## Contributors")
+    
     contributors = {
         "Balogun Ezekiel": "Data Scientist",
-        "Adesanwo Oluwakemi": "Data Analyst"
-        "Abayomi Damilare": "Softwre Developer"
+        "Adesanwo Oluwakemi": "Data Analyst",
+        "Abayomi Damilare": "Software Developer"
     }
+    
     for name, role in contributors.items():
         st.markdown(f"- **{name}** — *{role}*")
 
