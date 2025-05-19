@@ -326,7 +326,7 @@ if not st.session_state.logged_in:
                     finally:
                         conn.close()
                         
-user_id = st.session_state.get("user_id")
+    user_id = st.session_state.get("user_id")
 
     if st.session_state.show_signup:
         with st.container():
