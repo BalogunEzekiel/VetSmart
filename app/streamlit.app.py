@@ -296,7 +296,7 @@ if not st.session_state.get('logged_in'):
                             st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
 
                             # ✅ Instead of trying to clear input, rerun the app
-                            st.experimental_rerun()
+                            st.rerun()
 
                         else:
                             st.error("Login failed: Invalid email or password.")
@@ -408,7 +408,7 @@ if not st.session_state.logged_in:
 if st.session_state['logged_in']:
     if st.button("Logout"):
         st.session_state['logged_in'] = False
-        st.experimental_rerun()
+        st.rerun()
         
 # ========== Centered Logo ==========
 
