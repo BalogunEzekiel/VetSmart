@@ -404,36 +404,16 @@ if not st.session_state.logged_in:
     """)
 
     # New: Three columns of text boxes
-    st.markdown("""
-        <style>
-            .green-box {
-                background-color: green;
-                color: white;
-                padding: 15px;
-                border-radius: 10px;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        with st.container():
-            st.markdown('<div class="green-box">', unsafe_allow_html=True)
-            st.text_input("**Our Vision**", 
-                value="To be the leading force in transforming animal health through innovative, tech-driven veterinary solutions that empower farmers, veterinarians and communities globally.")
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.text_input("**Our Vission:** To be the leading force in transforming animal health through innovative, tech-driven veterinary solutions that empower farmers, veterinarians and communities globally.")
     
     with col2:
-        st.text_input("**Our Mission**", 
-            value="We are revolutionizing livestock care by combining medical expertise, artificial intelligence and sustainable practices - delivering smart, accessible and impactful solutions that improve animal health, productivity and livelihoods.")
+        st.text_input("**Our Mission:** We are revolutionizing livestock care by combining medical expertise, artificial intelligence and sustainable practices - delivering smart, accessible and impactful solutions that improve animal health, productivity and livelihoods.")
     
     with col3:
-        with st.container():
-            st.markdown('<div class="green-box">', unsafe_allow_html=True)
-            st.text_input(" ", 
-                value="Join us on this quest as we take the world by storm!")
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.text_input("Join us on this quest as we take the world by storm!")
     
     # Contributors
     st.markdown("## Contributors")
@@ -446,7 +426,7 @@ if not st.session_state.logged_in:
     
     for name, role in contributors.items():
         st.markdown(f"- **{name}** — *{role}*")
-
+        
 if not st.session_state.get('logged_in'):
     st.markdown("---")
     st.markdown("### 🤝 Supporters & Partners", unsafe_allow_html=True)
