@@ -134,10 +134,20 @@ def load_data():
         conn = get_sqlite_connection()
         df = pd.read_sql("SELECT * FROM livestock", conn)
         conn.close()
+
+        # Rename columns for consistency with Streamlit code
+        df.rename(columns={
+            "animal_type": "Type",
+            "name": "Name",
+            "age": "Age",
+            "weight": "Weight",
+            "vaccination": "Vaccination",
+            "added_on": "Date Added"
+        }, inplace=True)
+
         return df
     except FileNotFoundError:
         return pd.DataFrame()
-
 
 def save_livestock_data(name, animal_type, age, weight, vaccination):
     try:
