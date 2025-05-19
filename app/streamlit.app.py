@@ -418,7 +418,7 @@ with st.sidebar:
     if st.session_state.get('logged_in'):
         st.markdown(f"### 👋 Welcome, **{st.session_state.get('user_name', 'User')}**")
         if st.button("Logout"):
-            st.session_state['logged_in'] = False
+            st.session_state['logged_in'] = False]
             st.session_state['user_role'] = None
             st.session_state['user_name'] = ""
             st.rerun()
@@ -910,7 +910,18 @@ if st.session_state.get('logged_in'):
     chatbot_widget()
 
 # ========== Sidebar ==========
+# with st.sidebar:
+
+# Optional logout button
 with st.sidebar:
+    if st.session_state.get('logged_in'):
+        st.markdown(f"### 👋 Hi, **{st.session_state.get('firstname', 'User')}**")
+        if st.button("Logout"):
+            st.session_state['logged_in'] = False]
+            st.session_state['user_role'] = None
+            st.session_state['firstname'] = ""
+            st.rerun()
+        
     st.image("https://img.icons8.com/emoji/96/cow-emoji.png", width=80)
     st.markdown("## Livestock Focus")
     st.markdown("""
