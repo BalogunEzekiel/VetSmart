@@ -835,7 +835,7 @@ def handle_feedback_submission():
 import streamlit as st
 
 # Define your role (you can fetch this from login logic or session state)
-user_role = st.session_state.get("user_role", "")
+user_role = st.session_state.get("user_role", "Select")
 
 # Function mapping for each tab
 tab_functions = {
