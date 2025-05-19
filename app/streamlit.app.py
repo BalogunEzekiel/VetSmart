@@ -237,13 +237,6 @@ if "logged_in" not in st.session_state:
 if "user_role" not in st.session_state:
     st.session_state.user_role = None
 
-# -- Session State Defaults ---------------------------------------------------
-# Initialize session state variables for login status and whether to show signup.
-# if 'logged_in' not in st.session_state:
-#    st.session_state['logged_in'] = False
-# if 'show_signup' not in st.session_state:
-#    st.session_state['show_signup'] = False
-
 # -- Database connection helper --
 def get_sqlite_connection():
     return sqlite3.connect("livestock_data.db")
@@ -841,57 +834,67 @@ def handle_feedback_submission():
                 st.success("Thank you for your feedback!")
 
 # =================================================== Main =======================================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["🐐Add Livestock", "🐑🐐🐄View Livestock", "🩺Diagnosis", "💡Daily Health Tips", "👨‍⚕️Vet Doc", "📞Request Service", "📊Dashboard", "📝 Feedback"])
+import streamlit as st
 
-with tab1:
-    display_add_livestock()
-with tab2:
-    display_view_livestock()
-with tab3:
-    display_diagnosis()
-with tab4:
-    display_daily_health_tips()
-with tab5:
-    display_register_vet()
-with tab6:
-    request_vet_service()
-with tab7:
-    display_dashboard()
-with tab8:
-    handle_feedback_submission()
-# Run the chatbot widget
-def chatbot_widget():
-    chatbot_widget()
+# Define your role (you can fetch this from login logic or session state)
+user_role = st.selectbox("Select your role:", ["Farmer", "Veterinarian", "Admin"])
 
+# Function mapping for each tab
+tab_functions = {
+    "🐐Add Livestock": display_add_livestock,
+    "🐑🐐🐄View Livestock": display_view_livestock,
+    "🩺Diagnosis": display_diagnosis,
+    "💡Daily Health Tips": display_daily_health_tips,
+    "👨‍⚕️Vet Doc": display_register_vet,
+    "📞Request Service": request_vet_service,
+    "📊Dashboard": display_dashboard,
+    "📝 Feedback": handle_feedback_submission
+}
+
+# Tabs by user role
 tabs_by_role = {
     "Farmer": [
-        tab1,  # 🐐Add Livestock
-        tab2,  # 🐑🐐🐄View Livestock
-        tab3,  # 🩺Diagnosis
-        tab4,  # 💡Daily Health Tips
-        tab5,  # 👨‍⚕️Vet Doc
-        tab6,  # 📞Request Service
-        tab7,  # 📊Dashboard
-        tab8   # 📝 Feedback
+        "🐐Add Livestock",
+        "🐑🐐🐄View Livestock",
+        "🩺Diagnosis",
+        "💡Daily Health Tips",
+        "👨‍⚕️Vet Doc",
+        "📞Request Service",
+        "📊Dashboard",
+        "📝 Feedback"
     ],
     "Veterinarian": [
-        tab3,  # 🩺Diagnosis
-        tab4,  # 💡Daily Health Tips
-        tab5,  # 👨‍⚕️Vet Doc
-        tab8   # 📝 Feedback
+        "🩺Diagnosis",
+        "💡Daily Health Tips",
+        "👨‍⚕️Vet Doc",
+        "📝 Feedback"
     ],
     "Admin": [
-        tab1,  # 🐐Add Livestock
-        tab2,  # 🐑🐐🐄View Livestock
-        tab3,  # 🩺Diagnosis
-        tab4,  # 💡Daily Health Tips
-        tab5,  # 👨‍⚕️Vet Doc
-        tab6,  # 📞Request Service
-        tab7,  # 📊Dashboard
-        tab8   # 📝 Feedback
+        "🐐Add Livestock",
+        "🐑🐐🐄View Livestock",
+        "🩺Diagnosis",
+        "💡Daily Health Tips",
+        "👨‍⚕️Vet Doc",
+        "📞Request Service",
+        "📊Dashboard",
+        "📝 Feedback"
     ]
 }
 
+# Show only allowed tabs for the selected role
+allowed_tabs = tabs_by_role.get(user_role, [])
+tabs = st.tabs(allowed_tabs)
+
+for tab_name, tab in zip(allowed_tabs, tabs):
+    with tab:
+        tab_functions[tab_name]()  # Call the corresponding function
+
+# Optional: chatbot widget (must avoid recursion)
+def chatbot_widget():
+    # Your chatbot implementation here
+    pass
+
+chatbot_widget()
 
 # ========== Sidebar ==========
 with st.sidebar:
