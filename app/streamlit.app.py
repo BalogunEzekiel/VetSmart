@@ -395,9 +395,10 @@ if not st.session_state.logged_in:
     for name, role in contributors.items():
         st.markdown(f"- **{name}** — *{role}*")
 
-    # Supporters
-    st.markdown("## Supporters & Partners")
-    cols = st.columns(5)
+if not st.session_state.get('logged_in'):
+    st.markdown("---")
+    st.markdown("### 🤝 Supporters & Partners", unsafe_allow_html=True)
+
     logos = [
         "assets/Partner_FMCIDE.png",
         "assets/Partner_DSN.png",
@@ -407,9 +408,17 @@ if not st.session_state.logged_in:
         "assets/Partner_Amason.png",
         "assets/Partner_Microsoft.png"
     ]
-    for col, logo in zip(cols, logos):
-        col.image(logo, use_container_width=True)
-   
+
+    # Display logos in rows of 4
+    for i in range(0, len(logos), 4):
+        cols = st.columns(4)
+        for j, logo in enumerate(logos[i:i+4]):
+            with cols[j]:
+                try:
+                    st.image(logo, width=120)  # Adjust width as needed
+                except Exception as e:
+                    st.warning(f"Could not load logo: {e}")
+
     st.markdown("---")
 
 if st.session_state.get('logged_in'):
