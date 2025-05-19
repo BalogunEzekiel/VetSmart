@@ -5,6 +5,7 @@ st.set_page_config(page_title="VetSmart", layout="wide")
 
 import pandas as pd
 from datetime import datetime
+import datetime
 import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
