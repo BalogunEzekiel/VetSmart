@@ -917,7 +917,7 @@ with st.sidebar:
     if st.session_state.get('logged_in'):
         st.markdown(f"### 👋 Hi, **{st.session_state.get('firstname', 'User')}**")
         if st.button("Logout"):
-            st.session_state['logged_in'] = False]
+            st.session_state['logged_in'] = False
             st.session_state['user_role'] = None
             st.session_state['firstname'] = ""
             st.rerun()
