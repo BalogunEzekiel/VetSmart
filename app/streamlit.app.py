@@ -376,7 +376,7 @@ if not st.session_state.logged_in:
     
     with col2:
         st.markdown("<h1 style='color:white;'>Welcome to VetSmart</h1>", unsafe_allow_html=True)
-        st.markdown("<h4 style='color:white;'>...revolutionizing the livestock sector with AI.</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color:white;'>...revolutionizing the livestock sector with AI</h4>", unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -414,10 +414,14 @@ if not st.session_state.logged_in:
     st.markdown("---")
 
 # Optional logout button
-if st.session_state['logged_in']:
-    if st.button("Logout"):
-        st.session_state['logged_in'] = False
-        st.rerun()
+with st.sidebar:
+    if st.session_state.get('logged_in'):
+        st.markdown(f"### 👋 Welcome, **{st.session_state.get('user_name', 'User')}**")
+        if st.button("Logout"):
+            st.session_state['logged_in'] = False
+            st.session_state['user_role'] = None
+            st.session_state['user_name'] = ""
+            st.rerun()
         
 # ========== Centered Logo ==========
 
