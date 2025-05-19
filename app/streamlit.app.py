@@ -374,7 +374,7 @@ if not st.session_state.logged_in:
         st.image("logoo.png", width=100)
     
     with col2:
-        st.markdown("<h1 style='color:white;'>Welcome to VetSmart</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='color:black;'>Welcome to VetSmart</h1>", unsafe_allow_html=True)
         st.markdown("<h4 style='color:white;'>...revolutionizing the livestock sector with AI</h4>", unsafe_allow_html=True)
 
     st.markdown("---")
