@@ -178,7 +178,7 @@ def save_feedback(name, feedback_text):
 def load_veterinarians():
     conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM veterinarians", conn)
-]    conn.close()
+    conn.close()
     return df
 
 def save_veterinarian(name, specialization, phone, email):
