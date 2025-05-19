@@ -38,16 +38,16 @@ def initialize_database():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            role TEXT,
-            firstname TEXT,
-            lastname TEXT, 
-            email TEXT UNIQUE,
+            role TEXT NOT NULL,
+            firstname TEXT NOT NULL,
+            lastname TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL, 
-            telephone TEXT,
-            farmname TEXT,
-            farmaddress TEXT,
-            farmrole TEXT,
-            registered_on DATETIME
+            telephone TEXT NOT NULL,
+            farmname TEXT NOT NULL,
+            farmaddress TEXT NOT NULL,
+            farmrole TEXT NOT NULL,
+            registered_on DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     """)
 
@@ -59,8 +59,10 @@ def initialize_database():
             animal_type TEXT NOT NULL,
             age REAL NOT NULL,
             weight REAL NOT NULL,
-            vaccination TEXT,
-            added_on DATETIME
+            vaccination TEXT NOT NULL,
+            user_id INTEGER NOT NULL,
+            added_on DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
         )
     """)
 
@@ -68,9 +70,9 @@ def initialize_database():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS feedback (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
+            name TEXT NOT NULL,
             feedback TEXT NOT NULL,
-            submitted_on DATETIME
+            submitted_on DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -80,9 +82,9 @@ def initialize_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             specialization TEXT NOT NULL,
-            phone TEXT,
-            email TEXT,
-            registered_on DATETIME
+            phone TEXT NOT NULL,
+            email TEXT NOT NULL,
+            registered_on DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -92,9 +94,9 @@ def initialize_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             farmer_name TEXT NOT NULL,
             animal_tag TEXT NOT NULL,
-            vet_id INTEGER,
-            request_reason TEXT,
-            requested_on DATETIME,
+            vet_id INTEGER NOT NULL,
+            request_reason TEXT NOT NULL,
+            requested_on DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(vet_id) REFERENCES veterinarians(id)
         )
     """)
@@ -106,7 +108,6 @@ def initialize_database():
 initialize_database()
 
 # ========== Load & Save Data Functions ==========
-
 # Users
 def load_users():
     conn = get_sqlite_connection()
@@ -149,14 +150,14 @@ def load_data():
     except FileNotFoundError:
         return pd.DataFrame()
 
-def save_livestock_data(name, animal_type, age, weight, vaccination):
+def save_livestock_data(name, animal_type, age, weight, vaccination, user_id):
     try:
         conn = get_sqlite_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO livestock (name, animal_type, age, weight, vaccination, added_on)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (name, animal_type, age, weight, vaccination, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            INSERT INTO livestock (name, animal_type, age, weight, vaccination, user_id, added_on)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (name, animal_type, age, weight, vaccination, user_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         conn.commit()
     except Exception as e:
         print(f"Error saving livestock data: {e}")
@@ -324,6 +325,8 @@ if not st.session_state.logged_in:
                         st.error(f"Database error: {e}")
                     finally:
                         conn.close()
+                        
+user_id = st.session_state.get("user_id")
 
     if st.session_state.show_signup:
         with st.container():
@@ -604,11 +607,13 @@ def display_add_livestock():
         vaccination = st.text_input("Vaccination Details")
         submitted = st.form_submit_button("Add Livestock")
 
+        user_id = st.session_state.get("user_id")
+
         if submitted:
             if animal_type == "-- Select Type --" or not name:
                 st.warning("Please fill in all required fields.")
             else:
-                save_livestock_data(name, animal_type, age, weight, vaccination)
+                save_livestock_data(name, animal_type, age, weight, vaccination, user_id)
                 st.success(f"{animal_type} '{name}' saved successfully!")
 
 def display_view_livestock():
