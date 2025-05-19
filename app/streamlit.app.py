@@ -213,34 +213,23 @@ def save_vet_request(farmer_name, animal_tag, vet_id, request_reason):
         conn.close()
 
 # ================================== Landing / Login Page ======================================================
-def set_login_background():
+# Background image
+def set_background(cow_background):
     st.markdown(
-        """
+        f"""
         <style>
-        .stApp {
-            background-image: url("https://img.freepik.com/premium-vector/painting-farm-with-farmer-cows_1095437-5301.jpg");
+        .stApp {{
+            background-image: url("");
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: white;  /* default text color for contrast */
-        }
-
-        /* Optional: darker background for sidebar to ensure readability */
-        .st-emotion-cache-1y4p8pa, .st-emotion-cache-1d3w5wq {
-            background-color: rgba(0, 0, 0, 0.5);  /* semi-transparent dark overlay */
-        }
-
-        h1, h2, h3, h4, h5, h6, p, span, label, div {
-            color: white !important;  /* force text to white */
-        }
+        }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Apply only on login page
-if not st.session_state.get('logged_in'):
-    set_login_background()
+set_background("cow_background")
 
 # Session State Init
 if "logged_in" not in st.session_state:
