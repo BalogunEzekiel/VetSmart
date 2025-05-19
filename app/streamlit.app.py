@@ -270,11 +270,10 @@ def password_strength_message(score):
     else:
         return "Password is strong.", "green"
 
-if not st.session_state['logged_in']:
+if not st.session_state.get('logged_in'):
     with st.container():
         col_login, col_signup = st.columns(2)
 
-        # --- Login Container ---
         with col_login:
             st.subheader("🔐 Login")
             login_user = st.text_input("Email", key="login_user")
@@ -296,9 +295,8 @@ if not st.session_state['logged_in']:
                             st.session_state['user_name'] = f"{row[2]} {row[3]}"
                             st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
 
-                            # ✅ Clear the input fields after successful login
-                            st.session_state.login_user = ""
-                            st.session_state.login_pwd = ""
+                            # ✅ Instead of trying to clear input, rerun the app
+                            st.experimental_rerun()
 
                         else:
                             st.error("Login failed: Invalid email or password.")
