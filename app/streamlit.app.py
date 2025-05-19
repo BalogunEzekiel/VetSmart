@@ -130,10 +130,14 @@ def save_users(role, firstname, lastname, email, password, telephone, farmname, 
 
 # Livestock
 def load_data():
-    conn = get_sqlite_connection()
-    df = pd.read_sql("SELECT * FROM livestock", conn)
-    conn.close()
-    return df
+    try:
+        conn = get_sqlite_connection()
+        df = pd.read_sql("SELECT * FROM livestock", conn)
+        conn.close()
+        return df
+    except FileNotFoundError:
+        return pd.DataFrame()
+
 
 def save_livestock_data(name, animal_type, age, weight, vaccination):
     try:
@@ -174,7 +178,7 @@ def save_feedback(name, feedback_text):
 def load_veterinarians():
     conn = get_sqlite_connection()
     df = pd.read_sql("SELECT * FROM veterinarians", conn)
-    conn.close()
+]    conn.close()
     return df
 
 def save_veterinarian(name, specialization, phone, email):
@@ -316,7 +320,9 @@ if not st.session_state.logged_in:
             st.subheader("🆕 New User? Register")
 
             with st.form("signup_form", clear_on_submit=True):
-                role         = st.selectbox("Role", ["Farmer", "Veterinarian", "Admin"])
+                        animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
+
+                role         = st.selectbox("Role", ["-- Choose you role --", "Farmer", "Veterinarian", "Admin"])
                 firstname    = st.text_input("First Name")
                 lastname     = st.text_input("Last Name")
                 email        = st.text_input("Email")
