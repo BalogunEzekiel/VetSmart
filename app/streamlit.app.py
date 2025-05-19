@@ -320,8 +320,6 @@ if not st.session_state.logged_in:
             st.subheader("🆕 New User? Register")
 
             with st.form("signup_form", clear_on_submit=True):
-                        animal_types = ["-- Select Type --", "Cattle", "Goat", "Sheep"]
-
                 role         = st.selectbox("Role", ["-- Choose you role --", "Farmer", "Veterinarian", "Admin"])
                 firstname    = st.text_input("First Name")
                 lastname     = st.text_input("Last Name")
