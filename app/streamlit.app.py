@@ -375,7 +375,7 @@ if not st.session_state.logged_in:
     
     with col2:
         st.markdown("<h1 style='color:black;'>Welcome to VetSmart</h1>", unsafe_allow_html=True)
-        st.markdown("<h4 style='color:white;'>...revolutionizing the livestock sector with AI</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color:black;'>...revolutionizing the livestock sector with AI</h4>", unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -391,6 +391,7 @@ if not st.session_state.logged_in:
     contributors = {
         "Balogun Ezekiel": "Data Scientist",
         "Adesanwo Oluwakemi": "Data Analyst"
+        "Abayomi Damilare": "Softwre Developer"
     }
     for name, role in contributors.items():
         st.markdown(f"- **{name}** — *{role}*")
@@ -403,9 +404,6 @@ if not st.session_state.get('logged_in'):
         "assets/Partner_FMCIDE.png",
         "assets/Partner_DSN.png",
         "assets/Partner_Google.png",
-        "assets/Partner_AWS.png",
-        "assets/Partner_Azure.png",
-        "assets/Partner_Amason.png",
         "assets/Partner_Microsoft.png"
     ]
 
