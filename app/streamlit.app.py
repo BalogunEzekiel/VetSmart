@@ -5,7 +5,6 @@ st.set_page_config(page_title="VetSmart", layout="wide")
 
 import pandas as pd
 from datetime import datetime
-import datetime
 import random
 import sqlite3
 from reportlab.lib.pagesizes import letter
@@ -415,7 +414,7 @@ if not st.session_state.logged_in:
 
 # Optional logout button
 if st.session_state['logged_in']:
-    st.markdown(f"### 👋 Welcome, **{st.session_state.get('user_name', 'User')}**")
+    st.markdown(f"### 👋 Hi, **{st.session_state.get('user_name', 'User')}**")
     if st.button("Logout"):
         st.session_state['logged_in'] = False
         st.session_state['user_role'] = None
@@ -553,7 +552,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
         c.drawString(width - inch - 100, height - 50, "Logo could not be loaded")
 
     # --- Barcode Section ---
-    barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+    barcode_value = f"VS-DR-{animal_data['Name']}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
     barcode = code128.Code128(barcode_value, barHeight=0.75 * inch)
     barcode_width = barcode.wrap(0, 0)[0]
     x_position = width - barcode_width - inch
@@ -566,7 +565,7 @@ def generate_diagnosis_report(animal_data, disease, recommendation):
     # --- Footer (Permanent across pages) ---
     def draw_footer():
         c.setFont("Helvetica", 8)
-        c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        c.drawString(inch, 0.75 * inch, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         c.drawString(inch, 0.6 * inch, "Powered by VetSmart")
 
     # Draw footer
@@ -813,7 +812,7 @@ def request_vet_service():
                 conn.execute("""
                     INSERT INTO vet_requests (farmer_name, animal_tag, vet_id, request_reason, requested_on)
                     VALUES (?, ?, ?, ?, ?)
-                """, (farmer_name, animal_tag, vet_id, request_reason, datetime.datetime.now()))
+                """, (farmer_name, animal_tag, vet_id, request_reason, datetime.now()))
                 conn.commit()
                 st.success("Vet service requested successfully!")
 
