@@ -313,13 +313,14 @@ if not st.session_state.logged_in:
                     try:
                         conn = get_sqlite_connection()
                         c = conn.cursor()
-                        c.execute("SELECT Password, Role, Firstname, Lastname FROM users WHERE Email = ?", (login_user,))
+                        c.execute("SELECT Password, Role, Firstname, Lastname, id FROM users WHERE Email = ?", (login_user,))
                         row = c.fetchone()
 
                         if row and bcrypt.checkpw(login_pwd.encode('utf-8'), row[0].encode('utf-8')):
                             st.session_state['logged_in'] = True
                             st.session_state['user_role'] = row[1]
                             st.session_state['user_name'] = f"{row[2]} {row[3]}"
+                            st.session_state['user_id'] = row[4] # This is the crucial line to add
                             st.success(f"Logged in as {row[2]} {row[3]} ({row[1]})")
                             st.rerun()
                         else:
