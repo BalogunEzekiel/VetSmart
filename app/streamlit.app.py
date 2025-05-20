@@ -910,7 +910,6 @@ tabs_by_role = {
         "🐑🐐🐄View Livestock",
         "🩺Diagnosis",
         "💡Daily Health Tips",
-        "👨‍⚕️Vet Doc",
         "📞Request Service",
         "📊Dashboard",
         "📝 Feedback"
