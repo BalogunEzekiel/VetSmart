@@ -34,6 +34,12 @@ def initialize_database():
     conn = get_sqlite_connection()
     cursor = conn.cursor()
 
+def get_sqlite_connection():
+    db_path = "livestock_data.db"
+    st.write(f"Attempting to connect to database at: {db_path}")
+    conn = sqlite3.connect(db_path)
+    return conn
+
     # Create users table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
