@@ -27,7 +27,7 @@ SQLITE_DB = 'livestock_data.db'
 
 # ========== Database Connection Functions ==========
 def get_sqlite_connection():
-return sqlite3.connect(SQLITE_DB)
+    return sqlite3.connect(SQLITE_DB)
 
 # ========== Initialize Database and Tables ==========
 def initialize_database():
