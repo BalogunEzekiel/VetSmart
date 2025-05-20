@@ -329,8 +329,6 @@ if not st.session_state.logged_in:
                     finally:
                         conn.close()
                         
-    st.session_state["user_id"] = fetched_user_id
-
     user_id = st.session_state.get("user_id")
 
     if st.session_state.show_signup:
