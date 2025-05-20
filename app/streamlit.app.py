@@ -415,13 +415,13 @@ if not st.session_state.logged_in:
     with col2:
         st.markdown("##### Our Mission")
         st.markdown("""
-        We are revolutionizing livestock care by combining medical expertise, artificial intelligence and sustainable practices – delivering smart, accessible, and impactful solutions that improve animal health, productivity and livelihoods.
+        We are revolutionizing livestock care by combining medical expertise, artificial intelligence and sustainable practices – delivering smart, accessible and impactful solutions that improve animal health, productivity and livelihoods.
         """)
     
     with col3:
         st.markdown("##### Call")
         st.markdown("""
-        Join us on this quest as we take the world by storm!
+        **Our logo reflects our unique identity — inspired by livestock healthtech, powered by medical expertise, and curated through advanced AI — symbolizing our commitment to innovation in agri-health technology.** Join us on this quest as we take the world by storm!
         """)
         
     # Contributors
