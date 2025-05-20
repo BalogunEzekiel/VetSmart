@@ -421,7 +421,7 @@ if not st.session_state.logged_in:
     with col3:
         st.markdown("##### Call")
         st.markdown("""
-        **Our logo reflects our unique identity — inspired by livestock healthtech, powered by medical expertise, and curated through advanced AI — symbolizing our commitment to innovation in agri-health technology.** Join us on this quest as we take the world by storm!
+        **Our logo reflects our unique identity — inspired by livestock healthtech, powered by medical expertise and curated through advanced AI — symbolizing our commitment to innovation in agri-health technology.** Join us on this quest as we take the world by storm!
         """)
         
     # Contributors
