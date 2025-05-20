@@ -130,13 +130,16 @@ def save_users(role, firstname, lastname, email, password, telephone, farmname, 
         conn.close()
 
 # Livestock
-def load_data():
+def load_data(user_id=None):
     try:
         conn = get_sqlite_connection()
-        df = pd.read_sql("SELECT * FROM livestock", conn)
+        if user_id is not None:
+            df = pd.read_sql(f"SELECT * FROM livestock WHERE user_id = ?", conn, params=(user_id,))
+        else:
+            df = pd.read_sql("SELECT * FROM livestock", conn)
         conn.close()
 
-        # Rename columns for consistency with Streamlit code
+        # Rename columns for consistency
         df.rename(columns={
             "animal_type": "Type",
             "name": "Name",
@@ -149,7 +152,7 @@ def load_data():
         return df
     except FileNotFoundError:
         return pd.DataFrame()
-
+        
 def save_livestock_data(name, animal_type, age, weight, vaccination, user_id):
     try:
         conn = get_sqlite_connection()
@@ -326,6 +329,8 @@ if not st.session_state.logged_in:
                     finally:
                         conn.close()
                         
+    st.session_state["user_id"] = fetched_user_id
+
     user_id = st.session_state.get("user_id")
 
     if st.session_state.show_signup:
@@ -640,8 +645,8 @@ def display_add_livestock():
 def display_view_livestock():
     """Displays all registered livestock with filters, sorting, and export."""
     st.subheader("🐐🐑🐄 View Your Livestock")
-
-    df = load_data()
+    user_id = st.session_state.get("user_id")
+    df = load_data(user_id=user_id)
 
     if df.empty:
         st.info("No livestock records found.")
@@ -689,8 +694,8 @@ def display_view_livestock():
 
 def display_dashboard():
     st.subheader("📊 Livestock Dashboard")
-
-    df = load_data()
+    user_id = st.session_state.get("user_id")
+    df = load_data(user_id=user_id)
 
     if df.empty:
         st.info("No livestock records found. Please add livestock data.")
