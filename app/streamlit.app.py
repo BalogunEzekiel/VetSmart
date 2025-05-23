@@ -991,8 +991,6 @@ import streamlit as st
 import time
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Livestock Health Chatbot", page_icon="🐄", layout="wide")
-
 # Inject custom HTML, CSS, and JS for floating, draggable, resizable, and minimizable window
 components.html("""
 <style>
